@@ -13,7 +13,6 @@ CREATE TABLE roles (
 
 CREATE TABLE usuarios (
   	id_usuario INT PRIMARY KEY AUTO_INCREMENT,
-  	rol_id INT,
   	nombre VARCHAR(100) UNIQUE NOT NULL,
   	email VARCHAR(100) UNIQUE NOT NULL,
   	clave VARCHAR(255) NOT NULL,
@@ -25,7 +24,6 @@ CREATE TABLE usuarios (
   	act_uasurio varchar(150),
   	eli_fecha DATETIME null,
  	eli_usuario varchar(150),
-  FOREIGN KEY (rol_id) REFERENCES roles(id_rol)
 );
 
 CREATE TABLE contactos (
@@ -106,7 +104,7 @@ create table vinculaciones_mascotas(
 
 CREATE TABLE mascotas (
 	id_mascota INT PRIMARY KEY AUTO_INCREMENT,
-	cliente_id INT,
+	contacto_id INT,
 	nombre VARCHAR(150),
 	especie_id INT,
 	raza_id INT,
@@ -122,6 +120,7 @@ CREATE TABLE mascotas (
 	act_usuario varchar(150),
 	eli_fecha DATETIME null,
 	eli_usuario varchar(150),
+	FOREIGN KEY (rol_id) REFERENCES roles(id_rol),
 	FOREIGN KEY (cliente_id) REFERENCES usuarios(id_usuario),
 	FOREIGN KEY (especie_id) REFERENCES especies(id_especie),
 	FOREIGN KEY (raza_id) REFERENCES razas(id_raza)

@@ -49,7 +49,7 @@ module.exports = {
 
     async register(req, res) {
         try {
-            const { rol_id, nombre, email, clave, estado, reg_fecha } = req.body;
+            const { rol_id, nombre, email, clave, telefono,estado, reg_fecha } = req.body;
     
             // Verificar si el usuario ya existe
             const existingUser = await User.findByUsername({ email });
@@ -67,7 +67,7 @@ module.exports = {
             const claveHash = bcrypt.hashSync(clave, salt);
     
             // Crear nuevo usuario
-            const result = await User.createUser(rol_id,nombre,email, clave, claveHash, estado,reg_fecha);
+            const result = await User.createUser(rol_id,nombre,email, clave, claveHash, telefono,estado,reg_fecha);
     
             if (result && result.affectedRows === 1) {
                 return res.status(201).json({
@@ -89,7 +89,7 @@ module.exports = {
 
     async updateUser(req, res) {
         try {
-            const { id_usuario, rol_id, nombre, email, clave, estado } = req.body;
+            const { id_usuario, rol_id, nombre, email, clave, telefono,estado } = req.body;
             const usuario_actualizador = req.user?.id_usuario; // Obtenemos el id_usuario del token
     
             // Verifica que exista el usuario actualizador
@@ -105,6 +105,7 @@ module.exports = {
                 rol_id,
                 nombre,
                 email,
+                telefono,
                 estado
             };
     
@@ -139,7 +140,8 @@ module.exports = {
         } catch (err) {
             return res.status(500).json({
                 success: false,
-                message: 'Error al actualizar el usuario'
+                message: 'Error al actualizar el usuario',
+                error: err.message 
             });
         }
     },
@@ -195,7 +197,7 @@ module.exports = {
             return res.status(500).json({
                 success: false,
                 message: 'Error al eliminar el usuario',
-                error: err.message
+                //error: err.message
             });
         }
     }

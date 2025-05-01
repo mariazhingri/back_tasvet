@@ -1,17 +1,17 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: 'localhost',  
   user: 'root',       
   password: '',       
   database: 'tasvet_operativo' 
 });
 
-db.connect(err => {
-  if (err) {
+// db.connect(err => {
+//   if (err) {
   
-    return;
-  }
-});
+//     return;
+//   }
+// });
 
 module.exports = db;
