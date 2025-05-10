@@ -29,8 +29,9 @@ module.exports = {
     
             // Genera el token JWT incluyendo id_usuario
             const token = jwt.sign({ 
-                user: email,
-                id_usuario: user.id_usuario 
+                id_usuario: user.id_usuario,
+                nombre: user.nombre,
+                rol_descripcion: user.rol_descripcion
             }, key.JWT_SECRET, {});
     
             return res.status(200).json({
@@ -49,16 +50,31 @@ module.exports = {
 
     async register(req, res) {
         try {
-            const { rol_id, nombre, email, clave, telefono,estado, reg_fecha } = req.body;
-    
-            // Verificar si el usuario ya existe
-            const existingUser = await User.findByUsername({ email });
-            //console.log('Usuario existente:', existingUser); // Debug log
-    
-            if (existingUser && existingUser.length > 0) {
-                return res.status(400).json({
+            const {nombre, email, clave, telefono } = req.body;
+
+            // Validar campos requeridos
+        if (!nombre || !email || !clave) {
+            return res.status(400).json({
+                success: false,
+                message: 'Todos los campos son requeridos'
+            });
+        }
+
+            // Verificar si el nombre de usuario ya existe
+            const existUsername = await User.findByUsername({nombre});
+            if (existUsername) {
+                return res.status(409).json({
                     success: false,
-                    message: 'El usuario ya existe'
+                    message: 'El nombre de usuario ya está en uso'
+                });
+            }
+
+            // Verificar si el email ya existe
+            const existingUser = await User.findByUsername({ email });
+            if (existingUser) {
+                return res.status(410).json({
+                    success: false,
+                    message: 'El correo electrónico ya está registrado'
                 });
             }
     
@@ -67,7 +83,7 @@ module.exports = {
             const claveHash = bcrypt.hashSync(clave, salt);
     
             // Crear nuevo usuario
-            const result = await User.createUser(rol_id,nombre,email, clave, claveHash, telefono,estado,reg_fecha);
+            const result = await User.createUser(nombre,email, clave, claveHash, telefono);
     
             if (result && result.affectedRows === 1) {
                 return res.status(201).json({
@@ -81,7 +97,7 @@ module.exports = {
         } catch (err) {
             return res.status(500).json({
                 success: false,
-                message: 'Error en el servidor',
+                message: 'Error en el servidor al registrar usuario',
                 //error: err.message
             });
         }

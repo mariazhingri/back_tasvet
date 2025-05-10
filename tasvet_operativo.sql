@@ -1,5 +1,20 @@
 use tasvet_operativo;
 -- -----CREACIÓN DE TABLAS-------
+CREATE TABLE notificaciones (
+  	id_notificacion INT PRIMARY KEY AUTO_INCREMENT,
+  	usuario_id INT,
+  	mensaje TEXT NOT NULL,
+  	correo_veterinaria VARCHAR(100),
+  	correo_cliente VARCHAR(100),
+  	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  	reg_usuario varchar(150),
+  	act_fecha DATETIME null,
+  	act_usuario varchar(150),
+  	eli_fecha DATETIME null,
+ 	eli_usuario varchar(150),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id_usuario)
+);
+
 CREATE TABLE roles (
 	id_rol INT AUTO_INCREMENT PRIMARY KEY,
   	descripcion VARCHAR(100),
@@ -18,7 +33,6 @@ CREATE TABLE usuarios (
   	nombre VARCHAR(100) UNIQUE NOT NULL,
   	email VARCHAR(100) UNIQUE NOT NULL,
   	clave VARCHAR(255) NOT NULL,
-  	clave_segura VARCHAR(255),
   	telefono VARCHAR(10),
   	estado CHAR(1),
   	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -27,13 +41,14 @@ CREATE TABLE usuarios (
   	act_usuario varchar(150),
   	eli_fecha DATETIME null,
  	eli_usuario varchar(150),
-  FOREIGN KEY (rol_id) REFERENCES roles(id_rol)
+  	FOREIGN KEY (rol_id) REFERENCES roles(id_rol)
 );
 
-CREATE TABLE contactos (
-  	id_contacto INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE personas (
+  	id_persona INT PRIMARY KEY AUTO_INCREMENT,
   	nombre VARCHAR(100),
   	apellido VARCHAR(100),
+  	cedula INT(10),
   	telefono VARCHAR(10),
   	email VARCHAR(100),
   	direccion VARCHAR(255),
@@ -45,20 +60,32 @@ CREATE TABLE contactos (
   	eli_fecha DATETIME null,
  	eli_usuario varchar(150)
 );
-
-CREATE TABLE notificaciones (
-  	id_notificacion INT PRIMARY KEY AUTO_INCREMENT,
-  	usuario_id INT,
-  	mensaje TEXT NOT NULL,
-  	correo_veterinaria VARCHAR(100),
-  	correo_cliente VARCHAR(100),
+CREATE TABLE clientes (
+  	id_cliente INT PRIMARY KEY AUTO_INCREMENT,
+  	persona_id INT, 
+  	direccion VARCHAR(255),
+  	estado CHAR(1), 
   	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   	reg_usuario varchar(150),
   	act_fecha DATETIME null,
   	act_usuario varchar(150),
   	eli_fecha DATETIME null,
  	eli_usuario varchar(150),
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id_usuario)
+ 	FOREIGN KEY (persona_id) REFERENCES personas(id_persona)
+);
+
+CREATE TABLE veterinarios (
+  	id_veterinarios INT PRIMARY KEY AUTO_INCREMENT,
+  	persona_id INT, 
+  	especialidad VARCHAR(255),
+  	estado CHAR(1), 
+  	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  	reg_usuario varchar(150),
+  	act_fecha DATETIME null,
+  	act_usuario varchar(150),
+  	eli_fecha DATETIME null,
+ 	eli_usuario varchar(150),
+ 	FOREIGN KEY (persona_id) REFERENCES personas(id_persona)
 );
 
 create table especies(
@@ -87,26 +114,8 @@ create table razas(
   	FOREIGN KEY (especie_id) REFERENCES especies(id_especie)
 );
 
-create table vinculaciones_mascotas(
-	id_vinculacion_mascota INT PRIMARY KEY AUTO_INCREMENT,
-	mascota_id INT,
-	codigo_vinculacion VARCHAR(150),
-	cliente_id INT,
-	estado varchar(20),
-	vinc_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
-	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
-	reg_usuario varchar(150),
-	act_fecha DATETIME null,
-	act_usuario varchar(150),
-	eli_fecha DATETIME null,
-	eli_usuario varchar(150),
-	FOREIGN KEY (mascota_id) REFERENCES mascotas(id_mascota),
-	FOREIGN KEY (cliente_id) REFERENCES usuarios(id_usuario)
-);
-
 CREATE TABLE mascotas (
 	id_mascota INT PRIMARY KEY AUTO_INCREMENT,
-	contacto_id INT,
 	nombre VARCHAR(150),
 	especie_id INT,
 	raza_id INT,
@@ -114,7 +123,6 @@ CREATE TABLE mascotas (
 	edad_meses INT,
 	sexo VARCHAR(10),
 	peso_kg FLOAT,
-	color_pelaje VARCHAR(150),
 	estado CHAR(1),
 	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
 	reg_usuario varchar(150),
@@ -122,14 +130,15 @@ CREATE TABLE mascotas (
 	act_usuario varchar(150),
 	eli_fecha DATETIME null,
 	eli_usuario varchar(150),
-	FOREIGN KEY (contacto_id) REFERENCES contactos(id_contacto),
 	FOREIGN KEY (especie_id) REFERENCES especies(id_especie),
 	FOREIGN KEY (raza_id) REFERENCES razas(id_raza)
 );
 -- -------------------------------
-create table estado_cita(
-	id_estado_cita INT PRIMARY KEY auto_increment,
-	detalle VARCHAR(50),
+create table servicios(
+	id_servicio INT PRIMARY KEY auto_increment,
+	descripcion VARCHAR(150),
+	categoria VARCHAR(150),
+	precion FLOAT,
 	estado CHAR(1)
 )
 
@@ -148,16 +157,48 @@ create table citas(
   	act_usuario varchar(150),
   	eli_fecha DATETIME null,
  	eli_usuario varchar(150),
-	FOREIGN KEY (cliente_id) REFERENCES usuarios(id_usuario),
+	FOREIGN KEY (cliente_id) REFERENCES clientes(id_cliente),
 	FOREIGN KEY (mascota_id) REFERENCES mascotas(id_mascota),
-	FOREIGN KEY (veterinario_id) REFERENCES usuarios(id_usuario)
+	FOREIGN KEY (veterinario_id) REFERENCES veterinarios(id_veterinario)
 )
 
-create table servicios(
- 	id_servicio INT PRIMARY KEY auto_increment,
- 	categoria_id INT,
+create table vacunas(
+ 	id_vacuna INT PRIMARY KEY auto_increment,
+ 	especie_id INT,
  	descripcion VARCHAR(150),
- 	precio FLOAT,
+ 	estado char(1),
+ 	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  	reg_usuario varchar(150),
+  	act_fecha DATETIME null,
+  	act_usuario varchar(150),
+  	eli_fecha DATETIME null,
+ 	eli_usuario varchar(150),
+ 	FOREIGN KEY (especie_id) REFERENCES especies(id_especie),
+)
+
+create table carnets_vacunas(
+	id_carnet_vacuna INT PRIMARY KEY auto_increment,
+	veterinario_id INT,
+	vacuna_id INT,
+	fecha_aplicacion date,
+	peso_kg FLOAT,
+	edad_meses INT,
+	proxima_dosis date,
+	observaciones varchar(150),
+	estado char(1),
+	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  	reg_usuario varchar(150),
+  	act_fecha DATETIME null,
+  	act_usuario varchar(150),
+  	eli_fecha DATETIME null,
+ 	eli_usuario varchar(150),
+ 	FOREIGN KEY (veterinario_id) REFERENCES veterinarios(id_veterinario),
+ 	FOREIGN KEY (vacuna_id) REFERENCES vacunas(id_vacuna)
+)
+
+create table antiparacitarios(
+ 	id_antiparacitario INT PRIMARY KEY auto_increment,
+ 	descripcion VARCHAR(150),
  	estado char(1),
  	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   	reg_usuario varchar(150),
@@ -167,9 +208,15 @@ create table servicios(
  	eli_usuario varchar(150),
 )
 
-create table categorias(
-	id_categoria INT PRIMARY KEY auto_increment,
-	descripcion varchar(150),
+create table carnets_desparacitacion(
+	id_carnet_desparacitacion INT PRIMARY KEY auto_increment,
+	veterinario_id INT,
+	antiparacitario_id INT,
+	fecha_aplicacion date,
+	peso_kg FLOAT,
+	edad_meses INT,
+	proxima_dosis date,
+	observaciones varchar(150),
 	estado char(1),
 	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   	reg_usuario varchar(150),
@@ -177,4 +224,5 @@ create table categorias(
   	act_usuario varchar(150),
   	eli_fecha DATETIME null,
  	eli_usuario varchar(150),
+ 	FOREIGN KEY (veterinario_id) REFERENCES veterinarios(id_veterinario),
 )

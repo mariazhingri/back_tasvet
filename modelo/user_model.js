@@ -6,10 +6,25 @@ Usuarios.findByUsername = async (params) => {
         let sql, queryParams;
         
         if (params.id_usuario) {
-            sql = 'SELECT * FROM usuarios WHERE id_usuario = ?';
+            sql = `
+                SELECT u.*, r.descripcion as rol_descripcion 
+                FROM usuarios u 
+                LEFT JOIN roles r ON u.rol_id = r.id_rol 
+                WHERE u.id_usuario = ?`;
             queryParams = [params.id_usuario];
-        } else if (params.email) {
-            sql = 'SELECT * FROM usuarios WHERE email = ?';
+        }else if (params.nombre) {
+            sql = `
+                SELECT u.*, r.descripcion as rol_descripcion 
+                FROM usuarios u 
+                LEFT JOIN roles r ON u.rol_id = r.id_rol 
+                WHERE u.nombre = ?`;
+            queryParams = [params.nombre];
+        }else if (params.email) {
+            sql = `
+                SELECT u.*, r.descripcion as rol_descripcion 
+                FROM usuarios u 
+                LEFT JOIN roles r ON u.rol_id = r.id_rol 
+                WHERE u.email = ?`;
             queryParams = [params.email];
         } else {
             throw new Error('Se requiere id_usuario o email para buscar el usuario');
@@ -30,13 +45,14 @@ Usuarios.getUserName = async (id_usuario) => {
     }
 },
 
-Usuarios.createUser = async (rol_id, nombre, email, clave, claveHash, telefono) => {
+Usuarios.createUser = async (nombre, email, clave, claveHash, telefono) => {
     try {
         const currentDate = new Date();
         const estado = 'A'; 
+        const rol_id = 3; // rol por defecto
         const [result] = await db.query(
-            'INSERT INTO usuarios (rol_id, nombre, email, clave, clave_segura, telefono,estado, reg_fecha, reg_usuario) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)',
-            [rol_id, nombre, email, clave, claveHash, telefono,estado, currentDate, nombre]
+            'INSERT INTO usuarios (rol_id, nombre, email, clave, clave_segura, telefono, estado, reg_fecha, reg_usuario) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)',
+            [rol_id, nombre, email, clave, claveHash, telefono, estado, currentDate, nombre]
         );
         return result;
     } catch (error) {
