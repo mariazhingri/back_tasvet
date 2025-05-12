@@ -1,18 +1,19 @@
 use tasvet_operativo;
 -- -----CREACIÓN DE TABLAS-------
-CREATE TABLE notificaciones (
-  	id_notificacion INT PRIMARY KEY AUTO_INCREMENT,
-  	usuario_id INT,
-  	mensaje TEXT NOT NULL,
-  	correo_veterinaria VARCHAR(100),
-  	correo_cliente VARCHAR(100),
+
+CREATE TABLE personas (
+  	id_persona INT PRIMARY KEY AUTO_INCREMENT,
+  	cedula INT(10) UNIQUE NOT NULL,
+  	nombre VARCHAR(100),
+  	apellido VARCHAR(100),
+  	telefono VARCHAR(10) UNIQUE NOT NULL,
+  	estado CHAR(1),
   	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   	reg_usuario varchar(150),
   	act_fecha DATETIME null,
   	act_usuario varchar(150),
   	eli_fecha DATETIME null,
- 	eli_usuario varchar(150),
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id_usuario)
+ 	eli_usuario varchar(150)
 );
 
 CREATE TABLE roles (
@@ -30,10 +31,9 @@ CREATE TABLE roles (
 CREATE TABLE usuarios (
   	id_usuario INT PRIMARY KEY AUTO_INCREMENT,
   	rol_id INT,
-  	nombre VARCHAR(100) UNIQUE NOT NULL,
+  	persona_id INT, 
   	email VARCHAR(100) UNIQUE NOT NULL,
   	clave VARCHAR(255) NOT NULL,
-  	telefono VARCHAR(10),
   	estado CHAR(1),
   	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   	reg_usuario varchar(150),
@@ -41,25 +41,25 @@ CREATE TABLE usuarios (
   	act_usuario varchar(150),
   	eli_fecha DATETIME null,
  	eli_usuario varchar(150),
-  	FOREIGN KEY (rol_id) REFERENCES roles(id_rol)
+  	FOREIGN KEY (rol_id) REFERENCES roles(id_rol),
+  	FOREIGN KEY (persona_id) REFERENCES personas(id_persona)
 );
 
-CREATE TABLE personas (
-  	id_persona INT PRIMARY KEY AUTO_INCREMENT,
-  	nombre VARCHAR(100),
-  	apellido VARCHAR(100),
-  	cedula INT(10),
-  	telefono VARCHAR(10),
-  	email VARCHAR(100),
-  	direccion VARCHAR(255),
-  	estado CHAR(1),
+CREATE TABLE notificaciones (
+  	id_notificacion INT PRIMARY KEY AUTO_INCREMENT,
+  	usuario_id INT,
+  	mensaje TEXT NOT NULL,
+  	correo_veterinaria VARCHAR(100),
+  	correo_cliente VARCHAR(100),
   	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   	reg_usuario varchar(150),
   	act_fecha DATETIME null,
   	act_usuario varchar(150),
   	eli_fecha DATETIME null,
- 	eli_usuario varchar(150)
+ 	eli_usuario varchar(150),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id_usuario)
 );
+
 CREATE TABLE clientes (
   	id_cliente INT PRIMARY KEY AUTO_INCREMENT,
   	persona_id INT, 

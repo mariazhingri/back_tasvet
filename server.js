@@ -1,8 +1,11 @@
 const express = require("express");
 const cors = require("cors");
+
 const passport = require('passport');
 const auth_outes = require("./routes/authRoutes");
 const mascotas = require("./routes/mascotaRoutes");
+const clientes = require("./routes/clienteRoutes");
+
 const app = express();
 const port = 5000; 
 
@@ -12,6 +15,7 @@ require('./config/passport')(passport);
 
 app.use(express.json());
 
+clientes(app);
 auth_outes(app);
 mascotas(app);
 

@@ -19,7 +19,7 @@ module.exports = {
             }
     
             // Verifica la contraseña
-            const isvalid = bcrypt.compareSync(clave, user.clave_segura);
+            const isvalid = bcrypt.compareSync(clave, user.clave);
             if (!isvalid) {
                 return res.status(401).json({
                     success: false,
@@ -28,11 +28,13 @@ module.exports = {
             }
     
             // Genera el token JWT incluyendo id_usuario
+            
             const token = jwt.sign({ 
                 id_usuario: user.id_usuario,
-                nombre: user.nombre,
+                nombre: user.email,
                 rol_descripcion: user.rol_descripcion
             }, key.JWT_SECRET, {});
+            console.log('user', token);
     
             return res.status(200).json({
                 message: "Login exitoso",
@@ -50,55 +52,42 @@ module.exports = {
 
     async register(req, res) {
         try {
-            const {nombre, email, clave, telefono } = req.body;
+            const { email, clave, rol_id, persona } = req.body;
+            const usuarioCreador = req.user?.id_usuario || 1; 
 
-            // Validar campos requeridos
-        if (!nombre || !email || !clave) {
-            return res.status(400).json({
-                success: false,
-                message: 'Todos los campos son requeridos'
-            });
-        }
-
-            // Verificar si el nombre de usuario ya existe
-            const existUsername = await User.findByUsername({nombre});
-            if (existUsername) {
-                return res.status(409).json({
+            // Validar datos requeridos
+            if (!email || !clave || !rol_id) {
+                return res.status(400).json({
                     success: false,
-                    message: 'El nombre de usuario ya está en uso'
+                    message: 'Faltan datos obligatorios (email, clave, rol_id)'
                 });
             }
 
-            // Verificar si el email ya existe
-            const existingUser = await User.findByUsername({ email });
-            if (existingUser) {
-                return res.status(410).json({
-                    success: false,
-                    message: 'El correo electrónico ya está registrado'
-                });
-            }
-    
-            // Generar hash de la contraseña
+            // Encriptar la contraseña
             const salt = bcrypt.genSaltSync(10);
-            const claveHash = bcrypt.hashSync(clave, salt);
-    
-            // Crear nuevo usuario
-            const result = await User.createUser(nombre,email, clave, claveHash, telefono);
-    
-            if (result && result.affectedRows === 1) {
-                return res.status(201).json({
-                    success: true,
-                    message: 'Usuario registrado exitosamente'
-                });
-            } else {
-                throw new Error('No se pudo crear el usuario');
-            }
-    
+            const claveEncriptada = bcrypt.hashSync(clave, salt);
+
+            // Preparar datos del usuario
+            const datosUsuario = {
+                email,
+                clave: claveEncriptada,
+                rol_id,
+                persona // Datos opcionales de la tabla personas
+            };
+
+            // Crear usuario
+            const resultado = await User.createUser(datosUsuario, usuarioCreador);
+
+            return res.status(201).json({
+                success: true,
+                message: 'Usuario registrado exitosamente',
+                data: resultado
+            });
         } catch (err) {
             return res.status(500).json({
                 success: false,
-                message: 'Error en el servidor al registrar usuario',
-                //error: err.message
+                message: 'Error al registrar el usuario',
+                error: err.message
             });
         }
     },
