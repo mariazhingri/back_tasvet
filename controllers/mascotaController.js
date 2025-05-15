@@ -5,88 +5,104 @@ const Mascota = require('../modelo/mascota_model');
 require('dotenv').config();
 
 module.exports = {
-    // ...existing code...
     async crearmascota(req, res) {
-        const usuario_actualizador = req.user?.id_usuario;
+    const usuario_actualizador = req.user?.id_usuario;
 
-        // Verifica que exista el usuario actualizador
-        if (!usuario_actualizador) {
-            return res.status(401).json({
+    // Verifica que exista el usuario actualizador
+    if (!usuario_actualizador) {
+        return res.status(401).json({
+            success: false,
+            message: 'No autorizado'
+        });
+    }
+
+    try {
+        const {
+            nombre_mascota,
+            especie_id,
+            raza_id,
+            fecha_nacimiento,
+            edad_meses,
+            sexo,
+            peso_kg,
+            cliente
+        } = req.body;
+
+        // Validar que cliente y cliente.persona existan
+        if (!cliente || !cliente.persona) {
+            return res.status(400).json({
                 success: false,
-                message: 'No autorizado'
+                message: 'El cliente y sus datos personales son obligatorios'
             });
         }
 
-        try {
-            const {
-                nombre_mascota,
-                especie_id,
-                raza_id,
-                fecha_nacimiento,
-                edad_meses,
-                sexo,
-                peso_kg,
-                color_pelaje,
-                nombre_contacto,
-                apellido_contacto,
-                telefono,
-                email,
-                direccion
-            } = req.body;
+        const { cedula, nombre_cliente, apellido_cliente, telefono } = cliente.persona;
+        console.log('Cedula recibida:', cedula);
 
-            // Validaciones básicas
-            if (!nombre_mascota || !especie_id || !nombre_contacto || !apellido_contacto || !telefono) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Faltan campos obligatorios'
-                });
-            }
-
-            const params = {
-                nombre_mascota,
-                especie_id,
-                raza_id,
-                fecha_nacimiento,
-                edad_meses,
-                sexo,
-                peso_kg,
-                color_pelaje,
-                nombre_contacto,
-                apellido_contacto,
-                telefono,
-                email,
-                direccion,
-                reg_usuario: usuario_actualizador
-            };
-
-            const result = await Mascota.crearMascota(params);
-
-            if (!result.success) {
-                return res.status(400).json({
-                    success: false,
-                    message: result.error
-                });
-            }
-
-            res.status(201).json({
-                success: true,
-                message: 'Mascota registrada exitosamente',
-                data: {
-                    contacto_id: result.contacto_id,
-                    mascota_id: result.mascota_id,
-                    codigo_vinculacion: result.codigo_vinculacion
-                }
-            });
-
-        } catch (error) {
-            console.error('Error al crear mascota:', error);
-            res.status(500).json({
+        // Validaciones básicas
+        if (!nombre_mascota || !especie_id || !nombre_cliente || !apellido_cliente || !telefono || !cedula) {
+            return res.status(400).json({
                 success: false,
-                message: 'Error interno del servidor',
-                error: error.message
+                message: 'Faltan campos obligatorios'
             });
         }
-    },
+        console.log('Datos enviados a crearMascota:', {
+            nombre_mascota,
+            especie_id,
+            raza_id,
+            fecha_nacimiento,
+            edad_meses,
+            sexo,
+            peso_kg,
+            direccion: cliente.direccion,
+            cedula,
+            nombre_cliente,
+            apellido_cliente,
+            telefono,
+            reg_usuario: usuario_actualizador
+        });
+
+        const result = await Mascota.crearMascota({
+            nombre_mascota,
+            especie_id,
+            raza_id,
+            fecha_nacimiento,
+            edad_meses,
+            sexo,
+            peso_kg,
+            direccion: cliente.direccion,
+            cedula,
+            nombre_cliente,
+            apellido_cliente,
+            telefono,
+            reg_usuario: usuario_actualizador
+        });
+
+        if (!result.success) {
+            return res.status(400).json({
+                success: false,
+                message: result.error
+            });
+        }
+
+        res.status(201).json({
+            success: true,
+            message: 'Mascota registrada exitosamente',
+            data: {
+                cliente_id: result.cliente_id,
+                mascota_id: result.mascota_id,
+            }
+        });
+
+    } catch (error) {
+        console.error('Error al crear mascota:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor',
+            error: error.message
+        });
+    }
+},
 
     async updatemascota(req, res) {
         const usuario_actualizador = req.user?.id_usuario;

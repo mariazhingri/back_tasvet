@@ -2,69 +2,77 @@ const db = require('../config/conexion');
 const Usuarios = require('../modelo/user_model');
 const Mascota = {};
 
-const generarCodigoVinculacion = () => {
-    const numeros = Math.floor(100000 + Math.random() * 900000); // 6 dígitos
-    return `V-${numeros}`;
-};
 
 Mascota.crearMascota = async (params) => {
     const connection = await db.getConnection();
     try {
         // Obtener nombre del usuario que registra
         const nombreRegistrador = await Usuarios.getUserName(params.reg_usuario);
+         const currentDate = new Date();
 
         await connection.beginTransaction();
 
-         // Verificar si la mascota ya existe
+         // Verificar si la mascota ya existe ppara un cliente
          const verificarSQL = `
             SELECT m.* 
             FROM mascotas m
-            INNER JOIN contactos c ON m.contacto_id = c.id_contacto
-            WHERE m.nombre = ? 
+            INNER JOIN clientes c ON m.cliente_id = c.id_cliente
+            WHERE m.nombre = ?
             AND m.especie_id = ?
-            AND c.nombre = ?
-            AND c.apellido = ?
+            AND m.raza_id = ?
             AND m.estado = 'A'
         `;
 
         const [mascotasExistentes] = await connection.query(verificarSQL, [
             params.nombre_mascota,
             params.especie_id,
-            params.nombre_contacto,
-            params.apellido_contacto
+            params.raza_id
         ]);
 
         if (mascotasExistentes.length > 0) {
-            throw new Error('Ya existe una mascota registrada con el mismo nombre, especie y dueño');
+            throw new Error('Ya existe una mascota registrada con el mismo nombre, especie y raza para este cliente.');
         }
 
         // 1. Insertar contacto
-        const contactoSQL = `
-            INSERT INTO contactos (nombre, apellido, telefono, email, direccion, estado, reg_usuario)
-            VALUES (?, ?, ?, ?, ?, 'A', ?)
+        const personaSQL = `
+            INSERT INTO personas (cedula, nombre, apellido, telefono, estado, reg_fecha, reg_usuario)
+            VALUES (?, ?, ?, ?, 'A', ? ,?)
         `;
-        const [contactoResult] = await connection.query(contactoSQL, [
-            params.nombre_contacto,
-            params.apellido_contacto,
+        const [personaResult] = await connection.query(personaSQL, [
+            params.cedula,
+            params.nombre_cliente,
+            params.apellido_cliente,
             params.telefono,
-            params.email,
-            params.direccion,
+            currentDate,
             nombreRegistrador
         ]);
 
-        const contactoId = contactoResult.insertId;
+        const personaId = personaResult.insertId;
 
-        // 2. Insertar mascota
+        // 2. Insertar cliente
+        const clienteSQL = `
+            INSERT INTO clientes (persona_id, direccion,estado, reg_fecha, reg_usuario)
+            VALUES (?, ?,'A', ?, ?)
+        `;
+        const [clienteResult] = await connection.query(clienteSQL, [
+            personaId,
+            params.direccion,
+            currentDate,
+            nombreRegistrador
+        ]);
+        const clienteId = clienteResult.insertId;
+
+        // 3. Insertar mascota
         const mascotaSQL = `
             INSERT INTO mascotas (
-                contacto_id, nombre, especie_id, raza_id, 
+                cliente_id, nombre, especie_id, raza_id, 
                 fecha_nacimiento, edad_meses, sexo, peso_kg, 
-                color_pelaje, estado, reg_usuario
+                estado, reg_usuario
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'A', ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?,'A', ?)
         `;
         const [mascotaResult] = await connection.query(mascotaSQL, [
-            contactoId,
+            clienteId,
             params.nombre_mascota,
             params.especie_id,
             params.raza_id,
@@ -72,33 +80,18 @@ Mascota.crearMascota = async (params) => {
             params.edad_meses,
             params.sexo,
             params.peso_kg,
-            params.color_pelaje,
             nombreRegistrador
         ]);
 
         const mascotaId = mascotaResult.insertId;
 
-        // 3. Generar código de vinculación e insertar en vinculaciones_mascotas
-        const codigoVinculacion = generarCodigoVinculacion();
-        const vinculacionSQL = `
-            INSERT INTO vinculaciones_mascotas (
-                mascota_id, codigo_vinculacion, estado, reg_usuario
-            )
-            VALUES (?, ?, 'PENDIENTE', ?)
-        `;
-        await connection.query(vinculacionSQL, [
-            mascotaId,
-            codigoVinculacion,
-            nombreRegistrador
-        ]);
-
         await connection.commit();
 
         return {
             success: true,
-            contacto_id: contactoId,
+            persona_id: personaId,
+            cliente_id: clienteId,
             mascota_id: mascotaId,
-            codigo_vinculacion: codigoVinculacion
         };
 
     } catch (error) {
@@ -260,7 +253,5 @@ Mascota.deleteMascota = async (mascota_id, usuario_eliminador) => {
         connection.release();
     }
 };
-
-module.exports = Mascota;
 
 module.exports = Mascota;

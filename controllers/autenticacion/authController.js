@@ -18,8 +18,18 @@ module.exports = {
                 });
             }
     
-            // Verifica la contraseña
-            const isvalid = bcrypt.compareSync(clave, user.clave);
+            /// Verifica la contraseña
+            let isvalid;
+
+            // Verifica si la contraseña almacenada parece estar encriptada
+            if (user.clave.startsWith('$2b$') || user.clave.startsWith('$2a$')) {
+                // Si está encriptada, usa bcrypt para comparar
+                isvalid = bcrypt.compareSync(clave, user.clave);
+            } else {
+                // Si no está encriptada, compara directamente (texto plano)
+                isvalid = clave === user.clave;
+            }
+
             if (!isvalid) {
                 return res.status(401).json({
                     success: false,
@@ -33,7 +43,7 @@ module.exports = {
                 nombre: user.email,
                 rol_descripcion: user.rol_descripcion
             }, key.JWT_SECRET, {});
-            console.log('user', token);
+            //console.log('user', token);
     
             return res.status(200).json({
                 message: "Login exitoso",

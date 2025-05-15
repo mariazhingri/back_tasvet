@@ -3,7 +3,7 @@ use tasvet_operativo;
 
 CREATE TABLE personas (
   	id_persona INT PRIMARY KEY AUTO_INCREMENT,
-  	cedula INT(10) UNIQUE NOT NULL,
+  	cedula varchar(10) UNIQUE NOT NULL,
   	nombre VARCHAR(100),
   	apellido VARCHAR(100),
   	telefono VARCHAR(10) UNIQUE NOT NULL,
@@ -116,6 +116,7 @@ create table razas(
 
 CREATE TABLE mascotas (
 	id_mascota INT PRIMARY KEY AUTO_INCREMENT,
+	cliente_id INT,
 	nombre VARCHAR(150),
 	especie_id INT,
 	raza_id INT,
@@ -130,6 +131,7 @@ CREATE TABLE mascotas (
 	act_usuario varchar(150),
 	eli_fecha DATETIME null,
 	eli_usuario varchar(150),
+	FOREIGN KEY (cliente_id) REFERENCES clientes(id_cliente),
 	FOREIGN KEY (especie_id) REFERENCES especies(id_especie),
 	FOREIGN KEY (raza_id) REFERENCES razas(id_raza)
 );
