@@ -16,6 +16,7 @@ Usuarios.cambiarRol = async () => {
 };
 Usuarios.findByUsername = async (params) => {
     try {
+        //console.log('Parámetros recibidos en findByUsername:', params); // Depuración
         let sql, queryParams;
         
         if (params.id_usuario) {
@@ -32,11 +33,7 @@ Usuarios.findByUsername = async (params) => {
                 WHERE  u.email = ?`;
             queryParams = [params.email];
         }else if (params.cedula) {
-            sql = `
-                SELECT u.*
-                FROM usuarios u 
-                LEFT JOIN personas p ON u.id_usuario = p.usuario_id
-                WHERE p.cedula = ?`;
+            sql = `SELECT * FROM personas WHERE cedula = ?`;
             queryParams = [params.cedula];
         } else {
             throw new Error('Se requiere id_usuario o email para buscar el usuario');
@@ -48,22 +45,63 @@ Usuarios.findByUsername = async (params) => {
         throw error;
     }
 },
+Usuarios.findByCedula = async (cedula) => {
+    try {
+        const [rows] = await db.query(
+            'SELECT * FROM personas WHERE cedula = ?',
+            [cedula]
+        );
+        return rows[0]; // Retorna el primer resultado o undefined si no existe
+    } catch (error) {
+        throw error;
+    }
+};
 Usuarios.getUserName = async (id_usuario) => {
     try {
+        if (!id_usuario) {
+            return 'Sistema'; // Si no hay id_usuario, devolver "Sistema"
+        }
         const usuario = await Usuarios.findByUsername({ id_usuario });
         return usuario ? usuario.nombre : 'Sistema';
     } catch (error) {
         throw error;
     }
-},
+};
 
-Usuarios.createUser = async (datosUsuario, usuarioCreador) => {
+Usuarios.createUsuario = async (data, usuarioCreador) => {
+    try {
+
+        const currentDate = new Date();
+        const nombreCreador = await Usuarios.getUserName(usuarioCreador || 'Sistema');
+        const rol_id = 3;
+        
+        const [result] = await db.query(
+            `INSERT INTO usuarios (persona_id, email, clave, rol_id,estado, reg_fecha, reg_usuario) 
+                 VALUES (?, ?, ?, ?, ?, ?,?)`,
+            [
+                data.persona_id,
+                data.email,
+                data.clave, 
+                rol_id, 
+                'A', 
+                currentDate,
+                nombreCreador
+            ]
+        );
+        return { insertId: result.insertId };
+    } catch (error) {
+        throw error;
+    }
+};
+
+Usuarios.createPersonaYUsuario = async (datosUsuario, usuarioCreador) => {
     const connection = await db.getConnection(); 
     try {
         await connection.beginTransaction(); 
 
         const currentDate = new Date();
         const nombreCreador = await Usuarios.getUserName(usuarioCreador);
+        const rol_id = 3;
 
         let personaId = null;
 
@@ -77,7 +115,7 @@ Usuarios.createUser = async (datosUsuario, usuarioCreador) => {
                     datosUsuario.persona.nombre,
                     datosUsuario.persona.apellido,
                     datosUsuario.persona.telefono,
-                    'A', // Estado activo por defecto
+                    'A', 
                     currentDate,
                     nombreCreador
                 ]
@@ -92,9 +130,9 @@ Usuarios.createUser = async (datosUsuario, usuarioCreador) => {
             [
                 personaId,
                 datosUsuario.email,
-                datosUsuario.clave, // Asegúrate de que esté encriptada
-                3, // Rol por defecto (cliente)
-                'A', // Estado activo por defecto
+                datosUsuario.clave, 
+                rol_id, 
+                'A', 
                 currentDate,
                 nombreCreador
             ]
@@ -102,13 +140,13 @@ Usuarios.createUser = async (datosUsuario, usuarioCreador) => {
 
         const usuarioId = usuarioResult.insertId;
 
-        await connection.commit(); // Confirmar transacción
+        await connection.commit(); 
         return { id_usuario: usuarioId };
     } catch (error) {
-        await connection.rollback(); // Revertir transacción en caso de error
+        await connection.rollback(); 
         throw error;
     } finally {
-        connection.release(); // Liberar conexión
+        connection.release(); 
     }
 };
 

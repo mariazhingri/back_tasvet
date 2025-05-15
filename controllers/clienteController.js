@@ -2,6 +2,42 @@ const Clientes = require('../modelo/cliente_model');
 require('dotenv').config();
 
 module.exports = {
+
+    async obtenerDatosCliente(req, res) {
+        try {
+            const id_usuario = req.user?.id_usuario; // ID del usuario autenticado
+
+            // Validar si el usuario está autenticado
+            if (!id_usuario) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Usuario no autenticado'
+                });
+            }
+
+            const params = { id_usuario };
+            const cliente = await Clientes.datosCliente(params);
+
+            if (!cliente) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Cliente no encontrado'
+                });
+            }
+
+            res.status(200).json({
+                success: true,
+                data: cliente
+            });
+        } catch (error) {
+            console.error(error); // Registrar el error en el servidor
+            res.status(500).json({
+                success: false,
+                message: 'Error interno del servidor'
+            });
+        }
+    },
+
     async crearCliente(req, res) {
     try {
         const { nombre, apellido, cedula, telefono, email, direccion } = req.body;
@@ -47,7 +83,7 @@ module.exports = {
             message: 'Error interno del servidor'
         });
     }
-}
+    }
 }
 // }async register(req, res) {
 //         try {

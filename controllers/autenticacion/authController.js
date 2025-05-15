@@ -28,7 +28,6 @@ module.exports = {
             }
     
             // Genera el token JWT incluyendo id_usuario
-            
             const token = jwt.sign({ 
                 id_usuario: user.id_usuario,
                 nombre: user.email,
@@ -51,46 +50,73 @@ module.exports = {
     },
 
     async register(req, res) {
-        try {
-            const { email, clave, rol_id, persona } = req.body;
-            const usuarioCreador = req.user?.id_usuario || 1; 
+    try {
+        const { email, clave, persona } = req.body;
+        const usuarioCreador = req.user?.id_usuario || 1;
 
-            // Validar datos requeridos
-            if (!email || !clave || !rol_id) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Faltan datos obligatorios (email, clave, rol_id)'
-                });
-            }
+        // Validar datos requeridos
+        if (!email || !clave || !persona?.cedula) {
+            return res.status(400).json({
+                success: false,
+                message: 'Faltan datos obligatorios (email, clave, cédula)'
+            });
+        }
 
-            // Encriptar la contraseña
-            const salt = bcrypt.genSaltSync(10);
-            const claveEncriptada = bcrypt.hashSync(clave, salt);
+        // Encriptar la contraseña
+        const salt = bcrypt.genSaltSync(10);
+        const claveEncriptada = bcrypt.hashSync(clave, salt);
 
-            // Preparar datos del usuario
-            const datosUsuario = {
+        // Validar si la cédula ya existe
+        const cedulaExistente = await User.findByCedula(persona.cedula);
+        let personaId;
+
+        if (cedulaExistente) {
+            // Si la cédula ya existe, reutilizar el id_persona
+            personaId = cedulaExistente.id_persona;
+
+            // Crear el usuario asociado a la persona existente
+            const nuevoUsuario = await User.createUsuario({
                 email,
                 clave: claveEncriptada,
-                rol_id,
-                persona // Datos opcionales de la tabla personas
-            };
-
-            // Crear usuario
-            const resultado = await User.createUser(datosUsuario, usuarioCreador);
+                persona_id: personaId, 
+                estado: 'A', 
+                reg_usuario: usuarioCreador
+            });
 
             return res.status(201).json({
                 success: true,
                 message: 'Usuario registrado exitosamente',
-                data: resultado
+                data: nuevoUsuario
             });
-        } catch (err) {
-            return res.status(500).json({
-                success: false,
-                message: 'Error al registrar el usuario',
-                error: err.message
+        } else {
+            // Si la cédula no existe, crear un nuevo registro en personas y usuario
+            const nuevaPersonawithusuario = await User.createPersonaYUsuario({
+                email,
+                clave: claveEncriptada,
+                persona: {
+                    cedula: persona.cedula,
+                    nombre: persona.nombre,
+                    apellido: persona.apellido,
+                    telefono: persona.telefono,
+                    estado: 'A', 
+                    reg_usuario: usuarioCreador
+                }
+            });
+
+            return res.status(201).json({
+                success: true,
+                message: 'Persona y usuario registrados exitosamente',
+                data: nuevaPersonawithusuario
             });
         }
-    },
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: 'Error al registrar el usuario',
+            error: err.message
+        });
+    }
+},
 
     async updateUser(req, res) {
         try {
