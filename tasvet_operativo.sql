@@ -121,7 +121,6 @@ CREATE TABLE mascotas (
 	especie_id INT,
 	raza_id INT,
 	fecha_nacimiento DATE,
-	edad_meses INT,
 	sexo VARCHAR(10),
 	peso_kg FLOAT,
 	estado CHAR(1),
@@ -140,8 +139,13 @@ create table servicios(
 	id_servicio INT PRIMARY KEY auto_increment,
 	descripcion VARCHAR(150),
 	categoria VARCHAR(150),
-	precion FLOAT,
-	estado CHAR(1)
+	estado CHAR(1),
+	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  	reg_usuario varchar(150),
+  	act_fecha DATETIME null,
+  	act_usuario varchar(150),
+  	eli_fecha DATETIME null,
+ 	eli_usuario varchar(150)
 )
 
 create table citas(

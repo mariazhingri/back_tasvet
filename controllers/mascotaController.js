@@ -22,7 +22,6 @@ module.exports = {
             especie_id,
             raza_id,
             fecha_nacimiento,
-            edad_meses,
             sexo,
             peso_kg,
             cliente
@@ -51,7 +50,6 @@ module.exports = {
             especie_id,
             raza_id,
             fecha_nacimiento,
-            edad_meses,
             sexo,
             peso_kg,
             direccion: cliente.direccion,
@@ -67,7 +65,6 @@ module.exports = {
             especie_id,
             raza_id,
             fecha_nacimiento,
-            edad_meses,
             sexo,
             peso_kg,
             direccion: cliente.direccion,

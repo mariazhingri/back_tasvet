@@ -7,7 +7,6 @@ Mascota.crearMascota = async (params) => {
     const connection = await db.getConnection();
     try {
         // Obtener nombre del usuario que registra
-        const nombreRegistrador = await Usuarios.getUserName(params.reg_usuario);
          const currentDate = new Date();
 
         await connection.beginTransaction();
@@ -33,7 +32,7 @@ Mascota.crearMascota = async (params) => {
             throw new Error('Ya existe una mascota registrada con el mismo nombre, especie y raza para este cliente.');
         }
 
-        // 1. Insertar contacto
+        // 1. Insertar cliente
         const personaSQL = `
             INSERT INTO personas (cedula, nombre, apellido, telefono, estado, reg_fecha, reg_usuario)
             VALUES (?, ?, ?, ?, 'A', ? ,?)
@@ -44,7 +43,7 @@ Mascota.crearMascota = async (params) => {
             params.apellido_cliente,
             params.telefono,
             currentDate,
-            nombreRegistrador
+            params.reg_usuario
         ]);
 
         const personaId = personaResult.insertId;
@@ -58,7 +57,7 @@ Mascota.crearMascota = async (params) => {
             personaId,
             params.direccion,
             currentDate,
-            nombreRegistrador
+            params.reg_usuario
         ]);
         const clienteId = clienteResult.insertId;
 
@@ -66,10 +65,10 @@ Mascota.crearMascota = async (params) => {
         const mascotaSQL = `
             INSERT INTO mascotas (
                 cliente_id, nombre, especie_id, raza_id, 
-                fecha_nacimiento, edad_meses, sexo, peso_kg, 
+                fecha_nacimiento, sexo, peso_kg, 
                 estado, reg_usuario
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?,'A', ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?,'A', ?)
         `;
         const [mascotaResult] = await connection.query(mascotaSQL, [
             clienteId,
@@ -77,10 +76,9 @@ Mascota.crearMascota = async (params) => {
             params.especie_id,
             params.raza_id,
             params.fecha_nacimiento,
-            params.edad_meses,
             params.sexo,
             params.peso_kg,
-            nombreRegistrador
+            params.reg_usuario
         ]);
 
         const mascotaId = mascotaResult.insertId;
