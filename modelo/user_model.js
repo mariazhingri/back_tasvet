@@ -1,7 +1,6 @@
 const db = require('../config/conexion');
 
 const Usuarios = {}
-
 Usuarios.cambiarRol = async () => {
     try {
         const id_usuario_admin = 1; // ID del administrador que realiza la acción
