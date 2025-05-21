@@ -5,6 +5,7 @@ const passport = require('passport');
 const auth_outes = require("./routes/authRoutes");
 const mascotas = require("./routes/mascotaRoutes");
 const clientes = require("./routes/clienteRoutes");
+const servicios = require("./routes/servicioRoutes");
 
 const app = express();
 const port = 5000; 
@@ -18,6 +19,7 @@ app.use(express.json());
 clientes(app);
 auth_outes(app);
 mascotas(app);
+servicios(app);
 
 // Iniciar el servidor
 app.listen(port, () => {

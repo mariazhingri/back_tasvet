@@ -13,6 +13,20 @@ Usuarios.cambiarRol = async () => {
         console.error('Error al cambiar el rol:', error.message);
     }
 };
+Usuarios.findRol = async (email) => {
+    try {
+        const [rows] = await db.query(
+            `SELECT u.rol_id, r.descripcion as rol_descripcion 
+            FROM usuarios u 
+            LEFT JOIN roles r ON u.rol_id = r.id_rol 
+            WHERE u.id_usuario = ?`,
+            [email]
+        );
+        return rows[0];
+    } catch (error) {
+        throw error;
+    }
+}
 Usuarios.findByUsername = async (params) => {
     try {
         //console.log('Parámetros recibidos en findByUsername:', params); // Depuración
@@ -44,23 +58,33 @@ Usuarios.findByUsername = async (params) => {
         throw error;
     }
 },
+Usuarios.findByUserId = async (id_usuario) => {
+    try {
+        const [rows] = await db.query(
+            `SELECT u.* 
+            FROM usuarios u 
+            WHERE u.id_usuario = ?;`,
+            [id_usuario]
+        );
+        return rows[0]; 
+    } catch (error) {
+        throw error;
+    }
+};
 Usuarios.findByCedula = async (cedula) => {
     try {
         const [rows] = await db.query(
             'SELECT * FROM personas WHERE cedula = ?',
             [cedula]
         );
-        return rows[0]; // Retorna el primer resultado o undefined si no existe
+        return rows[0]; 
     } catch (error) {
         throw error;
     }
 };
 Usuarios.getUserName = async (id_usuario) => {
     try {
-        if (!id_usuario) {
-            return 'Sistema'; // Si no hay id_usuario, devolver "Sistema"
-        }
-        const usuario = await Usuarios.findByUsername({ id_usuario });
+        const usuario = await Usuarios.findByUserId( id_usuario );
         return usuario ? usuario.nombre : 'Sistema';
     } catch (error) {
         throw error;
@@ -71,7 +95,7 @@ Usuarios.createUsuario = async (data, usuarioCreador) => {
     try {
 
         const currentDate = new Date();
-        const nombreCreador = await Usuarios.getUserName(usuarioCreador || 'Sistema');
+        //const nombreCreador = await Usuarios.getUserName(usuarioCreador);
         const rol_id = 3;
         
         const [result] = await db.query(
@@ -84,7 +108,7 @@ Usuarios.createUsuario = async (data, usuarioCreador) => {
                 rol_id, 
                 'A', 
                 currentDate,
-                nombreCreador
+                data.reg_usuario
             ]
         );
         return { insertId: result.insertId };
@@ -99,7 +123,7 @@ Usuarios.createPersonaYUsuario = async (datosUsuario, usuarioCreador) => {
         await connection.beginTransaction(); 
 
         const currentDate = new Date();
-        const nombreCreador = await Usuarios.getUserName(usuarioCreador);
+        //const nombreCreador = await Usuarios.getUserName(usuarioCreador);
         const rol_id = 3;
 
         let personaId = null;
@@ -116,7 +140,7 @@ Usuarios.createPersonaYUsuario = async (datosUsuario, usuarioCreador) => {
                     datosUsuario.persona.telefono,
                     'A', 
                     currentDate,
-                    nombreCreador
+                    datosUsuario.reg_usuario
                 ]
             );
             personaId = personaResult.insertId;
@@ -133,7 +157,7 @@ Usuarios.createPersonaYUsuario = async (datosUsuario, usuarioCreador) => {
                 rol_id, 
                 'A', 
                 currentDate,
-                nombreCreador
+                datosUsuario.reg_usuario
             ]
         );
 
