@@ -2,19 +2,23 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const key = require('../../config/key');
 const User = require('../../modelo/user_model'); 
+const { enviarCodigoVerificacion } = require('../../services/mailSend');
+const {guardarCodigo}  = require('../../modelo/CodigoVerificacionModel');
+const { verificarCodigoDB } = require('../../modelo/CodigoVerificacionModel');
 require('dotenv').config();
 
 module.exports = {
     async login(req, res) {
         try {
-            const { email, clave } = req.body;
+            const { correo, clave } = req.body;
     
             // Busca al usuario en la base de datos
-            const user = await User.findByUsername({ email });
+            const user = await User.findUsuario({ correo });
             if (!user) {
                 return res.status(404).json({
                     success: false,
-                    message: 'Error al obtener los datos'
+                    message: 'Error al obtener los datos',
+                    error: err.message 
                 });
             }
     
@@ -40,35 +44,36 @@ module.exports = {
             // Genera el token JWT incluyendo id_usuario
             const token = jwt.sign({ 
                 id_usuario: user.id_usuario,
-                nombre: user.email,
+                nombre: user.correo,
                 rol_descripcion: user.rol_descripcion
             }, key.JWT_SECRET, {});
             //console.log('user', token);
     
             return res.status(200).json({
                 message: "Login exitoso",
-                user: email,
+                user: correo,
                 token: `JWT ${token}`
             });
     
         } catch (err) {
             return res.status(500).json({
                 success: false,
-                message: 'Error al obtener los datos'
+                message: 'Error al obtener los datoss',
+                error: err.message 
             });
         }
     },
 
     async register(req, res) {
     try {
-        const { email, clave, persona } = req.body;
+        const { clave, persona } = req.body;
         const usuarioCreador = req.user?.id_usuario || 1;
 
         // Validar datos requeridos
-        if (!email || !clave || !persona?.cedula) {
+        if ( !clave || !persona?.cedula) {
             return res.status(400).json({
                 success: false,
-                message: 'Faltan datos obligatorios (email, clave, cédula)'
+                message: 'Faltan datos obligatorios (clave, cédula)'
             });
         }
 
@@ -76,49 +81,27 @@ module.exports = {
         const salt = bcrypt.genSaltSync(10);
         const claveEncriptada = bcrypt.hashSync(clave, salt);
 
-        // Validar si la cédula ya existe
-        const cedulaExistente = await User.findByCedula(persona.cedula);
-        let personaId;
-
-        if (cedulaExistente) {
-            // Si la cédula ya existe, reutilizar el id_persona
-            personaId = cedulaExistente.id_persona;
-
-            // Crear el usuario asociado a la persona existente
-            const nuevoUsuario = await User.createUsuario({
-                email,
-                clave: claveEncriptada,
-                persona_id: personaId, 
+        // Si la cédula no existe, crear un nuevo registro en personas y usuario
+        const nuevaPersonawithusuario = await User.createUser({
+            clave: claveEncriptada,
+            persona: {
+                cedula: persona.cedula,
+                correo: persona.correo ,
+                nombre: persona.nombre,
+                apellido: persona.apellido,
+                telefono_1: persona.telefono_1,
+                telefono_2: persona.telefono_2 || null,
                 estado: 'A', 
                 reg_usuario: usuarioCreador
-            });
+            }
+        });
 
-            return res.status(201).json({
-                success: true,
-                message: 'Usuario registrado exitosamente',
-                data: nuevoUsuario
-            });
-        } else {
-            // Si la cédula no existe, crear un nuevo registro en personas y usuario
-            const nuevaPersonawithusuario = await User.createPersonaYUsuario({
-                email,
-                clave: claveEncriptada,
-                persona: {
-                    cedula: persona.cedula,
-                    nombre: persona.nombre,
-                    apellido: persona.apellido,
-                    telefono: persona.telefono,
-                    estado: 'A', 
-                    reg_usuario: usuarioCreador
-                }
-            });
-
-            return res.status(201).json({
-                success: true,
-                message: 'Persona y usuario registrados exitosamente',
-                data: nuevaPersonawithusuario
-            });
-        }
+        return res.status(201).json({
+            success: true,
+            message: 'Persona y usuario registrados exitosamente',
+            data: nuevaPersonawithusuario
+        });
+        
     } catch (err) {
         return res.status(500).json({
             success: false,
@@ -201,7 +184,7 @@ module.exports = {
             }
     
             // Verificar si el usuario a eliminar existe
-            const userToDelete = await User.findByUsername({ id_usuario });
+            const userToDelete = await User.findUsuario({ id_usuario });
             if (!userToDelete) {
                 return res.status(404).json({
                     success: false,
@@ -241,5 +224,112 @@ module.exports = {
                 //error: err.message
             });
         }
-    }
+    },
+
+    async VerificarCedula(req, res) {
+        try {
+            const { cedula } = req.params;
+            if (!cedula) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Cédula es requerida'
+                });
+            }
+
+            // Buscar persona por cédula
+            const persona = await User.findUsuario({ cedula });
+
+            // Caso 4: No existe la persona
+            if (!persona) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Persona no encontrada',
+                    caso: 4
+                });
+            }
+
+            // Caso 1: Persona tiene usuario asociado
+            if (persona.id_usuario) {
+                return res.status(200).json({
+                    success: true,
+                    message: 'La persona ya tiene un usuario asociado',
+                    data: persona,
+                    caso: 1,
+                    cuentaAsociada: true
+                });
+            }
+
+            // Caso 2: Persona tiene correo pero no usuario
+            if (persona.correo) {
+                return res.status(200).json({
+                    success: true,
+                    message: 'La persona tiene correo pero no tiene usuario asociado',
+                    data: persona,
+                    caso: 2,
+                    cuentaAsociada: false,
+                    correo: true
+                });
+            }
+
+            // Caso 3: Persona no tiene correo ni usuario
+            return res.status(200).json({
+                success: true,
+                message: 'La persona no tiene correo ni usuario asociado',
+                data: persona,
+                caso: 3,
+                cuentaAsociada: false,
+                correo: false
+            });
+
+        } catch (err) {
+            return res.status(500).json({
+                success: false,
+                message: 'Error al buscar la persona',
+                error: err.message
+            });
+        }
+    },
+
+    async solicitarCodigo(req, res) {
+        const { correo } = req.body;
+
+        try {
+            const codigo = await enviarCodigoVerificacion(correo);
+
+            // Guardar en la base de datos
+            await guardarCodigo(correo, codigo);
+
+            res.status(200).json({ 
+                mensaje: "Código enviado correctamente" 
+            });
+        }catch (error) {
+            console.error("Error detallado:", error);
+            res.status(500).json({ error: "No se pudo enviar el código" });
+        }
+
+    },
+
+    async  verificarCodigo(req, res) {
+        const { correo, codigo } = req.body;
+
+        try {
+            const valido = await verificarCodigoDB(correo, codigo);
+
+            if (valido) {
+                res.status(200).json({ 
+                    success: true,
+                    mensaje: "Código válido" 
+                });
+            } else {
+                res.status(400).json({ 
+                    success: false,
+                    error: "Código inválido o expirado" 
+                });
+            }
+        }catch (error) {
+            console.error("Error verificando código:", error); 
+            res.status(500).json({ error: "Error interno" });
+        }
+
+    },
 };

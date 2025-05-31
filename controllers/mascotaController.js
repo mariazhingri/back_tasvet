@@ -36,7 +36,7 @@ module.exports = {
         }
 
         const { cedula, nombre_cliente, apellido_cliente, telefono } = cliente.persona;
-        console.log('Cedula recibida:', cedula);
+        //console.log('Cedula recibida:', cedula);
 
         // Validaciones básicas
         if (!nombre_mascota || !especie_id || !nombre_cliente || !apellido_cliente || !telefono || !cedula) {
@@ -45,20 +45,20 @@ module.exports = {
                 message: 'Faltan campos obligatorios'
             });
         }
-        console.log('Datos enviados a crearMascota:', {
-            nombre_mascota,
-            especie_id,
-            raza_id,
-            fecha_nacimiento,
-            sexo,
-            peso_kg,
-            direccion: cliente.direccion,
-            cedula,
-            nombre_cliente,
-            apellido_cliente,
-            telefono,
-            reg_usuario: usuario_actualizador
-        });
+        // console.log('Datos enviados a crearMascota:', {
+        //     nombre_mascota,
+        //     especie_id,
+        //     raza_id,
+        //     fecha_nacimiento,
+        //     sexo,
+        //     peso_kg,
+        //     direccion: cliente.direccion,
+        //     cedula,
+        //     nombre_cliente,
+        //     apellido_cliente,
+        //     telefono,
+        //     reg_usuario: usuario_actualizador
+        // });
 
         const result = await Mascota.crearMascota({
             nombre_mascota,

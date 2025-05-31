@@ -12,7 +12,7 @@ module.exports = (passport) => {
         //console.log('Payload recibido:', jwt_payload); // Log del payload
         try {
             // Buscar al usuario en la base de datos usando id_usuario
-            const user = await User.findByUsername({ id_usuario: jwt_payload.id_usuario });
+            const user = await User.findUsuario({ id_usuario: jwt_payload.id_usuario });
             if (user) {
                 //console.log('Usuario encontrado:', user);
                 return done(null, user); // Pasar el usuario encontrado

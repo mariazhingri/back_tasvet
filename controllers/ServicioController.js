@@ -18,7 +18,7 @@ module.exports = {
     
         try {
              // Verifica el rol del usuario
-            const userRol = await Usuarios.findRol(id_usuario);
+            const userRol = await Usuarios.findUsuario({ id_usuario });
             if (!userRol || userRol.rol_id !== 1 && userRol.rol_id !== 2) {
                 return res.status(403).json({
                     success: false,
@@ -59,7 +59,7 @@ module.exports = {
     },
 
     async obtenerServicios(req, res) {
-       const id_usuario = req.user?.id_usuario; // ID del usuario autenticado
+       const id_usuario = req.user?.id_usuario;
 
             // Validar si el usuario está autenticado
             if (!id_usuario) {
@@ -102,7 +102,7 @@ module.exports = {
     
         try {
             // Verifica el rol del usuario
-            const userRol = await Usuarios.findRol(id_usuario);
+            const userRol = await Usuarios.findUsuario({id_usuario});
             if (!userRol || userRol.rol_id !== 1 && userRol.rol_id !== 2) {
                 return res.status(403).json({
                     success: false,
@@ -163,7 +163,7 @@ module.exports = {
     
         try {
             // Verifica el rol del usuario
-            const userRol = await Usuarios.findRol(id_usuario);
+            const userRol = await Usuarios.findUsuario({id_usuario});
             if (!userRol || userRol.rol_id !== 1 && userRol.rol_id !== 2) {
                 return res.status(403).json({
                     success: false,
@@ -204,7 +204,5 @@ module.exports = {
             });
         }
     }
-
-
 
 }
