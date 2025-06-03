@@ -95,7 +95,6 @@ CREATE TABLE mascotas (
 	especie varchar(150),
 	raza_id INT,
 	fecha_nacimiento DATE,
-	edad_meses INT,
 	sexo VARCHAR(10),
 	peso_kg FLOAT,
 	estado CHAR(1),
@@ -278,7 +277,10 @@ INSERT INTO personas (cedula,correo ,nombre,apellido, telefono_1, telefono_2, es
 ('0926343559','mariazhingripaz@outlook.com','Maria','Zhingri', '0985733121',NULL, 'A',NOW(),'Admin'),
 ('0978654568','tasvet@outlook.com', 'Dennise','Garces', '0987986751',NULL,'A',NOW(),'Admin'),
 ('0157863214','ejemplo@outlook.com', 'Juan','Perez', '0975463218',NULL,'A',NOW(),'Admin'),
-('0245789631','','Carla','Letamendi', '0987546325',NULL, 'A',NOW(),'Admin')
+('0245789631','','Carla','Letamendi', '0987546325',NULL, 'A',NOW(),'Admin'),
+('0578364215','','Roberto','Fores', '0987546321',NULL, 'A',NOW(),'Admin'),
+('0354269875','paula@ejemplo.com','Paula','Lucero', '0985621307',NULL, 'A',NOW(),'Admin'),
+('0487623592','','Lucas','Jaramillo', '0987542136',NULL, 'A',NOW(),'Admin')
 
 INSERT INTO usuarios (rol_id, persona_id, clave, estado, reg_fecha, reg_usuario) VALUES 
 (1,1, 'admin', 'A', NOW(),'Admin'),
@@ -290,8 +292,9 @@ INSERT INTO empleados (usuario_id,nombre, apellido,telefono, email, direccion,es
 INSERT INTO mascotas (cliente_id,especie_id,nombre,raza_id,fecha_nacimiento,edad,sexo,peso_kg,color_pelaje,estado) VALUES 
 (1,1,'Firulais',1,'2020-05-10',4,'Macho',25.5,'Marrón','A');
 
-insert into razas(nombre_raza, estado) VALUES('labrador', 'A');
-insert into razas(nombre_raza, estado) VALUES('Siamés', 'A');
+insert into razas(nombre_raza, estado) values
+('labrador', 'A'),
+('Siamés', 'A');
 
 insert into servicios( descripcion, estado) VALUES('Atencion Veterinaria','A')
 insert into servicios( descripcion, estado) VALUES('Vacunacion','A');
@@ -334,14 +337,14 @@ TRUNCATE TABLE codigos_verificacion;
 -- -------CONSULTAS--------
 select * from roles;
 select * from usuarios u; 
-select *  from clientes;
+select * from clientes;
 select * from codigos_verificacion;
 select * from mascotas;
 select * from razas;
 select * from servicios;
 select * from personas;
+
 SHOW TABLES;
-SELECT * FROM usuarios WHERE email = 'mariazhingripaz@outlook.com'
 
 SELECT u.*
 FROM usuarios u 
@@ -403,3 +406,14 @@ FROM personas p
 LEFT JOIN usuarios u ON u.persona_id = p.id_persona
 WHERE p.cedula = '0157863214'
 
+select p.*, r.descripcion as rol
+                from personas p
+                inner join usuarios u on p.id_persona = u.persona_id
+                inner join roles r on u.rol_id = r.id_rol
+                where u.id_usuario = 1
+                and u.estado = 'A'
+                
+select c.id_cliente, p.nombre, p.apellido, p.cedula, p.telefono_1, p.telefono_2, p.correo, c.direccion
+                from clientes c
+                inner join personas p on c.persona_id = p.id_persona
+                and c.estado = 'A'

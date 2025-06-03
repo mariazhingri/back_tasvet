@@ -65,91 +65,87 @@ module.exports = {
     },
 
     async register(req, res) {
-    try {
-        const { clave, persona } = req.body;
-        const usuarioCreador = req.user?.id_usuario || 1;
-
-        // Validar datos requeridos
-        if ( !clave || !persona?.cedula) {
-            return res.status(400).json({
-                success: false,
-                message: 'Faltan datos obligatorios (clave, cédula)'
-            });
-        }
-
-        // Encriptar la contraseña
-        const salt = bcrypt.genSaltSync(10);
-        const claveEncriptada = bcrypt.hashSync(clave, salt);
-
-        // Si la cédula no existe, crear un nuevo registro en personas y usuario
-        const nuevaPersonawithusuario = await User.createUser({
-            clave: claveEncriptada,
-            persona: {
-                cedula: persona.cedula,
-                correo: persona.correo ,
-                nombre: persona.nombre,
-                apellido: persona.apellido,
-                telefono_1: persona.telefono_1,
-                telefono_2: persona.telefono_2 || null,
-                estado: 'A', 
-                reg_usuario: usuarioCreador
-            }
-        });
-
-        return res.status(201).json({
-            success: true,
-            message: 'Persona y usuario registrados exitosamente',
-            data: nuevaPersonawithusuario
-        });
-        
-    } catch (err) {
-        return res.status(500).json({
-            success: false,
-            message: 'Error al registrar el usuario',
-            error: err.message
-        });
-    }
-},
-
-    async updateUser(req, res) {
         try {
-            const { id_usuario, rol_id, nombre, email, clave, telefono,estado } = req.body;
-            const usuario_actualizador = req.user?.id_usuario; // Obtenemos el id_usuario del token
-    
-            // Verifica que exista el usuario actualizador
-            if (!usuario_actualizador) {
-                return res.status(401).json({
+            const { clave, persona } = req.body;
+            const usuarioCreador = req.user?.id_usuario || 1;
+
+            // Validar datos requeridos
+            if ( !clave || !persona?.cedula) {
+                return res.status(400).json({
                     success: false,
-                    message: 'No autorizado'
+                    message: 'Faltan datos obligatorios (clave, cédula)'
                 });
             }
-    
-            // Prepare update data
-            const datosActualizacion = {
-                rol_id,
-                nombre,
-                email,
-                telefono,
-                estado
-            };
-    
-            // If password is provided, hash it
+
+            // Encriptar la contraseña
+            const salt = bcrypt.genSaltSync(10);
+            const claveEncriptada = bcrypt.hashSync(clave, salt);
+
+            // Si la cédula no existe, crear un nuevo registro en personas y usuario
+            const nuevaPersonawithusuario = await User.createUser({
+                clave: claveEncriptada,
+                persona: {
+                    cedula: persona.cedula,
+                    correo: persona.correo ,
+                    nombre: persona.nombre,
+                    apellido: persona.apellido,
+                    telefono_1: persona.telefono_1,
+                    telefono_2: persona.telefono_2 || null,
+                    estado: 'A', 
+                    reg_usuario: usuarioCreador
+                }
+            });
+
+            return res.status(201).json({
+                success: true,
+                message: 'Persona y usuario registrados exitosamente',
+                data: nuevaPersonawithusuario
+            });
+            
+        } catch (err) {
+            return res.status(500).json({
+                success: false,
+                message: 'Error al registrar el usuario',
+                error: err.message
+            });
+        }
+    },
+
+    async updateUserController(req, res) {
+        try {
+            const { id_usuario, clave, persona } = req.body;
+            const usuario_actualizador = req.user?.id_usuario;
+
+            // Prepara el objeto de actualización
+            const datosActualizacion = {};
+
+            // Si se envía clave, la encripta
             if (clave) {
                 const salt = bcrypt.genSaltSync(10);
-                const claveHash = bcrypt.hashSync(clave, salt);
-                datosActualizacion.clave = clave;
-                datosActualizacion.clave_segura = claveHash;
+                datosActualizacion.clave = bcrypt.hashSync(clave, salt);
             }
-    
-            // Remove undefined values
-            Object.keys(datosActualizacion).forEach(key => 
+
+            // Si se envía persona, la agrega al objeto
+            if (persona && persona.id_persona) {
+                datosActualizacion.persona = {
+                    id_persona: persona.id_persona,
+                    correo: persona.correo,
+                    nombre: persona.nombre,
+                    apellido: persona.apellido,
+                    telefono_1: persona.telefono_1,
+                    telefono_2: persona.telefono_2,
+                };
+            }
+
+            // Elimina campos undefined
+            Object.keys(datosActualizacion).forEach(key =>
                 datosActualizacion[key] === undefined && delete datosActualizacion[key]
             );
-    
-            // Update user
+
+            // Llama al modelo
             const result = await User.updateUser(id_usuario, datosActualizacion, usuario_actualizador);
-    
-            if (result && result.affectedRows > 0) {
+
+            if (result && result.success) {
                 return res.status(200).json({
                     success: true,
                     message: 'Usuario actualizado exitosamente'
@@ -160,12 +156,12 @@ module.exports = {
                     message: 'Usuario no encontrado o no se realizaron cambios'
                 });
             }
-    
+
         } catch (err) {
             return res.status(500).json({
                 success: false,
                 message: 'Error al actualizar el usuario',
-                error: err.message 
+                error: err.message
             });
         }
     },

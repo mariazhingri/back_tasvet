@@ -51,7 +51,6 @@ Usuarios.findUsuario = async (params) => {
     }
 };
 
-
 Usuarios.createUser = async (datosUsuario) => {
     const connection = await db.getConnection(); 
     try {
@@ -107,17 +106,77 @@ Usuarios.createUser = async (datosUsuario) => {
     }
 };
 
-Usuarios.updateUser = async (id_usuario, datos, usuario_actualizador) => {
+Usuarios.updateUser = async (id_usuario, datosUsuario, usuario_actualizador) => {
+    const connection = await db.getConnection();
     try {
+        await connection.beginTransaction();
+
         const currentDate = new Date();
-        const nombreActualizador = await Usuarios.getUserName(usuario_actualizador);
-        const [result] = await db.query(
-            'UPDATE usuarios SET ? , act_fecha = ?, act_usuario = ? WHERE id_usuario = ?',
-            [datos, currentDate, nombreActualizador, id_usuario]
-        );
-        return result;
+
+        // Actualizar tabla personas si hay datos de persona
+        if (datosUsuario.persona && datosUsuario.persona.id_persona) {
+            await connection.query(
+                `UPDATE personas SET correo = ?, nombre = ?, apellido = ?, telefono_1 = ?, telefono_2 = ?, act_fecha = ?, act_usuario = ?
+                 WHERE id_persona = ?`,
+                [
+                    datosUsuario.persona.correo || null,
+                    datosUsuario.persona.nombre,
+                    datosUsuario.persona.apellido,
+                    datosUsuario.persona.telefono_1,
+                    datosUsuario.persona.telefono_2 || null,
+                    currentDate,
+                    usuario_actualizador,
+                    datosUsuario.persona.id_persona
+                ]
+            );
+        }
+
+        // Verificar si existe el usuario
+        let usuarioExiste = false;
+        if (id_usuario) {
+            const [rows] = await connection.query(
+                'SELECT id_usuario FROM usuarios WHERE id_usuario = ?',
+                [id_usuario]
+            );
+            usuarioExiste = rows.length > 0;
+        }
+
+        if (usuarioExiste) {
+            // Actualizar usuario existente
+            let datosUsuarioUpdate = {
+                clave: datosUsuario.clave,
+                act_fecha: currentDate,
+                act_usuario: usuario_actualizador
+            };
+            Object.keys(datosUsuarioUpdate).forEach(key => datosUsuarioUpdate[key] === undefined && delete datosUsuarioUpdate[key]);
+
+            await connection.query(
+                'UPDATE usuarios SET ? WHERE id_usuario = ?',
+                [datosUsuarioUpdate, id_usuario]
+            );
+        } else if (datosUsuario.persona && datosUsuario.clave) {
+            // Crear usuario si no existe y hay datos suficientes
+            await connection.query(
+                `INSERT INTO usuarios (persona_id, clave, rol_id, estado, reg_fecha, reg_usuario)
+                 VALUES (?, ?, ?, ?, ?, ?)`,
+                [
+                    datosUsuario.persona.id_persona,
+                    datosUsuario.clave,
+                    3, 
+                    'A',
+                    currentDate,
+                    usuario_actualizador
+                ]
+            );
+        }
+
+        await connection.commit();
+        return { success: true };
     } catch (error) {
+        await connection.rollback();
         throw error;
+    } finally {
+        connection.release();
     }
 }
 
