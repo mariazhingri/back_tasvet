@@ -1,48 +1,14 @@
 const Usuarios = require('../modelo/user_model');
-const Servicio = require('../modelo/servicios_model'); 
+const servicioService = require('../services/servicioService'); 
 const e = require('express');
 require('dotenv').config();
 
 module.exports = {
     async crearServicio(req, res) {
-
-        const id_usuario = req.user?.id_usuario;
-
-            // Verifica que exista el usuario actualizador
-            if (!id_usuario) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'No autorizado'
-                });
-            }
-    
         try {
-             // Verifica el rol del usuario
-            const userRol = await Usuarios.findUsuario({ id_usuario });
-            if (!userRol || userRol.rol_id !== 1 && userRol.rol_id !== 2) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Acción no permitida'
-                });
-            }
-
-            const { descripcion, categoria} = req.body;
-
-            // Validar que todos los campos requeridos estén presentes
-            if (!descripcion || !categoria ) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Faltan campos obligatorios'
-                });
-            }
-
-            // Crear el servicio
-            const nuevoServicio = await Servicio.crearServicio({
-                descripcion,
-                categoria,
-                reg_usuario: id_usuario
-            });
-
+             const id_usuario = req.user?.id_usuario
+             const nuevoServicio = await servicioService.createServicio(id_usuario, req.body);
+             
             return res.status(201).json({
                 success: true,
                 message: 'Servicio creado exitosamente',
@@ -59,20 +25,11 @@ module.exports = {
     },
 
     async obtenerServicios(req, res) {
-       const id_usuario = req.user?.id_usuario;
-
-            // Validar si el usuario está autenticado
-            if (!id_usuario) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Usuario no autenticado'
-                });
-            }
-    
+       
         try {
 
-            // Obtener los servicios
-            const servicios = await Servicio.obtenerServicios();
+            const id_usuario = req.user?.id_usuario;
+            const servicios = await servicioService.getServicio(id_usuario);
 
             return res.status(200).json({
                 success: true,
@@ -89,52 +46,18 @@ module.exports = {
     },
 
     async actualizarServicio(req, res) {
-        const id_usuario = req.user?.id_usuario;
-
-            // Validar si el usuario está autenticado
-            if (!id_usuario) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Usuario no autenticado',
-                    error: error.message
-                });
-            }
-    
+       
         try {
-            // Verifica el rol del usuario
-            const userRol = await Usuarios.findUsuario({id_usuario});
-            if (!userRol || userRol.rol_id !== 1 && userRol.rol_id !== 2) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Acción no permitida'
-                });
-            }
-
+             const id_usuario = req.user?.id_usuario;
             const { id_servicio, descripcion, categoria } = req.body;
-
-            // Validar que todos los campos requeridos estén presentes
-            if (!id_servicio || !descripcion || !categoria) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Faltan campos obligatorios'
-                });
-            }
-
-            // Actualizar el servicio
-            const resultado = await Servicio.actualizarServicio({
+            await servicioService.actualizarServicio({
+                id_usuario,
                 id_servicio,
                 descripcion,
-                categoria,
-                act_usuario: id_usuario
+                categoria
             });
 
-            if (resultado === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Servicio no encontrado'
-                });
-            }
-
+            
             return res.status(200).json({
                 success: true,
                 message: 'Servicio actualizado exitosamente'
@@ -150,46 +73,11 @@ module.exports = {
     },
 
     async eliminarServicio(req, res) {
-        const id_usuario = req.user?.id_usuario;
-
-            // Validar si el usuario está autenticado
-            if (!id_usuario) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Usuario no autenticado',
-                    error: error.message
-                });
-            }
-    
+        
         try {
-            // Verifica el rol del usuario
-            const userRol = await Usuarios.findUsuario({id_usuario});
-            if (!userRol || userRol.rol_id !== 1 && userRol.rol_id !== 2) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Acción no permitida'
-                });
-            }
-
-            const { id_servicio } = req.body;
-
-            // Validar que el ID del servicio esté presente
-            if (!id_servicio) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Falta el ID del servicio'
-                });
-            }
-
-            // Eliminar el servicio
-            const resultado = await Servicio.eliminarServicio(id_servicio);
-
-            if (resultado === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Servicio no encontrado'
-                });
-            }
+             const id_usuario = req.user?.id_usuario;
+             const { id_servicio } = req.body;
+             await servicioService.eliminarServicio({ id_usuario, id_servicio });
 
             return res.status(200).json({
                 success: true,

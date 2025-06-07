@@ -6,53 +6,17 @@ const { enviarCodigoVerificacion } = require('../../services/mailSend');
 const {guardarCodigo}  = require('../../modelo/CodigoVerificacionModel');
 const { verificarCodigoDB } = require('../../modelo/CodigoVerificacionModel');
 require('dotenv').config();
+const authService = require('../../services/authService')
 
 module.exports = {
     async login(req, res) {
         try {
-            const { correo, clave } = req.body;
-    
-            // Busca al usuario en la base de datos
-            const user = await User.findUsuario({ correo });
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Error al obtener los datos',
-                    error: err.message 
-                });
-            }
-    
-            /// Verifica la contraseña
-            let isvalid;
-
-            // Verifica si la contraseña almacenada parece estar encriptada
-            if (user.clave.startsWith('$2b$') || user.clave.startsWith('$2a$')) {
-                // Si está encriptada, usa bcrypt para comparar
-                isvalid = bcrypt.compareSync(clave, user.clave);
-            } else {
-                // Si no está encriptada, compara directamente (texto plano)
-                isvalid = clave === user.clave;
-            }
-
-            if (!isvalid) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Acceso no autorizado'
-                });
-            }
-    
-            // Genera el token JWT incluyendo id_usuario
-            const token = jwt.sign({ 
-                id_usuario: user.id_usuario,
-                nombre: user.correo,
-                rol_descripcion: user.rol_descripcion
-            }, key.JWT_SECRET, {});
-            //console.log('user', token);
-    
+            const result  = await authService.login(req.body)
             return res.status(200).json({
                 message: "Login exitoso",
-                user: correo,
-                token: `JWT ${token}`
+                ...result
+                // user: correo,
+                // token: `JWT ${token}`
             });
     
         } catch (err) {
@@ -66,40 +30,13 @@ module.exports = {
 
     async register(req, res) {
         try {
-            const { clave, persona } = req.body;
             const usuarioCreador = req.user?.id_usuario || 1;
-
-            // Validar datos requeridos
-            if ( !clave || !persona?.cedula) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Faltan datos obligatorios (clave, cédula)'
-                });
-            }
-
-            // Encriptar la contraseña
-            const salt = bcrypt.genSaltSync(10);
-            const claveEncriptada = bcrypt.hashSync(clave, salt);
-
-            // Si la cédula no existe, crear un nuevo registro en personas y usuario
-            const nuevaPersonawithusuario = await User.createUser({
-                clave: claveEncriptada,
-                persona: {
-                    cedula: persona.cedula,
-                    correo: persona.correo ,
-                    nombre: persona.nombre,
-                    apellido: persona.apellido,
-                    telefono_1: persona.telefono_1,
-                    telefono_2: persona.telefono_2 || null,
-                    estado: 'A', 
-                    reg_usuario: usuarioCreador
-                }
-            });
+            const data = await authService.userRegister(req.body, usuarioCreador); 
 
             return res.status(201).json({
                 success: true,
                 message: 'Persona y usuario registrados exitosamente',
-                data: nuevaPersonawithusuario
+                data: data
             });
             
         } catch (err) {
@@ -113,37 +50,10 @@ module.exports = {
 
     async updateUserController(req, res) {
         try {
-            const { id_usuario, clave, persona } = req.body;
+           const { id_usuario, clave, persona } = req.body;
             const usuario_actualizador = req.user?.id_usuario;
 
-            // Prepara el objeto de actualización
-            const datosActualizacion = {};
-
-            // Si se envía clave, la encripta
-            if (clave) {
-                const salt = bcrypt.genSaltSync(10);
-                datosActualizacion.clave = bcrypt.hashSync(clave, salt);
-            }
-
-            // Si se envía persona, la agrega al objeto
-            if (persona && persona.id_persona) {
-                datosActualizacion.persona = {
-                    id_persona: persona.id_persona,
-                    correo: persona.correo,
-                    nombre: persona.nombre,
-                    apellido: persona.apellido,
-                    telefono_1: persona.telefono_1,
-                    telefono_2: persona.telefono_2,
-                };
-            }
-
-            // Elimina campos undefined
-            Object.keys(datosActualizacion).forEach(key =>
-                datosActualizacion[key] === undefined && delete datosActualizacion[key]
-            );
-
-            // Llama al modelo
-            const result = await User.updateUser(id_usuario, datosActualizacion, usuario_actualizador);
+            const result = await authService.updateUser(id_usuario, { clave, persona }, usuario_actualizador); 
 
             if (result && result.success) {
                 return res.status(200).json({
