@@ -95,6 +95,7 @@ CREATE TABLE mascotas (
 	especie varchar(150),
 	raza_id INT,
 	fecha_nacimiento DATE,
+	edad_meses INT,
 	sexo VARCHAR(10),
 	peso_kg FLOAT,
 	estado CHAR(1),
@@ -267,6 +268,7 @@ CREATE TABLE codigos_verificacion (
     usado BOOLEAN DEFAULT FALSE
 );
 
+
 -- ------INSERCIÓN DE DATOS--------
 INSERT INTO roles (descripcion, estado) VALUES
 ('Administrador', 'A'),
@@ -274,13 +276,14 @@ INSERT INTO roles (descripcion, estado) VALUES
 ('Cliente', 'A');
 
 INSERT INTO personas (cedula,correo ,nombre,apellido, telefono_1, telefono_2, estado,reg_fecha,reg_usuario) values
+('000000000','','iii','aa', '0000002356',NULL, 'A',NOW(),'Admin')
 ('0926343559','mariazhingripaz@outlook.com','Maria','Zhingri', '0985733121',NULL, 'A',NOW(),'Admin'),
 ('0978654568','tasvet@outlook.com', 'Dennise','Garces', '0987986751',NULL,'A',NOW(),'Admin'),
 ('0157863214','ejemplo@outlook.com', 'Juan','Perez', '0975463218',NULL,'A',NOW(),'Admin'),
 ('0245789631','','Carla','Letamendi', '0987546325',NULL, 'A',NOW(),'Admin'),
-('0578364215','','Roberto','Fores', '0987546321',NULL, 'A',NOW(),'Admin'),
-('0354269875','paula@ejemplo.com','Paula','Lucero', '0985621307',NULL, 'A',NOW(),'Admin'),
-('0487623592','','Lucas','Jaramillo', '0987542136',NULL, 'A',NOW(),'Admin')
+('0354862130','mzhingri@gmail.com','Maca','Suarez', '0987546321',NULL, 'A',NOW(),'Admin'),
+('0456893216','','Hugo','Piguave', '0985301250',NULL, 'A',NOW(),'Admin')
+
 
 INSERT INTO usuarios (rol_id, persona_id, clave, estado, reg_fecha, reg_usuario) VALUES 
 (1,1, 'admin', 'A', NOW(),'Admin'),
@@ -308,11 +311,14 @@ insert into sub_servicios(servicio_id,especie_id, descripcion,estado,reg_fecha, 
 INSERT INTO citas (cliente_id,mascota_id,veterinario_id,servicio_id,fecha_hora_cita,estado) VALUES 
 (3,1,4,'Consulta general',1,'2025-04-20 10:30:00','A');
 
--- -----------ALTERAR------------
+-- -----------------------
 ALTER TABLE personas MODIFY COLUMN usuario_id INT NULL;
 ALTER TABLE personas MODIFY COLUMN cedula varchar(10) UNIQUE NOT NULL ;
 ALTER TABLE personas DROP COLUMN direccion;
 ALTER TABLE mascotas DROP COLUMN edad_meses;
+ALTER TABLE personas MODIFY reg_usuario varchar(150) NULL;
+ALTER TABLE usuarios MODIFY reg_usuario varchar(150) NULL;
+
 
 -- ELIMINAR ---
 drop database tasvet_operativo
@@ -329,7 +335,6 @@ DROP TABLE personas;
 DROP TABLE razas ;
 
 delete from mascotas where id_mascota  = 1;
-delete from vinculaciones_mascotas  where id_vinculacion_mascota   = 1;
 
 TRUNCATE TABLE usuarios;
 TRUNCATE TABLE codigos_verificacion;
@@ -337,14 +342,14 @@ TRUNCATE TABLE codigos_verificacion;
 -- -------CONSULTAS--------
 select * from roles;
 select * from usuarios u; 
-select * from clientes;
+select *  from clientes;
 select * from codigos_verificacion;
 select * from mascotas;
 select * from razas;
 select * from servicios;
 select * from personas;
-
 SHOW TABLES;
+SELECT * FROM usuarios WHERE email = 'mariazhingripaz@outlook.com'
 
 SELECT u.*
 FROM usuarios u 
@@ -406,14 +411,3 @@ FROM personas p
 LEFT JOIN usuarios u ON u.persona_id = p.id_persona
 WHERE p.cedula = '0157863214'
 
-select p.*, r.descripcion as rol
-                from personas p
-                inner join usuarios u on p.id_persona = u.persona_id
-                inner join roles r on u.rol_id = r.id_rol
-                where u.id_usuario = 1
-                and u.estado = 'A'
-                
-select c.id_cliente, p.nombre, p.apellido, p.cedula, p.telefono_1, p.telefono_2, p.correo, c.direccion
-                from clientes c
-                inner join personas p on c.persona_id = p.id_persona
-                and c.estado = 'A'
