@@ -250,6 +250,35 @@ Mascota.deleteMascota = async (mascota_id, usuario_eliminador) => {
     } finally {
         connection.release();
     }
+
+Mascota.obtenerPorClienteId = async (cliente_id) => {
+    const connection = await db.getConnection();
+    try {
+        const sql = `
+            SELECT 
+                m.id_mascota,
+                m.nombre AS nombre_mascota,
+                m.fecha_nacimiento,
+                m.sexo,
+                m.peso_kg,
+                m.estado,
+                e.nombre AS especie,
+                r.nombre AS raza
+            FROM mascotas m
+            INNER JOIN especies e ON m.especie_id = e.id_especie
+            INNER JOIN razas r ON m.raza_id = r.id_raza
+            WHERE m.cliente_id = ? AND m.estado = 'A'
+        `;
+
+        const [mascotas] = await connection.query(sql, [cliente_id]);
+        return mascotas;
+    } catch (error) {
+        throw error;
+    } finally {
+        connection.release();
+    }
+};
+
 };
 
 module.exports = Mascota;

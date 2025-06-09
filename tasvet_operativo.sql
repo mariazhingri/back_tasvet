@@ -113,6 +113,7 @@ create table servicios(
 	id_servicio INT PRIMARY KEY auto_increment,
 	descripcion VARCHAR(150),
 	categoria VARCHAR(150),
+  formulario INT null,
 	estado CHAR(1),
 	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   	reg_usuario varchar(150),
