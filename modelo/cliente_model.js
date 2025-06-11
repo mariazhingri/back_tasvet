@@ -46,18 +46,16 @@ Clientes.createClientPet = async (params) => {
             sexo,
             peso_kg,
             fecha_nacimiento,
-            cliente: {
-                direccion,
-                persona: {
-                    nombre: nombrePersona,
-                    apellido,
-                    cedula,
-                    telefono_1,
-                    telefono_2,
-                    correo,
-                    reg_usuario
-                }
-            }
+            direccion,
+            nombreCliente,
+            apellido,
+            cedula,
+            telefono_1,
+            telefono_2,
+            correo,
+            reg_usuario
+                
+            
         } = params;
 
         // Crear la persona
@@ -66,7 +64,7 @@ Clientes.createClientPet = async (params) => {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
         const [personaResult] = await db.query(sqlPersona, [
-            nombrePersona,
+            nombreCliente,
             apellido,
             cedula,
             telefono_1,
@@ -123,16 +121,15 @@ Clientes.updateClient = async (params) => {
         const { 
             id_cliente,
             direccion,
-            persona: {
-                id_persona,
-                nombre,
-                apellido,
-                cedula,
-                telefono_1,
-                telefono_2,
-                correo,
-                reg_usuario
-            }
+            id_persona,
+            nombre,
+            apellido,
+            cedula,
+            telefono_1,
+            telefono_2,
+            correo,
+            reg_usuario
+            
         } = params;
 
         // Actualizar persona
@@ -168,5 +165,63 @@ Clientes.updateClient = async (params) => {
         throw err;
     }
 }
+
+Clientes.deleteClient = async(id_cliente, eli_usuario) => {
+    try{
+        const currentDate = new Date();
+        const [result] = await db.query(
+            'UPDATE clientes SET estado = "I", eli_fecha = ?, eli_usuario = ? WHERE id_cliente = ?',
+            [currentDate, eli_usuario, id_cliente]
+        );
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
+Clientes.crearcliente = async (params) => {
+    try{
+        const currentDate = new Date();
+
+        const sql = `INSERT INTO clientes (persona_id, direccion, estado, reg_fecha, reg_usuario)
+        VALUES (?, ?, ?, ?, ?)`;
+        const [result] = await db.query(sql, 
+            [params.personaId, params.direccion, 'A',
+            currentDate, params.reg_usuario])
+            
+        return result.insertId;
+    }catch(err){
+        throw err;
+    }
+};
+
+Clientes.updateCliente = async (params) => {
+  try {
+    const currentDate = new Date();
+
+    const sql = `
+      UPDATE clientes SET
+        persona_id = ?,
+        direccion = ?,
+        act_fecha = ?,
+        act_usuario = ?
+      WHERE id_cliente = ? AND estado = 'A'
+    `;
+
+    const [result] = await db.query(sql, [
+      params.personaId,
+      params.direccion,
+      currentDate,
+      params.act_usuario,
+      params.id_cliente
+    ]);
+
+    return result.affectedRows > 0; // true si se actualizó
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 
 module.exports = Clientes;
