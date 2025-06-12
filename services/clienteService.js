@@ -2,12 +2,12 @@ const Clientes = require('../modelo/cliente_model')
 
 module.exports = {
 
-   async getClients (id_usuario) {
+   async obtenerDatosClientes (id_usuario) {
         if (!id_usuario) {
             throw { status: 401, message: 'Usuario no autenticado' };
         }
         const params = { id_usuario };
-        const clientes = await Clientes.datosCliente(params);
+        const clientes = await Clientes.obtenerDatosCliente(params);
 
         // const clientes = rawData.map(row => ({
         //         id_cliente: row.id_cliente,
@@ -26,7 +26,7 @@ module.exports = {
         return clientes;
     },
 
-    async createClientPet (body, usuario_creador) {
+    async CrearclienteConMascota (body, usuario_creador) {
 
         // Validar campos requeridos
         if (!body || !body.cliente || !body.cliente.persona) {
@@ -48,7 +48,7 @@ module.exports = {
         // Construcción del objeto para enviarlo a la base de datos
         //console.log(JSON.stringify(body.cliente.persona, null, 2));
 
-        const clienteConMascota = await Clientes.createClientPet ({
+        const clienteConMascota = await Clientes.CrearclienteConMascota ({
             nombre: body.nombre,
             especie: body.especie,
             raza: body.raza,
@@ -72,14 +72,14 @@ module.exports = {
         return clienteConMascota;
     },
 
-    async updateClient (body, usuario_actualizador) {
+    async acualizarClienteconMascota (body, usuario_actualizador) {
 
         // Validar permisos
         if (usuario_actualizador !== 1 && usuario_actualizador !== 2) {
             throw { status: 403, message: 'No tiene permisos para actualizar este cliente' };
         }
 
-        const clienteActualizado = await Clientes.updateClient({
+        const clienteActualizado = await Clientes.acualizarClienteconMascota({
             id_cliente: body.id_cliente,
             direccion: body.direccion,
                 persona: {

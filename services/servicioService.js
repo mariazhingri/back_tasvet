@@ -3,7 +3,7 @@ const Servicio = require('../modelo/servicios_model');
 
 module.exports = {
 
-    async getServicio (id_usuario) {
+    async obtenerServicios (id_usuario) {
         if (!id_usuario) {
             throw { status: 401, message: 'Usuario no autenticado' };
         }
@@ -12,7 +12,7 @@ module.exports = {
         return servicios;
     },
 
-    async createServicio (id_usuario, data){
+    async crearServicio (id_usuario, data){
         if (!id_usuario) {
             throw { status: 401, message: 'No autorizado' };
         }
@@ -37,7 +37,7 @@ module.exports = {
         return nuevoServicio;
     },
 
-    async updateService ({ id_usuario, id_servicio, descripcion, categoria }){
+    async actualizarServicio ({ id_usuario, id_servicio, descripcion, categoria }){
          if (!id_usuario) {
             throw { status: 401, message: 'Usuario no autenticado' };
         }
@@ -65,7 +65,7 @@ module.exports = {
         return true;
     },
 
-    async deleteService ({ id_usuario, id_servicio }){
+    async eliminarServicio ({ id_usuario, id_servicio }){
         if (!id_usuario) {
             throw { status: 401, message: 'Usuario no autenticado' };
         }

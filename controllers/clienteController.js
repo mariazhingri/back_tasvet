@@ -17,7 +17,7 @@ module.exports = {
             }
 
             const params = { id_usuario };
-            const usuario = await Clientes.datosUsuario(params);
+            const usuario = await Clientes.obtenerDatosUsuario(params);
 
             if (!usuario) {
                 return res.status(404).json({
@@ -57,10 +57,10 @@ module.exports = {
         }
     },
 
-    async CreateclientePetController(req, res) {
+    async CrearclienteConMascota(req, res) {
         try {
             const usuario_creador = req.user?.id_usuario;
-            const clienteCreado = await clienteService.createClientPet(req.body, usuario_creador); 
+            const clienteCreado = await clienteService.CrearclienteConMascota(req.body, usuario_creador); 
 
             res.status(201).json({
                 success: true,
@@ -77,10 +77,10 @@ module.exports = {
         }
     },
 
-    async UpdateClient(req, res) {
+    async acualizarClienteconMascota(req, res) {
         try {
             const usuario_actualizador = req.user?.id_usuario; 
-            const clienteActualizado = await clienteService.updateClient(req.body, usuario_actualizador);
+            const clienteActualizado = await clienteService.acualizarClienteconMascota(req.body, usuario_actualizador);
 
             res.status(200).json({
                 success: true,

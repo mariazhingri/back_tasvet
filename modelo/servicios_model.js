@@ -14,11 +14,11 @@ Servicios.crearServicio = async (params) => {
             sql, 
             [params.descripcion, params.categoria, 'A', currentDate, params.reg_usuario]);
 
-        return result.insertId; // Devuelve el ID del nuevo servicio creado
+        return result.insertId; 
     } catch (error) {
         throw error;
     }
-}
+};
 
 Servicios.obtenerServicios = async () => {
     try {
@@ -32,7 +32,7 @@ Servicios.obtenerServicios = async () => {
     } catch (error) {
         throw error;
     }
-}
+};
 
 Servicios.actualizarServicio = async (params) => {
     try {
@@ -49,7 +49,8 @@ Servicios.actualizarServicio = async (params) => {
     } catch (error) {
         throw error;
     }
-}
+};
+
 Servicios.eliminarServicio = async (id_servicio, eli_usuario) => {
     try {
         const currentDate = new Date();
@@ -65,6 +66,6 @@ Servicios.eliminarServicio = async (id_servicio, eli_usuario) => {
     } catch (error) {
         throw error;
     }
-}
+};
 
 module.exports = Servicios;

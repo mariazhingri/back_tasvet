@@ -7,7 +7,7 @@ module.exports = {
     async crearServicio(req, res) {
         try {
              const id_usuario = req.user?.id_usuario
-             const nuevoServicio = await servicioService.createServicio(id_usuario, req.body);
+             const nuevoServicio = await servicioService.crearServicio(id_usuario, req.body);
              
             return res.status(201).json({
                 success: true,
@@ -29,7 +29,7 @@ module.exports = {
         try {
 
             const id_usuario = req.user?.id_usuario;
-            const servicios = await servicioService.getServicio(id_usuario);
+            const servicios = await servicioService.obtenerServicios(id_usuario);
 
             return res.status(200).json({
                 success: true,

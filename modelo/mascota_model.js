@@ -3,6 +3,86 @@ const Usuarios = require('../modelo/user_model');
 const Mascota = {};
 
 
+Mascota.crearMascota1 = async(params) => {
+    try{
+        const currentDate = new Date();
+        const sql = `
+            INSERT INTO mascotas (
+                cliente_id, nombre, especie, raza_id, 
+                fecha_nacimiento, sexo, peso_kg, 
+                estado, reg_fecha,reg_usuario
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?,'A',,?, ?)
+        `;
+        const [result] = await db.query(sql, [
+            clienteId,
+            params.nombre_mascota,
+            params.especie,
+            params.raza_id,
+            params.fecha_nacimiento,
+            params.sexo,
+            params.peso_kg,
+            currentDate,
+            params.reg_usuario
+        ]);
+
+        return result.insertId;
+    }catch(err){
+        throw err;
+    }
+        
+};
+
+Mascota.actualizarMascota = async (params) => {
+    try {
+        const currentDate = new Date();
+        const sql = `
+            UPDATE mascotas SET
+                cliente_id = ?,
+                nombre = ?,
+                especie = ?,
+                raza_id = ?,
+                fecha_nacimiento = ?,
+                sexo = ?,
+                peso_kg = ?,
+                act_fecha = ?,
+                act_usuario = ?
+            WHERE mascota_id = ?
+        `;
+
+        const [result] = await db.query(sql, [
+            params.cliente_id,
+            params.nombre_mascota,
+            params.especie,
+            params.raza_id,
+            params.fecha_nacimiento,
+            params.sexo,
+            params.peso_kg,
+            currentDate,
+            params.act_usuario,  
+            params.mascota_id
+        ]);
+
+        return result.affectedRows;
+    } catch (err) {
+        throw err;
+    }
+};
+
+Mascota.eliminarMascota = async (mascotaId) => {
+    try {
+        const sql = `
+            UPDATE mascotas 
+            SET estado = 'I' 
+            WHERE mascota_id = ?
+        `;
+        const [result] = await db.query(sql, [mascotaId]);
+        return result;
+    } catch (err) {
+        throw err;
+    }
+}
+
 Mascota.crearMascota = async (params) => {
     const connection = await db.getConnection();
     try {
@@ -251,5 +331,6 @@ Mascota.deleteMascota = async (mascota_id, usuario_eliminador) => {
         connection.release();
     }
 };
+
 
 module.exports = Mascota;
