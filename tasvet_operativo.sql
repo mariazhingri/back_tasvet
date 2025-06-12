@@ -276,13 +276,13 @@ INSERT INTO roles (descripcion, estado) VALUES
 ('Cliente', 'A');
 
 INSERT INTO personas (cedula,correo ,nombre,apellido, telefono_1, telefono_2, estado,reg_fecha,reg_usuario) values
-('000000000','','iii','aa', '0000002356',NULL, 'A',NOW(),'Admin')
 ('0926343559','mariazhingripaz@outlook.com','Maria','Zhingri', '0985733121',NULL, 'A',NOW(),'Admin'),
 ('0978654568','tasvet@outlook.com', 'Dennise','Garces', '0987986751',NULL,'A',NOW(),'Admin'),
 ('0157863214','ejemplo@outlook.com', 'Juan','Perez', '0975463218',NULL,'A',NOW(),'Admin'),
 ('0245789631','','Carla','Letamendi', '0987546325',NULL, 'A',NOW(),'Admin'),
 ('0354862130','mzhingri@gmail.com','Maca','Suarez', '0987546321',NULL, 'A',NOW(),'Admin'),
 ('0456893216','','Hugo','Piguave', '0985301250',NULL, 'A',NOW(),'Admin')
+('000000000','','iii','aa', '0000002356',NULL, 'A',NOW(),'Admin')
 
 
 INSERT INTO usuarios (rol_id, persona_id, clave, estado, reg_fecha, reg_usuario) VALUES 

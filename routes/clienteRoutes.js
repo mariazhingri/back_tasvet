@@ -9,5 +9,6 @@ module.exports = (app) => {
     app.post('/api/create/cliente', verificarToken,clienteController.CreateclientePetController);
 
     app.put('/api/update/cliente', verificarToken,clienteController.UpdateClient);
+    app.put('/api/delete/cliente', verificarToken,clienteController.DeleteClient)
 
 }

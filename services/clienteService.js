@@ -9,29 +9,15 @@ module.exports = {
         const params = { id_usuario };
         const clientes = await Clientes.obtenerDatosCliente(params);
 
-        // const clientes = rawData.map(row => ({
-        //         id_cliente: row.id_cliente,
-        //         direccion: row.direccion,
-        //         persona: {
-        //         id_persona: row.id_persona,
-        //         nombre: row.nombre,
-        //         apellido: row.apellido,
-        //         cedula: row.cedula,
-        //         correo: row.correo,
-        //         telefono_1: row.telefono_1,
-        //         telefono_2: row.telefono_2,
-        //         },
-        //     }));
-
         return clientes;
     },
 
     async CrearclienteConMascota (body, usuario_creador) {
 
         // Validar campos requeridos
-        if (!body || !body.cliente || !body.cliente.persona) {
-            throw { status: 400, message: 'Datos incompletos para crear el cliente' };
-        }
+        // if (!body ) {
+        //     throw { status: 400, message: 'Datos incompletos para crear el cliente' };
+        // }
 
         // Validar autenticación
         if (!usuario_creador) {
@@ -48,26 +34,23 @@ module.exports = {
         // Construcción del objeto para enviarlo a la base de datos
         //console.log(JSON.stringify(body.cliente.persona, null, 2));
 
-        const clienteConMascota = await Clientes.CrearclienteConMascota ({
-            nombre: body.nombre,
+        const clienteConMascota = await Clientes.createClientPet ({
+            nombre: body.nombre_mascota,
             especie: body.especie,
             raza: body.raza,
             sexo: body.sexo,
             peso_kg: body.peso_kg,
             fecha_nacimiento: body.fecha_nacimiento,
-            cliente: {
-                direccion: body.cliente.direccion,
-                persona: {
-                    cedula: body.cliente.persona.cedula,
-                    correo: body.cliente.persona.correo,
-                    nombre: body.cliente.persona.nombre,
-                    apellido: body.cliente.persona.apellido,
-                    telefono_1: body.cliente.persona.telefono_1,
-                    telefono_2: body.cliente.persona.telefono_2 || null,
-                    estado: "A",
-                    reg_usuario: usuario_creador,
-                },
-            },
+            direccion: body.direccion,
+            cedula: body.cedula,
+            correo: body.correo,
+            nombreCliente: body.nombreCliente,
+            apellido: body.apellidoCliente,
+            telefono_1: body.telefono_1,
+            telefono_2: body.telefono_2 || null,
+            estado: "A",
+            reg_usuario: usuario_creador,
+
         });
         return clienteConMascota;
     },
@@ -82,20 +65,33 @@ module.exports = {
         const clienteActualizado = await Clientes.acualizarClienteconMascota({
             id_cliente: body.id_cliente,
             direccion: body.direccion,
-                persona: {
-                    cedula: body.persona.cedula,
-                    correo: body.persona.correo,
-                    nombre: body.persona.nombre,
-                    apellido: body.persona.apellido,
-                    telefono_1: body.persona.telefono_1,
-                    telefono_2: body.persona.telefono_2 || null,
-                    estado: "A",
-                    reg_usuario: usuario_actualizador,
-                    id_persona: body.persona.id_persona
-                },
+            cedula: body.cedula,
+            correo: body.correo,
+            nombre: body.nombre,
+            apellido: body.apellido,
+            telefono_1: body.telefono_1,
+            telefono_2: body.telefono_2 || null,
+            estado: "A",
+            reg_usuario: usuario_actualizador,
+            id_persona: body.id_persona
+
         });
 
         return clienteActualizado;
+    },
+
+    async deleteClient (id_cliente, usuario_eliminador){
+
+        if (usuario_eliminador !== 1 && usuario_eliminador !== 2) {
+            throw { status: 403, message: 'No tiene permisos para eliminar este cliente' };
+        }
+        if (!id_cliente) {
+            throw { status: 400, message: 'Falta el ID del cliente' };
+        }
+
+        const ClienteEliminado = await Clientes.deleteClient(id_cliente)
+
+        return ClienteEliminado;
     }
 
 };

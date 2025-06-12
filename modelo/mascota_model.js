@@ -8,79 +8,28 @@ Mascota.crearMascota1 = async(params) => {
         const currentDate = new Date();
         const sql = `
             INSERT INTO mascotas (
-                cliente_id, nombre, especie, raza_id, 
+                cliente_id, nombre, especie_id, raza_id, 
                 fecha_nacimiento, sexo, peso_kg, 
-                estado, reg_fecha,reg_usuario
+                estado, reg_usuario
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?,'A',,?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?,'A', ?)
         `;
-        const [result] = await db.query(sql, [
+        const [mascotaResult] = await db.query(sql, [
             clienteId,
             params.nombre_mascota,
-            params.especie,
+            params.especie_id,
             params.raza_id,
             params.fecha_nacimiento,
             params.sexo,
             params.peso_kg,
-            currentDate,
             params.reg_usuario
         ]);
 
-        return result.insertId;
+        const mascotaId = mascotaResult.insertId;
     }catch(err){
         throw err;
     }
         
-};
-
-Mascota.actualizarMascota = async (params) => {
-    try {
-        const currentDate = new Date();
-        const sql = `
-            UPDATE mascotas SET
-                cliente_id = ?,
-                nombre = ?,
-                especie = ?,
-                raza_id = ?,
-                fecha_nacimiento = ?,
-                sexo = ?,
-                peso_kg = ?,
-                act_fecha = ?,
-                act_usuario = ?
-            WHERE mascota_id = ?
-        `;
-
-        const [result] = await db.query(sql, [
-            params.cliente_id,
-            params.nombre_mascota,
-            params.especie,
-            params.raza_id,
-            params.fecha_nacimiento,
-            params.sexo,
-            params.peso_kg,
-            currentDate,
-            params.act_usuario,  
-            params.mascota_id
-        ]);
-
-        return result.affectedRows;
-    } catch (err) {
-        throw err;
-    }
-};
-
-Mascota.eliminarMascota = async (mascotaId) => {
-    try {
-        const sql = `
-            UPDATE mascotas 
-            SET estado = 'I' 
-            WHERE mascota_id = ?
-        `;
-        const [result] = await db.query(sql, [mascotaId]);
-        return result;
-    } catch (err) {
-        throw err;
-    }
 }
 
 Mascota.crearMascota = async (params) => {

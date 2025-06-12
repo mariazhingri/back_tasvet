@@ -96,4 +96,25 @@ module.exports = {
             });
         }
     },
+
+    async DeleteClient(req, res) {
+        try {
+            const usuario_eliminador = req.user?.id_usuario; 
+            const { id_cliente } = req.body
+            const clienteEliminado = await clienteService.deleteClient(id_cliente, usuario_eliminador);
+
+            res.status(200).json({
+                success: true,
+                message: 'Cliente eliminado exitosamente',
+                //data: clienteEliminado
+            });
+        } catch (error) {
+            console.error(error); 
+            res.status(500).json({
+                success: false,
+                message: 'Error interno del servidor',
+                error: error.message
+            });
+        }
+    },
 }

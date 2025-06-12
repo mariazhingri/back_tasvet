@@ -2,7 +2,7 @@ const db = require('../config/conexion');
 
 const Clientes = {}
 
-Clientes.obtenerDatosUsuario = async (params) => {
+Clientes.datosUsuario = async (params) => {
     try {
         sql = `select p.*, r.descripcion as rol
                 from personas p
@@ -20,7 +20,7 @@ Clientes.obtenerDatosUsuario = async (params) => {
     }
 }
 
-Clientes.obtenerDatosCliente = async (params) => {
+Clientes.datosCliente = async (params) => {
     try {
         sql = `select c.id_cliente, p.id_persona,p.nombre, p.apellido, p.cedula, p.telefono_1, p.telefono_2, p.correo, c.direccion
                 from clientes c
@@ -34,7 +34,7 @@ Clientes.obtenerDatosCliente = async (params) => {
     }
 }
 
-Clientes.CrearclienteConMascota = async (params) => {
+Clientes.createClientPet = async (params) => {
     try {
         const currentDate = new Date();
 
@@ -117,7 +117,7 @@ Clientes.CrearclienteConMascota = async (params) => {
     }
 };
 
-Clientes.acualizarClienteconMascota = async (params) => {
+Clientes.updateClient = async (params) => {
     try {
         const currentDate = new Date();
         const { 
