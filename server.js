@@ -41,3 +41,56 @@ app.use((req, res, next) => {
 app.listen(port, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
 });
+
+//
+// const express = require("express");
+// const cors = require("cors");
+// const cookieParser = require('cookie-parser');
+// const passport = require('passport');
+// const auth_routes = require("./routes/authRoutes");
+// const mascotas = require("./routes/mascotaRoutes");
+// const clientes = require("./routes/clienteRoutes");
+// const servicios = require("./routes/servicioRoutes");
+
+// const app = express();
+// const port = 5000;
+
+// // 1. CORS 
+// app.use(cors({
+//   origin: 'http://localhost:3000',
+//   credentials: true,
+// }));
+
+// // 2. Parsers
+// app.use(express.json());
+// app.use(cookieParser());
+
+// // 3. Logging para debugging 
+// app.use((req, res, next) => {
+//   console.log(`📡 ${req.method} ${req.path}`);
+//   console.log('📨 Body:', req.body);
+//   console.log('🍪 Cookies:', req.cookies);
+//   console.log('📋 Headers:', req.headers);
+//   next();
+// });
+
+// // 4. Passport
+// app.use(passport.initialize());
+
+// // 5. Configurar passport
+// require('./config/passport')(passport);
+
+// // 6. RUTAS AL FINAL
+// auth_routes(app);
+// clientes(app);
+// mascotas(app);
+// servicios(app);
+
+// // Iniciar el servidor
+// app.listen(port, () => {
+//   console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
+// });
+//
+//
+
+

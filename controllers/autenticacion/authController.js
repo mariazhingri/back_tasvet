@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const key = require('../../config/key');
@@ -5,16 +7,14 @@ const User = require('../../modelo/user_model');
 const { enviarCodigoVerificacion } = require('../../services/mailSend');
 const { guardarCodigo } = require('../../modelo/CodigoVerificacionModel');
 const { verificarCodigoDB } = require('../../modelo/CodigoVerificacionModel');
-require('dotenv').config();
+const Usuarios = require('../../modelo/user_model');
+
+const ADMIN_SECRET = process.env.ADMIN_CREATION_SECRET || 'AdminSecretKey2024VetSystem';
 
 module.exports = {
   async login(req, res) {
     try {
-      console.log('🔄 Iniciando proceso de login');
-      console.log('📨 Body recibido:', req.body);
-
-      const { correo, clave } = req.body;
-
+      console.log('🔄 Iniciando proceso de login'); console.log('📨 Body recibido:', req.body); const { correo, clave } = req.body;
       // Buscar usuario por correo
       const user = await User.findUsuario({ correo });
 
@@ -48,6 +48,8 @@ module.exports = {
         rol_descripcion: user.rol_descripcion,
       };
 
+
+      console.log('🔑 JWT_SECRET en backend:', key.JWT_SECRET);
 
       const token = jwt.sign(tokenPayload, key.JWT_SECRET, { expiresIn: '1d' });
 
@@ -132,6 +134,53 @@ module.exports = {
       return res.status(500).json({
         success: false,
         message: 'Error al registrar el usuario',
+        error: err.message
+      });
+    }
+  },
+
+  async registerAdmin(req, res) {
+
+    console.log('🔍 ADMIN_SECRET:', ADMIN_SECRET);
+    console.log('🔍 Secret recibido:', req.body.secret);
+    console.log('🔍 Son iguales?', req.body.secret === ADMIN_SECRET);
+    try {
+      const { clave, persona, secret } = req.body;
+
+      // Validar secreto
+      if (secret !== ADMIN_SECRET) {
+        return res.status(403).json({
+          success: false,
+          message: 'Clave secreta inválida para crear administrador'
+        });
+      }
+
+      // Validación de campos requeridos
+      if (!clave || !persona?.cedula) {
+        return res.status(400).json({
+          success: false,
+          message: 'Faltan datos obligatorios (clave, cédula)'
+        });
+      }
+
+      const salt = bcrypt.genSaltSync(10);
+      const claveEncriptada = bcrypt.hashSync(clave, salt);
+
+      const nuevoUsuario = await Usuarios.createUserAdministrador({
+        clave: claveEncriptada,
+        persona,
+        reg_usuario: 1,
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Administrador creado exitosamente',
+        data: nuevoUsuario
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error al crear administrador',
         error: err.message
       });
     }
