@@ -94,8 +94,7 @@ CREATE TABLE mascotas (
 	nombre VARCHAR(150),
 	especie varchar(150),
 	raza_id INT,
-	fecha_nacimiento DATE,
-	edad_meses INT,
+	fecha_nacimiento varchar(150),
 	sexo VARCHAR(10),
 	peso_kg FLOAT,
 	estado CHAR(1),
@@ -128,9 +127,9 @@ create table citas(
 	mascota_id INT,
 	empleado_id INT,
 	servicio_id INT,
-	fecha_hora_cita DATETIME,
-	estado_cita_id INT,
-	estado char(1),
+	fecha_varchar(100),
+	hora varchar(10)
+	estado_cita Varchar(50),
 	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   	reg_usuario varchar(150),
   	act_fecha DATETIME null,
@@ -276,24 +275,25 @@ INSERT INTO roles (descripcion, estado) VALUES
 ('Cliente', 'A');
 
 INSERT INTO personas (cedula,correo ,nombre,apellido, telefono_1, telefono_2, estado,reg_fecha,reg_usuario) values
+('0687541256',NULL,'Nathanael','Poorteño', '0000215478',NULL, 'A',NOW(),'Admin')
+('000000000','','iii','aa', '0000002356',NULL, 'A',NOW(),'Admin')
 ('0926343559','mariazhingripaz@outlook.com','Maria','Zhingri', '0985733121',NULL, 'A',NOW(),'Admin'),
 ('0978654568','tasvet@outlook.com', 'Dennise','Garces', '0987986751',NULL,'A',NOW(),'Admin'),
 ('0157863214','ejemplo@outlook.com', 'Juan','Perez', '0975463218',NULL,'A',NOW(),'Admin'),
-('0245789631','','Carla','Letamendi', '0987546325',NULL, 'A',NOW(),'Admin'),
+('0245789631',NULL,'Carla','Letamendi', '0987546325',NULL, 'A',NOW(),'Admin'),
 ('0354862130','mzhingri@gmail.com','Maca','Suarez', '0987546321',NULL, 'A',NOW(),'Admin'),
-('0456893216','','Hugo','Piguave', '0985301250',NULL, 'A',NOW(),'Admin')
-('000000000','','iii','aa', '0000002356',NULL, 'A',NOW(),'Admin')
+('0456893216',NULL,'Hugo','Piguave', '0985301250',NULL, 'A',NOW(),'Admin')
 
 
 INSERT INTO usuarios (rol_id, persona_id, clave, estado, reg_fecha, reg_usuario) VALUES 
 (1,1, 'admin', 'A', NOW(),'Admin'),
 (2,2, 'denniseVete1', 'A', NOW(),'Admin');
 
-INSERT INTO empleados (usuario_id,nombre, apellido,telefono, email, direccion,estado) VALUES
-(1,'Maria','Zhingri', '0999999999', 'mariazhingripaz@outlook.com','La perla','A');
+INSERT INTO empleados (persona_id,cargo, descripcion,estado, reg_fecha,reg_usuario) VALUES
+(2,'Veterinario',null, 'A', NOW(),'Admin');
 
 INSERT INTO mascotas (cliente_id,especie_id,nombre,raza_id,fecha_nacimiento,edad,sexo,peso_kg,color_pelaje,estado) VALUES 
-(1,1,'Firulais',1,'2020-05-10',4,'Macho',25.5,'Marrón','A');
+(2,1,'Firulais',1,'2020-05-10',4,'Macho',25.5,'Marrón','A');
 
 insert into razas(nombre_raza, estado) values
 ('labrador', 'A'),
@@ -316,6 +316,11 @@ ALTER TABLE personas MODIFY COLUMN usuario_id INT NULL;
 ALTER TABLE personas MODIFY COLUMN cedula varchar(10) UNIQUE NOT NULL ;
 ALTER TABLE personas DROP COLUMN direccion;
 ALTER TABLE mascotas DROP COLUMN edad_meses;
+ALTER TABLE citas DROP COLUMN estado;
+ALTER TABLE mascotas CHANGE COLUMN fecha_hora_cita fecha VARCHAR(100);
+ALTER TABLE citas CHANGE COLUMN estado_cita_id estado_cita Varchar(50);
+
+estado_cita Varchar(50),
 ALTER TABLE personas MODIFY reg_usuario varchar(150) NULL;
 ALTER TABLE usuarios MODIFY reg_usuario varchar(150) NULL;
 
@@ -348,6 +353,9 @@ select * from mascotas;
 select * from razas;
 select * from servicios;
 select * from personas;
+select * from empleados;
+select * from citas;
+
 SHOW TABLES;
 SELECT * FROM usuarios WHERE email = 'mariazhingripaz@outlook.com'
 
@@ -411,3 +419,10 @@ FROM personas p
 LEFT JOIN usuarios u ON u.persona_id = p.id_persona
 WHERE p.cedula = '0157863214'
 
+select *
+from citas c
+where estado_cita  = 'Pendiente'
+
+SELECT * FROM citas 
+        WHERE empleado_id = 1 AND fecha_hora_cita = '2025-06-15T10:30:00'
+        
