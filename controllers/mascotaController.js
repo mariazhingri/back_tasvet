@@ -4,6 +4,7 @@ const key = require('../config/key');
 const MascotaModal = require('../modelo/mascota_model'); 
 const MascotaService = require ('../services/mascotaService');
 const { ObtenerMascota } = require('../services/mascotaService');
+const PersonaModel = require('../modelo/persona_model');
 require('dotenv').config();
 
 module.exports = {
@@ -26,9 +27,9 @@ module.exports = {
             });
         }
     },
-    async crearmascota(req, res) {
+    async crearMascotayCliente(req, res) {
         try {
-            const result = await MascotaService.createPet(req.body);
+            const result = await MascotaService.crearMascotayCliente(req.body);
             return res.status(201).json({ 
                 success: true, 
                 ...result 
@@ -41,17 +42,22 @@ module.exports = {
         }
     },
 
-    async updatemascota(req, res) {
+    async actualizarMascota(req, res) {
         try{
             const usuario_actualizador = req.user?.id_usuario;
-            const result = await MascotaModal.updateMascota(req.body, usuario_actualizador);
+            const body = req.body;
+            const params = {
+                ...body,
+                act_usuario: usuario_actualizador
+            }
+            const result = await MascotaService.actualizarMascota(params);
 
             res.status(200).json({
                 success: true,
                 message: 'Mascota actualizada exitosamente',
-                data: {
-                    mascota_id: result.mascota_id
-                }
+                // data: {
+                //     id_mascota: result.id_mascota
+                // }
             });
 
         } catch (error) {
@@ -63,59 +69,18 @@ module.exports = {
             });
         }
     },
-
-    // async deletemascota(req, res) {
-    //     const usuario_eliminador = req.user?.id_usuario;
-
-    //     // Verifica que exista el usuario eliminador
-    //     if (!usuario_eliminador) {
-    //         return res.status(401).json({
-    //             success: false,
-    //             message: 'No autorizado'
-    //         });
-    //     }
-
-    //     try {
-    //         const { mascota_id } = req.params;
-
-    //         // Validar que se proporcione el ID de la mascota
-    //         if (!mascota_id) {
-    //             return res.status(400).json({
-    //                 success: false,
-    //                 message: 'Se requiere el ID de la mascota'
-    //             });
-    //         }
-
-    //         const result = await Mascota.deleteMascota(mascota_id, usuario_eliminador);
-
-    //         if (!result.success) {
-    //             return res.status(400).json({
-    //                 success: false,
-    //                 message: result.error
-    //             });
-    //         }
-
-    //         res.status(200).json({
-    //             success: true,
-    //             message: 'Mascota eliminada exitosamente',
-    //             data: {
-    //                 mascota_id: result.mascota_id
-    //             }
-    //         });
-
-    //     } catch (error) {
-    //         console.error('Error al eliminar mascota:', error);
-    //         res.status(500).json({
-    //             success: false,
-    //             message: 'Error interno del servidor',
-    //             error: error.message
-    //         });
-    //     }
-    // },
-
+   
     async asignarNuevaMascota(req, res){
         try {
-            const params = req.body;
+            const usuario_creador = req.user?.id_usuario; 
+            const body = req.body;
+
+            const params = {
+                ...body,
+                reg_usuario: usuario_creador,
+                act_usuario: usuario_creador
+        };
+        //console.log("desde front: ",params)
 
             const resultado = await MascotaService.asignarNuevaMascotaACliente(params);
 
@@ -141,10 +106,10 @@ module.exports = {
         }
     },
 
-    async getRazas(req, res){
+    async obtenerRazas(req, res){
          try {
             const id_usuario = req.user?.id_usuario;
-            const Mascotas = await MascotaModal.getRazas(id_usuario);
+            const Mascotas = await MascotaModal.obtenerRazas(id_usuario);
 
             return res.status(200).json({
                 success: true,
@@ -160,12 +125,13 @@ module.exports = {
         }
     },
 
-    async deleteMascota(req, res){
+    async eliminarMascota(req, res){
         try {
             const id_usuario = req.user?.id_usuario;
             const { id_mascota } = req.body;
-            await MascotaModal.deleteMascota(id_mascota, id_usuario);
-
+             //console.log("datos al modelo: ", datos);
+            await MascotaService.eliminarMascota(id_mascota, id_usuario);
+           
             return res.status(200).json({
                 success: true,
                 message: 'Mascota eliminada exitosamente'
@@ -200,4 +166,39 @@ module.exports = {
             });
         }
     },
+
+   async actualizarPersona(req, res) {
+    try {
+        const usuario_actualizador = req.user?.id_usuario;
+        const { correo, apellidoCliente, nombre, telefono_1, telefono_2, act_usuario, persona_id } = req.body;
+
+        const params = {
+            correo,
+            apellido: apellidoCliente,
+            nombre,
+            telefono_1,
+            telefono_2,
+            act_usuario: usuario_actualizador,
+            id_persona: persona_id
+        };
+
+        console.log('PARAMS que le mando al service:', params);
+
+        const personaActualizada = await PersonaModel.actualizarPersona(params);
+
+        res.status(200).json({
+            success: true,
+            data: personaActualizada
+        });
+
+    } catch (error) {
+        console.error('Error al actualizar persona:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor',
+            error: error.message
+        });
+    }
+}
+
 }

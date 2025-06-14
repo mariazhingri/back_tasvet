@@ -3,23 +3,40 @@ const Persona = {};
 
 Persona.crearPersona = async (params) => {
     const currentDate = new Date();
-    const sql = `INSERT INTO personas (cedula, nombre, apellido, telefono_1,telefono_2, estado, reg_fecha, reg_usuario)
-                VALUES (?, ?, ?, ?,?, 'A', ?, ?)`;
+    const sql = `
+    INSERT INTO personas (
+      cedula, 
+      correo,
+      nombre, 
+      apellido, 
+      telefono_1,
+      telefono_2, 
+      estado, 
+      reg_fecha, 
+      reg_usuario)
+    VALUES (?, ?, ?, ?,?,?, 'A', ?, ?)`;
     const [result] = await db.query(sql, [
-        params.cedula, params.nombre, params.apellido,
-        params.telefono_1, params.telefono_2, currentDate, params.reg_usuario
+        params.cedula, 
+        params.correo,
+        params.nombre, 
+        params.apellido,
+        params.telefono_1, 
+        params.telefono_2, 
+        currentDate, 
+        params.reg_usuario
     ]);
     return result.insertId;
 };
 
-Persona.updatePersona = async (params) => {
+Persona.actualizarPersona = async (params) => {
   try {
+     console.log("👉 Recibido en actualizarPersona:", params);
     const currentDate = new Date();
     const sql = `
       UPDATE personas SET
-        nombre = ?,
-        apellido = ?,
         correo = ?,
+        apellido = ?,
+        nombre = ?,
         telefono_1 = ?,
         telefono_2 = ?,
         act_fecha = ?,
@@ -28,9 +45,9 @@ Persona.updatePersona = async (params) => {
     `;
 
     const [result] = await db.query(sql, [
-      params.nombre,
-      params.apellido,
       params.correo,
+      params.apellido,
+      params.nombre,
       params.telefono_1,
       params.telefono_2,
       currentDate,

@@ -1,86 +1,72 @@
-const Clientes = require('../modelo/cliente_model')
+const ClienteModel = require('../modelo/cliente_model');
+const MascotaModel = require('../modelo/mascota_model');
+const PersonaModel = require('../modelo/persona_model');
 
 module.exports = {
 
-   async obtenerDatosClientes (id_usuario) {
-        if (!id_usuario) {
-            throw { status: 401, message: 'Usuario no autenticado' };
-        }
-        const params = { id_usuario };
-        const clientes = await Clientes.obtenerDatosCliente(params);
-
-        return clientes;
-    },
-
-    async CrearclienteConMascota (body, usuario_creador) {
-
-        // Validar campos requeridos
-        // if (!body ) {
-        //     throw { status: 400, message: 'Datos incompletos para crear el cliente' };
-        // }
-
-        // Validar autenticación
-        if (!usuario_creador) {
-            throw { status: 401, message: 'Usuario no autenticado' };
-        }
-
-        // Verificar permisos
-        if (usuario_creador !== 1 && usuario_creador !== 2) {
-            if (usuario_creador !== id_usuario) {
-                throw { status: 403, message: 'Solo puede registrar clientes para su propio usuario' };
+    async obtenerDatosClientes (id_usuario) {
+            if (!id_usuario) {
+                throw { status: 401, message: 'Usuario no autenticado' };
             }
+            const params = { id_usuario };
+            const clientes = await ClienteModel.obtenerDatosCliente(params);
+
+            return clientes;
+        },
+
+    async crearMascotayCliente(params){     
+        // 1. Verificar existencia de mascota
+        const existentes = await MascotaModel.verificarExistenciaMascota(
+            params.nombre_mascota,
+            params.especie,
+            params.raza_id
+        );
+
+        if (existentes.length > 0) {
+            throw new Error('Ya existe una mascota registrada con el mismo nombre, especie y raza.');
         }
 
-        // Construcción del objeto para enviarlo a la base de datos
-        //console.log(JSON.stringify(body.cliente.persona, null, 2));
+        // 2. Insertar persona
+        const personaData = {
+            cedula: params.cedula,
+            nombre: params.nombre,
+            correo: params.correo,
+            apellido: params.apellidoCliente,
+            telefono_1: params.telefono_1,
+            telefono_2: params.telefono_2,
+            reg_usuario: params.reg_usuario
+        };
+        const personaId = await PersonaModel.crearPersona(personaData);
 
-        const clienteConMascota = await Clientes.createClientPet ({
-            nombre: body.nombre_mascota,
-            especie: body.especie,
-            raza: body.raza,
-            sexo: body.sexo,
-            peso_kg: body.peso_kg,
-            fecha_nacimiento: body.fecha_nacimiento,
-            direccion: body.direccion,
-            cedula: body.cedula,
-            correo: body.correo,
-            nombreCliente: body.nombreCliente,
-            apellido: body.apellidoCliente,
-            telefono_1: body.telefono_1,
-            telefono_2: body.telefono_2 || null,
-            estado: "A",
-            reg_usuario: usuario_creador,
+        // 3. Insertar cliente
+        const clienteData = {
+            persona_id: personaId,
+            direccion: params.direccion,
+            reg_usuario: params.reg_usuario
+        };
+        const clienteId = await ClienteModel.crearCliente(clienteData);
 
-        });
-        return clienteConMascota;
+        // 4. Insertar mascota
+        const mascotaData = {
+            cliente_id: clienteId,
+            nombre_mascota: params.nombre_mascota,
+            especie: params.especie,
+            raza_id: params.raza,
+            fecha_nacimiento: params.fecha_nacimiento,
+            sexo: params.sexo,
+            peso_kg: params.peso_kg,
+            reg_usuario: params.reg_usuario
+        };
+        const mascotaId = await MascotaModel.crearMascota(mascotaData);
+
+        return {
+            persona_id: personaId,
+            cliente_id: clienteId,
+            mascota_id: mascotaId
+        };
     },
 
-    async acualizarClienteconMascota (body, usuario_actualizador) {
-
-        // Validar permisos
-        if (usuario_actualizador !== 1 && usuario_actualizador !== 2) {
-            throw { status: 403, message: 'No tiene permisos para actualizar este cliente' };
-        }
-
-        const clienteActualizado = await Clientes.acualizarClienteconMascota({
-            id_cliente: body.id_cliente,
-            direccion: body.direccion,
-            cedula: body.cedula,
-            correo: body.correo,
-            nombre: body.nombre,
-            apellido: body.apellido,
-            telefono_1: body.telefono_1,
-            telefono_2: body.telefono_2 || null,
-            estado: "A",
-            reg_usuario: usuario_actualizador,
-            id_persona: body.id_persona
-
-        });
-
-        return clienteActualizado;
-    },
-
-    async deleteClient (id_cliente, usuario_eliminador){
+    async eliminarCliente (id_cliente, usuario_eliminador){
 
         if (usuario_eliminador !== 1 && usuario_eliminador !== 2) {
             throw { status: 403, message: 'No tiene permisos para eliminar este cliente' };
@@ -89,9 +75,38 @@ module.exports = {
             throw { status: 400, message: 'Falta el ID del cliente' };
         }
 
-        const ClienteEliminado = await Clientes.deleteClient(id_cliente)
+        const ClienteEliminado = await ClienteModel.eliminarCliente(id_cliente)
 
         return ClienteEliminado;
-    }
+    },
+    async actualizarCliente (params) {
+
+        // Validar permisos
+        if (params.act_usuario !== 1 && params.act_usuario !== 2) {
+            throw { status: 403, message: 'No tiene permisos para actualizar este cliente' };
+        }
+
+        const PersonaActualizada = await PersonaModel.actualizarPersona({
+            id_persona: params.id_persona,
+            correo: params.correo,
+            nombre: params.nombre,
+            apellido: params.apellido,
+            telefono_1: params.telefono_1,
+            telefono_2: params.telefono_2 || null,
+        })
+
+        const clienteActualizado = await ClienteModel.actualizarCliente({
+            id_cliente: params.id_cliente,
+            direccion: params.direccion,
+            act_usuario: params.ract_usuario,
+        });
+
+
+        return {
+            persona_id: PersonaActualizada,
+            cliente_id: clienteActualizado,
+        };
+    },
+
 
 };

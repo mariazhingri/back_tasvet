@@ -8,6 +8,7 @@ const auth_outes = require("./routes/authRoutes");
 const mascotas = require("./routes/mascotaRoutes");
 const clientes = require("./routes/clienteRoutes");
 const servicios = require("./routes/servicioRoutes");
+const citas = require('./routes/citaRoutes')
 
 const app = express();
 const port = 5000; 
@@ -22,6 +23,7 @@ clientes(app);
 auth_outes(app);
 mascotas(app);
 servicios(app);
+citas(app);
 
 // Iniciar el servidor
 app.listen(port, () => {

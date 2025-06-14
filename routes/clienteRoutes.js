@@ -6,9 +6,12 @@ module.exports = (app) => {
     app.get('/api/obtener/usuario', verificarToken,clienteController.obtenerDatosUsuario);
     app.get('/api/obtener/cliente', verificarToken,clienteController.obtenerDatoClientes);
 
-    app.post('/api/create/cliente', verificarToken,clienteController.CreateclientePetController);
+    app.post('/api/create/cliente', verificarToken,clienteController.crearMascotayCliente);
 
-    app.put('/api/update/cliente', verificarToken,clienteController.UpdateClient);
-    app.put('/api/delete/cliente', verificarToken,clienteController.DeleteClient)
+    app.put('/api/cliente/actualizar', verificarToken,clienteController.actualizarCliente);
+    app.put('/api/delete/cliente', verificarToken,clienteController.eliminarCliente)
+
+    //app.post('/api/crear/cliente', verificarToken,clienteController.crearCliente);
+    //app.post('/mascota/crearycliente', verificarToken ,mascotaController.crearMascotayCliente);
 
 }

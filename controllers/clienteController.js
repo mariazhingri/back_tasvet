@@ -1,6 +1,6 @@
 require('dotenv').config();
 const clienteService = require('../services/clienteService')
-const Clientes = require('../modelo/cliente_model')
+const ClienteModel = require('../modelo/cliente_model')
 
 module.exports = {
 
@@ -17,7 +17,7 @@ module.exports = {
             }
 
             const params = { id_usuario };
-            const usuario = await Clientes.obtenerDatosUsuario(params);
+            const usuario = await ClienteModel.obtenerDatosUsuario(params);
 
             if (!usuario) {
                 return res.status(404).json({
@@ -42,7 +42,7 @@ module.exports = {
     async obtenerDatoClientes(req, res) {
         try {
             const id_usuario = req.user?.id_usuario; 
-            const cliente = await clienteService.getClients(id_usuario)
+            const cliente = await clienteService.obtenerDatosClientes(id_usuario)
 
             res.status(200).json({
                 success: true,
@@ -57,10 +57,15 @@ module.exports = {
         }
     },
 
-    async CrearclienteConMascota(req, res) {
+    async crearMascotayCliente(req, res) {
         try {
             const usuario_creador = req.user?.id_usuario;
-            const clienteCreado = await clienteService.CrearclienteConMascota(req.body, usuario_creador); 
+            const body = req.body;
+            const params = {
+                ...body,
+                reg_usuario: usuario_creador
+            }
+            const clienteCreado = await clienteService.crearMascotayCliente(params); 
 
             res.status(201).json({
                 success: true,
@@ -77,10 +82,64 @@ module.exports = {
         }
     },
 
-    async acualizarClienteconMascota(req, res) {
+    async eliminarCliente(req, res) {
+        try {
+            const usuario_eliminador = req.user?.id_usuario; 
+            const { id_cliente } = req.body
+            const clienteEliminado = await clienteService.eliminarCliente(id_cliente, usuario_eliminador);
+
+            res.status(200).json({
+                success: true,
+                message: 'Cliente eliminado exitosamente',
+                //data: clienteEliminado
+            });
+        } catch (error) {
+            console.error(error); 
+            res.status(500).json({
+                success: false,
+                message: 'Error interno del servidor',
+                error: error.message
+            });
+        }
+    },
+
+    async crearCliente(req, res){
+    try{
+        const usuario_creador = req.user?.id_usuario; 
+        const { persona_id, direccion } = req.body; // ojo, te faltaba direccion también
+
+        const params = {
+            persona_id: persona_id,
+            direccion: direccion,
+            reg_usuario: usuario_creador
+        };
+
+        const clienteId = await ClienteModel.crearCliente(params);
+
+        res.status(200).json({
+            success: true,
+            message: 'Cliente creado exitosamente',
+            data: clienteId
+        });
+    }catch(error){
+        console.error(error); 
+        res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor',
+            error: error.message
+        });
+    }
+},
+
+ async actualizarCliente(req, res) {
         try {
             const usuario_actualizador = req.user?.id_usuario; 
-            const clienteActualizado = await clienteService.acualizarClienteconMascota(req.body, usuario_actualizador);
+            const body = req.body;
+            const params ={
+                ...body,
+                act_usuario: usuario_actualizador
+            }
+            const clienteActualizado = await clienteService.actualizarCliente(params);
 
             res.status(200).json({
                 success: true,
@@ -97,24 +156,4 @@ module.exports = {
         }
     },
 
-    async DeleteClient(req, res) {
-        try {
-            const usuario_eliminador = req.user?.id_usuario; 
-            const { id_cliente } = req.body
-            const clienteEliminado = await clienteService.deleteClient(id_cliente, usuario_eliminador);
-
-            res.status(200).json({
-                success: true,
-                message: 'Cliente eliminado exitosamente',
-                //data: clienteEliminado
-            });
-        } catch (error) {
-            console.error(error); 
-            res.status(500).json({
-                success: false,
-                message: 'Error interno del servidor',
-                error: error.message
-            });
-        }
-    },
 }
