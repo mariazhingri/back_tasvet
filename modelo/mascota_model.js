@@ -133,4 +133,21 @@ Mascota.verificarExistenciaMascota = async ( nombre_mascota, especieId, razaId) 
         throw err;
     }
 };
+
+Mascota.obtenerMascotaDeCliente = async (id_cliente) => {
+    try {
+        sql = `select r.nombre_raza, m.*
+                from mascotas m
+                inner join clientes c on m.cliente_id = c.id_cliente
+                inner join razas r on m.raza_id = r.id_raza
+                where c.id_cliente = ?
+                and m.estado = 'A'
+                and r.estado = 'A'
+                `;
+        const [rows] = await db.query(sql,[id_cliente]);
+        return rows; 
+    }catch (error) {
+        throw error;
+    }
+}
 module.exports = Mascota;

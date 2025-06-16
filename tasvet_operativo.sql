@@ -127,8 +127,7 @@ create table citas(
 	mascota_id INT,
 	empleado_id INT,
 	servicio_id INT,
-	fecha_varchar(100),
-	hora varchar(10)
+	fecha_hora_cita datetime,
 	estado_cita Varchar(50),
 	reg_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   	reg_usuario varchar(150),
@@ -314,11 +313,18 @@ INSERT INTO citas (cliente_id,mascota_id,veterinario_id,servicio_id,fecha_hora_c
 -- -----------------------
 ALTER TABLE personas MODIFY COLUMN usuario_id INT NULL;
 ALTER TABLE personas MODIFY COLUMN cedula varchar(10) UNIQUE NOT NULL ;
-ALTER TABLE personas DROP COLUMN direccion;
+ALTER TABLE citas DROP column empleado_id;
+ALTER TABLE citas DROP FOREIGN KEY citas_ibfk_3;
+
 ALTER TABLE mascotas DROP COLUMN edad_meses;
 ALTER TABLE citas DROP COLUMN estado;
 ALTER TABLE mascotas CHANGE COLUMN fecha_hora_cita fecha VARCHAR(100);
 ALTER TABLE citas CHANGE COLUMN estado_cita_id estado_cita Varchar(50);
+
+SELECT CONSTRAINT_NAME 
+FROM information_schema.KEY_COLUMN_USAGE 
+WHERE TABLE_NAME = 'citas' AND COLUMN_NAME = 'empleado_id';
+
 
 estado_cita Varchar(50),
 ALTER TABLE personas MODIFY reg_usuario varchar(150) NULL;
@@ -354,7 +360,7 @@ select * from razas;
 select * from servicios;
 select * from personas;
 select * from empleados;
-select * from citas;
+select * from citas; 
 
 SHOW TABLES;
 SELECT * FROM usuarios WHERE email = 'mariazhingripaz@outlook.com'
@@ -419,10 +425,23 @@ FROM personas p
 LEFT JOIN usuarios u ON u.persona_id = p.id_persona
 WHERE p.cedula = '0157863214'
 
-select *
+select m.nombre_mascota, m.especie, r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_cita 
 from citas c
-where estado_cita  = 'Pendiente'
+inner join clientes cl on c.cliente_id = cl.id_cliente
+inner join personas p on cl.persona_id = p.id_persona
+inner join mascotas m on c.mascota_id  = m.id_mascota
+inner join razas r on m.raza_id = r.id_raza
+where c.estado_cita = 'Pendiente'
+and cl.estado = 'A'
+and p.estado = 'A'
+and m.estado  = 'A'
+and r.estado = 'A'
+limit 10
 
-SELECT * FROM citas 
-        WHERE empleado_id = 1 AND fecha_hora_cita = '2025-06-15T10:30:00'
+
+SELECT * FROM citas
+WHERE empleado_id = 1
+AND fecha_hora_cita BETWEEN '2025-06-16 11:30:00' AND DATE_ADD('2025-06-16 11:30:00', INTERVAL 29 MINUTE);
+
+
         

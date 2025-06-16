@@ -11,7 +11,7 @@ module.exports = {
             const personaActualizada = await PersonaModel.actualizarPersona({
             correo: params.correo,
             apellido: params.apellidoCliente,
-            nombre: params.nombre,
+            nombre: params.nombreCliente,
             telefono_1: params.telefono_1,
             telefono_2: params.telefono_2,
             act_usuario: params.act_usuario,

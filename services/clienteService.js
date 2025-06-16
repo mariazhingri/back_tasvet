@@ -29,7 +29,7 @@ module.exports = {
         // 2. Insertar persona
         const personaData = {
             cedula: params.cedula,
-            nombre: params.nombre,
+            nombre: params.nombreCliente,
             correo: params.correo,
             apellido: params.apellidoCliente,
             telefono_1: params.telefono_1,

@@ -170,12 +170,12 @@ module.exports = {
    async actualizarPersona(req, res) {
     try {
         const usuario_actualizador = req.user?.id_usuario;
-        const { correo, apellidoCliente, nombre, telefono_1, telefono_2, act_usuario, persona_id } = req.body;
+        const { correo, apellidoCliente, nombreCliente, telefono_1, telefono_2, act_usuario, persona_id } = req.body;
 
         const params = {
             correo,
             apellido: apellidoCliente,
-            nombre,
+            nombre: nombreCliente,
             telefono_1,
             telefono_2,
             act_usuario: usuario_actualizador,
