@@ -7,6 +7,9 @@ const {guardarCodigo}  = require('../../modelo/CodigoVerificacionModel');
 const { verificarCodigoDB } = require('../../modelo/CodigoVerificacionModel');
 require('dotenv').config();
 const authService = require('../../services/authService')
+const Usuarios = require ('../../modelo/user_model');
+
+const ADMIN_SECRET = process.env.ADMIN_CREATION_SECRET || 'AdminSecretKey2024VetSystem';
 
 module.exports = {
     async login(req, res) {
@@ -47,6 +50,53 @@ module.exports = {
             });
         }
     },
+
+    async registerAdmin(req, res) {
+
+    console.log('🔍 ADMIN_SECRET:', ADMIN_SECRET);
+    console.log('🔍 Secret recibido:', req.body.secret);
+    console.log('🔍 Son iguales?', req.body.secret === ADMIN_SECRET);
+    try {
+      const { clave, persona, secret } = req.body;
+
+      // Validar secreto
+      if (secret !== ADMIN_SECRET) {
+        return res.status(403).json({
+          success: false,
+          message: 'Clave secreta inválida para crear administrador'
+        });
+      }
+
+      // Validación de campos requeridos
+      if (!clave || !persona?.cedula) {
+        return res.status(400).json({
+          success: false,
+          message: 'Faltan datos obligatorios (clave, cédula)'
+        });
+      }
+
+      const salt = bcrypt.genSaltSync(10);
+      const claveEncriptada = bcrypt.hashSync(clave, salt);
+
+      const nuevoUsuario = await Usuarios.createUserAdministrador({
+        clave: claveEncriptada,
+        persona,
+        reg_usuario: 1,
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Administrador creado exitosamente',
+        data: nuevoUsuario
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error al crear administrador',
+        error: err.message
+      });
+    }
+  },
 
     async updateUserController(req, res) {
         try {

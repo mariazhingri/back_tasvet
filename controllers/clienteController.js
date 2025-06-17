@@ -128,8 +128,9 @@ module.exports = {
             message: 'Error interno del servidor',
             error: error.message
         });
-    }
-},
+      }
+    } ,
+
 
  async actualizarCliente(req, res) {
         try {
@@ -155,5 +156,48 @@ module.exports = {
             });
         }
     },
+  
+  async obtenerDatosClienteV2(req, res) {
+    try {
+      const token = req.cookies.token;
+
+      if (!token) {
+        return res.status(401).json({
+          success: false,
+          message: 'Token no proporcionado'
+        });
+      }
+
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const id_usuario = decoded.id_usuario;
+
+      if (!id_usuario) {
+        return res.status(401).json({
+          success: false,
+          message: 'Usuario no autenticado'
+        });
+      }
+
+      const cliente = await ClienteModel.obtenerDatosCliente({ id_usuario });
+
+      if (!cliente) {
+        return res.status(404).json({
+          success: false,
+          message: 'Cliente no encontrado'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: cliente
+      });
+    } catch (error) {
+      console.error('❌ Error en obtenerDatosCliente2:', error.message);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor'
+      });
+    }
+  },
 
 }

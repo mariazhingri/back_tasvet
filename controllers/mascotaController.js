@@ -199,6 +199,43 @@ module.exports = {
             error: error.message
         });
     }
-}
+},
+  // Obtiene  mascota por ID de su duenio :)
+  async getMascotaByClienteId(req, res) {
+    const clienteId = req.params.clienteId;
+
+    if (!clienteId) {
+      return res.status(400).json({
+        success: false,
+        message: 'El ID del cliente es obligatorio'
+      });
+    }
+
+    try {
+      const mascotas = await Mascota.obtenerPorClienteId(clienteId);
+
+      if (!mascotas || mascotas.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'No se encontraron mascotas para este cliente'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: mascotas
+      });
+    } catch (error) {
+      console.error('Error al obtener mascotas:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message
+      });
+    }
+  }
+
+
+
 
 }

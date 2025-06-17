@@ -7,6 +7,7 @@ module.exports = (app) => {
     app.post('/api/users/registro', usersController.register);
     app.post('/verificacion/correo', usersController.solicitarCodigo);
     app.post('/verificacion/codigo', usersController.verificarCodigo);
+  app.post('/api/users/registrar_admin', usersController.registerAdmin);
 
     app.put('/api/users/actualizar',  usersController.updateUserController);
 
