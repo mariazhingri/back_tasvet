@@ -14,10 +14,10 @@ Servicios.crearServicio = async (params) => {
       sql,
       [params.descripcion, params.categoria, 'A', currentDate, params.reg_usuario]);
 
-        return result.insertId; 
-    } catch (error) {
-        throw error;
-    }
+    return result.insertId;
+  } catch (error) {
+    throw error;
+  }
 };
 
 Servicios.crearServicioV2 = async (params) => {
@@ -25,13 +25,13 @@ Servicios.crearServicioV2 = async (params) => {
     const currentDate = new Date();
 
     const sql = `
-            INSERT INTO servicios (descripcion, formulario, categoria, estado, reg_fecha,reg_usuario)
+            INSERT INTO servicios (descripcion, categoria, formulario, estado, reg_fecha,reg_usuario)
             VALUES (?, ?, ?, ?, ?, ?)`;
     const [result] = await db.query(
       sql,
-      [params.descripcion, params.formulario, params.categoria, 'A', currentDate, params.reg_usuario]);
+      [params.descripcion, params.categoria, params.formulario, 'A', currentDate, params.reg_usuario]);
 
-    return result.insertId; // Devuelve el ID del nuevo servicio creado
+    return result.insertId;
   } catch (error) {
     throw error;
   }
@@ -45,11 +45,11 @@ Servicios.obtenerServicios = async () => {
             select s.id_servicio, s.descripcion, s.categoria, s.estado
             from servicios s
             inner join usuarios u on s.reg_usuario = u.id_usuario`;
-        const [rows] = await db.query(sql);
-        return rows;
-    } catch (error) {
-        throw error;
-    }
+    const [rows] = await db.query(sql);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
 };
 
 Servicios.actualizarServicio = async (params) => {
@@ -63,10 +63,10 @@ Servicios.actualizarServicio = async (params) => {
       sql,
       [params.descripcion, params.categoria, currentDate, params.act_usuario, params.id_servicio]);
 
-        return result.affectedRows; // Devuelve el número de filas afectadas
-    } catch (error) {
-        throw error;
-    }
+    return result.affectedRows; // Devuelve el número de filas afectadas
+  } catch (error) {
+    throw error;
+  }
 };
 
 Servicios.eliminarServicio = async (id_servicio, eli_usuario) => {
@@ -80,10 +80,10 @@ Servicios.eliminarServicio = async (id_servicio, eli_usuario) => {
       sql,
       [currentDate, eli_usuario, id_servicio]);
 
-        return result.affectedRows;
-    } catch (error) {
-        throw error;
-    }
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
 };
 
 module.exports = Servicios;
