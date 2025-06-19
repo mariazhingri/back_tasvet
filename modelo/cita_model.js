@@ -132,8 +132,44 @@ Citas.getCitasByIdCita = async (id_cita) => {
 };
 
 
+Citas.getCitasByRangoMes = async (inicioMes, finMes) => {
+  console.log('📥 Rango de citas recibido:', inicioMes, finMes);
 
+  if (!inicioMes || !finMes) {
+    throw new Error('Fechas de inicio y fin requeridas');
+  }
 
+  try {
+    const sql = `
+      SELECT c.id_cita, c.estado_cita,
+             m.nombre_mascota, m.especie,
+             r.nombre_raza,
+             p.nombre, p.apellido, p.telefono_1,
+             cl.direccion,
+             c.fecha_hora_cita
+      FROM citas c
+      INNER JOIN clientes cl ON c.cliente_id = cl.id_cliente
+      INNER JOIN personas p ON cl.persona_id = p.id_persona
+      INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
+      INNER JOIN razas r ON m.raza_id = r.id_raza
+      WHERE c.estado_cita = 'Pendiente'
+        AND cl.estado = 'A'
+        AND p.estado = 'A'
+        AND m.estado = 'A'
+        AND r.estado = 'A'
+        AND c.fecha_hora_cita BETWEEN ? AND ?
+      ORDER BY c.fecha_hora_cita ASC
+    `;
+
+    const [rows] = await db.query(sql, [inicioMes, finMes]);
+
+    console.log(`✅ ${rows.length} citas encontradas en el rango`);
+    return rows;
+  } catch (error) {
+    console.error('❌ Error al obtener citas por rango:', error.message);
+    throw new Error('Error al consultar citas por rango de fechas');
+  }
+};
 
 
 Citas.crearCita = async (params) => {

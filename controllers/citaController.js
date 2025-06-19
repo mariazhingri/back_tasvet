@@ -1,4 +1,4 @@
-const { obtenerCitas, getCitasByDate, getCitasByIdCita } = require('../modelo/cita_model');
+const { obtenerCitas, getCitasByDate, getCitasByIdCita, getCitasByRangoMes } = require('../modelo/cita_model');
 const CitaService = require('../services/citaService');
 
 module.exports = {
@@ -89,6 +89,40 @@ module.exports = {
     }
   },
 
+  async obtenerCitaPorRangoMes(req, res) {
+    console.log(' Obteniendo citas rango de un mes ');
+    try {
+      const { inicioMes } = req.body;
+      const { finMes } = req.body;
+
+      console.log('Rango recibido', inicioMes, finMes);
+
+      if (!inicioMes || !finMes) {
+        return res.status(400).json({
+          success: false,
+          message: 'Rango de mes no esta definido',
+        });
+      }
+
+      const rangoCita = await getCitasByRangoMes(inicioMes, finMes);
+
+      res.status(200).json({
+        success: true,
+        data: rangoCita,
+        message: 'Rango de Cita por mes obtenidas correctamente',
+      });
+
+      // console.log('Cita obtenida:', cita)
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
 
   async crearCita(req, res) {
     try {
