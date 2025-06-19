@@ -77,7 +77,7 @@ module.exports = {
     try {
       const id_usuario = req.user?.id_usuario;
       const { id_servicio } = req.body;
-      await servicioService.deleteService({ id_usuario, id_servicio });
+      await servicioService.eliminarServicio({ id_usuario, id_servicio });
 
       return res.status(200).json({
         success: true,
