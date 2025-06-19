@@ -1,4 +1,4 @@
-const { obtenerCitas, getCitasByDate } = require('../modelo/cita_model');
+const { obtenerCitas, getCitasByDate, getCitasByIdCita } = require('../modelo/cita_model');
 const CitaService = require('../services/citaService');
 
 module.exports = {
@@ -45,6 +45,39 @@ module.exports = {
       });
 
       console.log('Citas obtenidas:', citas)
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  async obtenerCitasPorId(req, res) {
+    console.log(') Obteniendo citas por id');
+    try {
+      const { idCita } = req.body;
+      console.log('Id de cita recibida:', idCita);
+
+      if (!idCita) {
+        return res.status(400).json({
+          success: false,
+          message: 'Id de la cita no proporcionada',
+        });
+      }
+
+      const cita = await getCitasByIdCita(idCita);
+
+      res.status(200).json({
+        success: true,
+        data: cita,
+        message: 'Cita obtenidas correctamente',
+      });
+
+      // console.log('Cita obtenida:', cita)
 
     } catch (error) {
       console.error(error);

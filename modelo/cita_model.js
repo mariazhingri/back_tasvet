@@ -88,6 +88,53 @@ Citas.getCitasByDate = async (fecha) => {
 };
 
 
+Citas.getCitasByIdCita = async (id_cita) => {
+  console.log('📥 Id de cita recibida en getCitasByIdCita:', id_cita);
+
+  if (!id_cita || isNaN(Number(id_cita))) {
+    throw new Error('ID de cita inválido');
+  }
+
+  try {
+    const sql = `
+      SELECT c.id_cita, c.estado_cita,
+             m.nombre_mascota, m.especie,
+             r.nombre_raza,
+             p.nombre, p.apellido, p.telefono_1,
+             cl.direccion,
+             c.fecha_hora_cita
+      FROM citas c
+      INNER JOIN clientes cl ON c.cliente_id = cl.id_cliente
+      INNER JOIN personas p ON cl.persona_id = p.id_persona
+      INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
+      INNER JOIN razas r ON m.raza_id = r.id_raza
+      WHERE c.estado_cita = 'Pendiente'
+        AND cl.estado = 'A'
+        AND p.estado = 'A'
+        AND m.estado = 'A'
+        AND r.estado = 'A'
+        AND c.id_cita = ?
+    `;
+
+    const [rows] = await db.query(sql, [id_cita]);
+
+    if (rows.length === 0) {
+      console.warn(`⚠️ No se encontró cita con ID ${id_cita}`);
+      return null;
+    }
+
+    console.log('✅ Cita obtenida:', rows[0]);
+    return rows[0]; // Devuelve solo el objeto
+  } catch (error) {
+    console.error('❌ Error en getCitasByIdCita:', error.message);
+    throw new Error('Error al obtener la cita por ID');
+  }
+};
+
+
+
+
+
 
 Citas.crearCita = async (params) => {
   try {
