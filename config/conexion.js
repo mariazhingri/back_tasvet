@@ -7,9 +7,16 @@ const db = mysql.createPool({
   database: 'tasvet_operativo' 
 });
 
+// const db = mysql.createPool({
+//   host: 'localhost',
+//   user: 'lenn',
+//   password: 'batman',
+//   database: 'tasvet_operativo'
+// });
+
 // db.connect(err => {
 //   if (err) {
-  
+
 //     return;
 //   }
 // });
