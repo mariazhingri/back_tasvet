@@ -6,8 +6,14 @@ require('dotenv').config();
 module.exports = {
     async crearServicio(req, res) {
         try {
-             const id_usuario = req.user?.id_usuario
-             const nuevoServicio = await servicioService.crearServicio(id_usuario, req.body);
+             const usuario_creador = req.user?.id_usuario
+             const body = req.body
+
+             const params ={
+              ...body,
+              id_usuario: usuario_creador
+             }
+             const nuevoServicio = await servicioService.crearServicio(params);
              
             return res.status(201).json({
                 success: true,
@@ -25,7 +31,6 @@ module.exports = {
     },
 
     async obtenerServicios(req, res) {
-       
         try {
 
             const id_usuario = req.user?.id_usuario;

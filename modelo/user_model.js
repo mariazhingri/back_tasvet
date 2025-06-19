@@ -90,7 +90,6 @@ Usuarios.createUser = async (datosUsuario) => {
         personaId,
         datosUsuario.clave,
         rol_id,
-        // rol_id,
         'A',
         currentDate,
         datosUsuario.reg_usuario

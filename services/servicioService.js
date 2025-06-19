@@ -12,26 +12,27 @@ module.exports = {
         return servicios;
     },
 
-    async crearServicio (id_usuario, data){
-        if (!id_usuario) {
+    async crearServicio (params){
+        user = params.id_usuario
+        if (!params.id_usuario) {
             throw { status: 401, message: 'No autorizado' };
         }
 
-        const userRol = await Usuarios.findUsuario({ id_usuario });
-        if (!userRol || (userRol.rol_id !== 1 && userRol.rol_id !== 2)) {
+        const userRol = await Usuarios.findUsuario({ id_usuario: user });
+        if (userRol.rol_id !== 1 && params.rol_id !== 2) {
             throw { status: 403, message: 'Acción no permitida' };
         }
 
-        const { descripcion, categoria } = data;
 
-        if (!descripcion || !categoria) {
+        if (!params.descripcion || !params.categoria) {
             throw { status: 400, message: 'Faltan campos obligatorios' };
         }
 
         const nuevoServicio = await Servicio.crearServicio({
             descripcion,
             categoria,
-            reg_usuario: id_usuario
+            formulario,
+            reg_usuario: params.id_usuario
         });
 
         return nuevoServicio;

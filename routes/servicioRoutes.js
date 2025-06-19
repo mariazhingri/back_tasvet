@@ -8,6 +8,6 @@ module.exports = (app) => {
   app.put('/servicio/actualizar', verificarToken, ServicioController.actualizarServicio);
   app.put('/servicio/eliminar', verificarToken, ServicioController.eliminarServicio);
 
-  app.post('/servicio/crearV2', verificarToken, ServicioController.crearServicioV2);
+  app.post('/servicio/crearV2', verificarToken, ServicioController.crearServicio);
 
 }

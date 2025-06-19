@@ -1,5 +1,5 @@
 const CitaModel = require('../modelo/cita_model');
-
+const ServicioModel = require('../modelo/servicios_model');
 module.exports = {
 
     async crearCita(params){
@@ -31,21 +31,33 @@ module.exports = {
                 params.fechaHora  
             );
             if (Array.isArray(citaExistente) && citaExistente.length > 0) {
-    return { success: false, message: "Ya existe una cita en ese horario" };
-}
-
+                return { success: false, message: "Ya existe una cita en ese horario" };
+            }
 
             const citaId = await CitaModel.crearCita({
                 cliente_id: params.id_cliente,
                 mascota_id: params.id_mascota,
-                servicio_id: params.id_servicio,
                 fecha_hora_cita: params.fechaHora,
                 reg_usuario: params.reg_usuario
             })
+    
+            const detallesInsertados = [];
+            for (let servicioId of params.id_servicio) {
+                const detalle = await ServicioModel.crearDetalleServicio({
+                    cita_id: citaId,
+                    servicio_id: servicioId,
+                    reg_usuario: params.reg_usuario
+                });
+                detallesInsertados.push(detalle);
+                }
+
+
+
                                                                                                                                                    
         return {
             success: true,
-            cita_id:citaId
+            cita_id:citaId,
+            detalle_servicio_id: detallesInsertados
         }
         }catch(err){
             return {

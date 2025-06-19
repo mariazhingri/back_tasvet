@@ -8,11 +8,11 @@ Servicios.crearServicio = async (params) => {
     const currentDate = new Date();
 
     const sql = `
-            INSERT INTO servicios (descripcion, categoria, estado, reg_fecha,reg_usuario)
-            VALUES (?, ?, ?, ?, ?)`;
+            INSERT INTO servicios (descripcion, categoria, formulario ,estado, reg_fecha,reg_usuario)
+            VALUES (?, ?, ?, ?, ?,?)`;
     const [result] = await db.query(
       sql,
-      [params.descripcion, params.categoria, 'A', currentDate, params.reg_usuario]);
+      [params.descripcion, params.categoria, params.formulario,'A', currentDate, params.reg_usuario]);
 
         return result.insertId; 
     } catch (error) {
@@ -37,12 +37,11 @@ Servicios.crearServicioV2 = async (params) => {
   }
 }
 
-
 Servicios.obtenerServicios = async () => {
   try {
     // Consulta para obtener los servicios (descripcion y categoria) que estan resgistrados en la base de datos   
     const sql = `
-            select s.id_servicio, s.descripcion, s.categoria, s.estado
+            select s.id_servicio, s.descripcion, s.categoria, s.formulario,s.estado
             from servicios s
             inner join usuarios u on s.reg_usuario = u.id_usuario`;
         const [rows] = await db.query(sql);
@@ -86,4 +85,19 @@ Servicios.eliminarServicio = async (id_servicio, eli_usuario) => {
     }
 };
 
+Servicios.crearDetalleServicio = async (params) => {
+  try {
+    const currentDate = new Date();
+    const sql = `
+            INSERT INTO detalle_servicios (cita_id, servicio_id,estado, reg_fecha,reg_usuario)
+            VALUES (?,?,?,?,?)`;
+    const [result] = await db.query(
+      sql,[params.cita_id,params.servicio_id,'A', currentDate, params.reg_usuario]);
+
+    return result.insertId; 
+  } catch (error) {
+    throw error;
+  }
+
+};
 module.exports = Servicios;

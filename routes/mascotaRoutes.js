@@ -11,7 +11,7 @@ module.exports = (app) => {
     
     app.put('/mascota/actualizar', verificarToken ,mascotaController.actualizarMascota);
     app.put('/api/mascota/eliminar', verificarToken ,mascotaController.eliminarMascota);
-
+    
     //app.delete('/mascota/eliminar/:mascota_id', verificarToken ,mascotaController.deletemascota);
 
 }
