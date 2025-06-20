@@ -68,6 +68,41 @@ WHERE hc.mascota_id = 1 AND hc.estado = 'A' AND cv.estado = 'A';
     throw err;
   }
 }
+HistoriaClinico.getDesparacitacionPorId = async (id_mascota) => {
+  console.log("🔍 Iniciando getDesparacitacionPorId con id_mascota:", id_mascota);
+  try {
+    const sql = `
+SELECT 
+  hc.mascota_id AS idMascota,
+  cd.id_carnet_desparacitacion AS idCarnetDesparacitacion,
+  cd.fecha_aplicacion AS fechaAplicacion,
+  cd.peso_kg AS peso,
+  cd.edad_meses AS edad,
+  cd.proxima_dosis AS proximaDosis,
+  cd.observaciones AS observaciones,
+  CONCAT(p.nombre, ' ', p.apellido) AS empleadoNombre,
+  a.descripcion AS antiparacitarioDescripcion
+FROM historial_clinico hc
+JOIN evento_clinico ec ON hc.evento_clinico_id = ec.id_evento_clinico
+JOIN carnets_desparasitacion cd ON ec.carnet_desparasitacion_id = cd.id_carnet_desparacitacion
+LEFT JOIN empleados e ON cd.empleado_id = e.id_empleado
+LEFT JOIN personas p ON e.persona_id = p.id_persona
+LEFT JOIN antiparasitarios a ON cd.antiparasitario_id = a.id_antiparasitario
+WHERE hc.mascota_id = ? AND hc.estado = 'A' AND cd.estado = 'A';
+        `;
+    const [result] = await db.query(sql, [id_mascota]);
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    console.log("🔍 Resultado de la consulta Desparacitacion:", result);
+
+    return result;
+  } catch (err) {
+    throw err;
+  }
+}
 
 module.exports = HistoriaClinico;
 
