@@ -8,6 +8,7 @@ const mascotas = require("./routes/mascotaRoutes");
 const clientes = require("./routes/clienteRoutes");
 const servicios = require("./routes/servicioRoutes");
 const citas = require('./routes/citaRoutes')
+const formulario = require('./routes/formulariosRoutes')
 const historialClinicoRoutes = require('./routes/historialClinicoRoutes');
 
 
@@ -33,6 +34,7 @@ auth_outes(app);
 mascotas(app);
 servicios(app);
 citas(app);
+formulario(app);
 historialClinicoRoutes(app);
 
 
