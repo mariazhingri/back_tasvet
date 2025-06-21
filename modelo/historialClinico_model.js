@@ -55,7 +55,8 @@ HistoriaClinico.getVacunacionPorId = async (id_mascota) => {
     const [result] = await db.query(sql, [id_mascota]);
 
     if (result.length === 0) {
-      return null;
+
+      return [];
     }
 
     console.log('🔍 Resultado de la consulta vacunacion:', result);
@@ -90,9 +91,8 @@ HistoriaClinico.getDesparacitacionPorId = async (id_mascota) => {
     const [result] = await db.query(sql, [id_mascota]);
 
     if (result.length === 0) {
-      return null;
+      return [];
     }
-
     console.log('🔍 Resultado de la consulta Desparacitacion:', result);
 
     return result;
@@ -132,7 +132,7 @@ HistoriaClinico.getSpaPorId = async (id_mascota) => {
     const [result] = await db.query(sql, [id_mascota]);
 
     if (result.length === 0) {
-      return null;
+      return [];
     }
 
     console.log('🔍 Resultado de la consulta spa:', result);
@@ -179,7 +179,7 @@ HistoriaClinico.getMascotasAtendidas = async () => {
     const [result] = await db.query(sql);
 
     if (result.length === 0) {
-      return null;
+      return [];
     }
 
     console.log('🔍 Resultado de la consulta Obtener mascotas atendidas:', result);
