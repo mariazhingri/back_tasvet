@@ -17,9 +17,9 @@ module.exports = (app) => {
     verificarToken,
     HistorialClinicoController.obtenerDesparacitacionPorId,
   );
-  // app.get(
-  //   "/historialClinico/obtener/spa/:id",
-  //   verificarToken,
-  //   HistorialClinicoController.obtenerDesparacitacionPorId,
-  // );
+  app.get(
+    '/historialClinico/obtener/spa/:id',
+    verificarToken,
+    HistorialClinicoController.obtenerSpaPorId,
+  );
 };

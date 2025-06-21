@@ -1,31 +1,31 @@
-require("dotenv").config();
+require('dotenv').config();
 const {
   getAtencionVeterinariaPorId,
   getVacunacionPorId,
   getDesparacitacionPorId,
-} = require("../modelo/historialClinico_model");
+} = require('../modelo/historialClinico_model');
 
 module.exports = {
   async obtenerAtencionVeterinariaPorId(req, res) {
-    console.log("🔍 Iniciando obtenerAtencionVetPorId");
+    console.log('🔍 Iniciando obtenerAtencionVetPorId');
     try {
       const id_mascota = req.params.id;
 
       if (!id_mascota) {
         return res.status(400).json({
           success: false,
-          message: "ID de mascota no proporcionado",
+          message: 'ID de mascota no proporcionado',
         });
       }
 
-      console.log("🔍 ID de mascota recibido:", id_mascota);
+      console.log('🔍 ID de mascota recibido:', id_mascota);
 
       const atencionVeterinaria = await getAtencionVeterinariaPorId(id_mascota);
 
       if (!atencionVeterinaria || atencionVeterinaria.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "Atención veterinaria no encontrada",
+          message: 'Atención veterinaria no encontrada',
         });
       }
 
@@ -37,113 +37,113 @@ module.exports = {
       console.error(error);
       res.status(500).json({
         success: false,
-        message: "Error interno del servidor",
+        message: 'Error interno del servidor',
       });
     }
   },
 
   async obtenerVacunacionPorId(req, res) {
-    console.log("🔍 Iniciando obtenerVacunacionPorId");
+    console.log('🔍 Iniciando obtenerVacunacionPorId');
     try {
       const id_mascota = req.params.id;
 
       if (!id_mascota) {
         return res.status(400).json({
           success: false,
-          message: "ID de mascota no proporcionado",
+          message: 'ID de mascota no proporcionado',
         });
       }
 
-      console.log("🔍 ID de mascota recibido:", id_mascota);
+      console.log('🔍 ID de mascota recibido:', id_mascota);
 
-      const atencionVeterinaria = await getVacunacionPorId(id_mascota);
+      const vacunacion = await getVacunacionPorId(id_mascota);
 
-      if (!atencionVeterinaria || atencionVeterinaria.length === 0) {
+      if (!vacunacion || vacunacion.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "Atención veterinaria no encontrada",
+          message: 'Historial vacuanacion  no encontrada',
         });
       }
 
       res.status(200).json({
         success: true,
-        data: atencionVeterinaria,
+        data: vacunacion,
       });
     } catch (error) {
       console.error(error);
       res.status(500).json({
         success: false,
-        message: "Error interno del servidor",
+        message: 'Error interno del servidor',
       });
     }
   },
 
   async obtenerDesparacitacionPorId(req, res) {
-    console.log("🔍 Iniciando obtenerDesparacitacionPorId");
+    console.log('🔍 Iniciando obtenerDesparacitacionPorId');
     try {
       const id_mascota = req.params.id;
 
       if (!id_mascota) {
         return res.status(400).json({
           success: false,
-          message: "ID de mascota no proporcionado",
+          message: 'ID de mascota no proporcionado',
         });
       }
 
-      console.log("🔍 ID de mascota recibido:", id_mascota);
-      const atencionVeterinaria = await getDesparacitacionPorId(id_mascota);
+      console.log('🔍 ID de mascota recibido:', id_mascota);
+      const desparacitacion = await getDesparacitacionPorId(id_mascota);
 
-      if (!atencionVeterinaria || atencionVeterinaria.length === 0) {
+      if (!desparacitacion || desparacitacion.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "Atención veterinaria no encontrada",
+          message: 'Historial desparacitacion no encontrada',
         });
       }
 
       res.status(200).json({
         success: true,
-        data: atencionVeterinaria,
+        data: desparacitacion,
       });
     } catch (error) {
       console.error(error);
       res.status(500).json({
         success: false,
-        message: "Error interno del servidor",
+        message: 'Error interno del servidor',
       });
     }
   },
 
-  async obtenerDesparacitacionPorId(req, res) {
-    console.log("🔍 Iniciando obtenerDesparacitacionPorId");
+  async obtenerSpaPorId(req, res) {
+    console.log('🔍 Iniciando obtener SpaPorId');
     try {
       const id_mascota = req.params.id;
 
       if (!id_mascota) {
         return res.status(400).json({
           success: false,
-          message: "ID de mascota no proporcionado",
+          message: 'ID de mascota no proporcionado',
         });
       }
 
-      console.log("🔍 ID de mascota recibido:", id_mascota);
-      const atencionVeterinaria = await getDesparacitacionPorId(id_mascota);
+      console.log('🔍 ID de mascota recibido:', id_mascota);
+      const spa = await getDesparacitacionPorId(id_mascota);
 
-      if (!atencionVeterinaria || atencionVeterinaria.length === 0) {
+      if (!spa || spa.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "Atención veterinaria no encontrada",
+          message: 'Historial spa no encontrada',
         });
       }
 
       res.status(200).json({
         success: true,
-        data: atencionVeterinaria,
+        data: spa,
       });
     } catch (error) {
       console.error(error);
       res.status(500).json({
         success: false,
-        message: "Error interno del servidor",
+        message: 'Error interno del servidor',
       });
     }
   },
