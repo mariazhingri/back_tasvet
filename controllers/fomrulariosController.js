@@ -194,4 +194,31 @@ module.exports = {
         }
     },
 
+    async obtenerAntiparasitarios(req, res) {
+       try{
+        const usuario_creador = req.user?.id_usuario;
+        const body = req.body;
+
+        const params = {
+            ...body,
+            reg_usuario: usuario_creador
+        }
+        console.log("params: ", params)
+        const antiparasitario = await FormularioModel.obtenerAntiparasitarios(params)
+
+        res.status(201).json({
+            success: true,
+            data: antiparasitario
+
+        });
+        } catch (error) {
+            console.error(error); 
+            res.status(500).json({
+                success: false,
+                message: 'Error interno del servidor',
+                error: error.message
+            });
+        }
+    },
+
 }

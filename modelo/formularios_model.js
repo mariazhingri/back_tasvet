@@ -262,5 +262,36 @@ formularios.obtenerVacunas = async(params) =>{
   }
 }
 
+formularios.calcularNumeroHistoriaClinica = async(params) =>{
+  try{
+     sql =`SELECT 
+     COALESCE(MAX(numero_historia_clinica), 0) + 1 AS siguiente_historia 
+     FROM historial_clinico 
+     WHERE mascota_id = ?`;
+    
+    const [rows] = await db.query(sql, [params.mascota_id]);
+
+    return rows[0].siguiente_historia;
+  }catch(err){
+    throw err
+  }
+  
+}
+
+formularios.obtenerAntiparasitarios = async(params) =>{
+      try {
+    const sql = `
+            select id_antiparasitario, nombre_antiparasitario, descripcion
+            from antiparasitarios a
+            where estado = 'A'
+            `;
+    const [rows] = await db.query(sql);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 module.exports = formularios;
 

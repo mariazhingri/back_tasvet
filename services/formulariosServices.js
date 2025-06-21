@@ -32,10 +32,13 @@ async crearCarnetVacuna(params){
         reg_usuario: params.reg_usuario
     })
 
+    const siguienteNumero = await FormularioModel.calcularNumeroHistoriaClinica({ mascota_id: params.IdMascota });
+    const numeroHistoria = siguienteNumero; 
+
     const historialClinico = await FormularioModel.crearHistorialClinico({
         mascota_id: params.IdMascota,
         evento_clinico_id: eventoClinico,
-        numero_historia_clinica: params.NumHistoriaClinica,
+        numero_historia_clinica: numeroHistoria,
         antecedentes_veterinarios_id: params.AntecedentesVeterinarios,
         fecha: params.fecha
     })

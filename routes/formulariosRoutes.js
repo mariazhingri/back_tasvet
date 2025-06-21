@@ -5,6 +5,7 @@ module.exports = (app) => {
 
     app.get('/api/obtener/empleados', verificarToken,formularioController.obtenerEmpleados);
     app.get('/api/obtener/vacunas', verificarToken,formularioController.obtenerVacunas);
+    app.get('/api/obtener/antiparasitario', verificarToken,formularioController.obtenerAntiparasitarios);
     
     app.post('/api/carnet/vacuna/crear', verificarToken,formularioController.crearCarnetVacuna);
     app.post('/api/carnet/desparasitacion/crear', verificarToken,formularioController.crearCarnetDesparasitacion);
