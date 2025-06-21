@@ -198,15 +198,14 @@ module.exports = {
     }
   },
 
-  async crearServicioV2(req, res) {
-    console.log('Crear Servicio ', req.body);
+  async obtenerFormularios(req, res) {
+    //console.log('Crear Servicio ', req.body);
     try {
       const id_usuario = req.user?.id_usuario
-      const nuevoServicio = await servicioService.crearServicioV2(id_usuario, req.body);
+      const nuevoServicio = await servicioService.obtenerFormularios(id_usuario, req.body);
 
       return res.status(201).json({
         success: true,
-        message: 'Servicio creado exitosamente',
         data: nuevoServicio
       });
     } catch (error) {

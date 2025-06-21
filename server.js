@@ -2,11 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
+
 const auth_outes = require("./routes/authRoutes");
 const mascotas = require("./routes/mascotaRoutes");
 const clientes = require("./routes/clienteRoutes");
 const servicios = require("./routes/servicioRoutes");
 const citas = require('./routes/citaRoutes')
+const formularios = require('./routes/formulariosRoutes')
 
 const app = express();
 const port = 5000;
@@ -30,6 +32,7 @@ auth_outes(app);
 mascotas(app);
 servicios(app);
 citas(app);
+formularios(app)
 
 // Agregar logging para debugging
 app.use((req, res, next) => {

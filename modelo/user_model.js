@@ -190,4 +190,20 @@ Usuarios.deleteUser = async (nombre, usuario_eliminador) => {
   }
 }
 
+Usuarios.findEmpleado = async (params) => {
+  try {
+    let sql = `
+            SELECT e.id_empleado
+            FROM personas p
+            INNER JOIN empleados e ON p.id_persona = e.persona_id
+            INNER JOIN usuarios u ON p.id_persona = u.persona_id
+            where u.id_usuario = ?
+        `;
+
+    const [rows] = await db.query(sql, [params.id_usuario]);
+    return rows[0];
+  } catch (error) {
+    throw error;
+  }
+}
 module.exports = Usuarios;

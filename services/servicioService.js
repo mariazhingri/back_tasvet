@@ -12,32 +12,31 @@ module.exports = {
     return servicios;
   },
 
-    async crearServicio (params){
-        user = params.id_usuario
-        if (!params.id_usuario) {
-            throw { status: 401, message: 'No autorizado' };
-        }
+  async crearServicio (params){
+      user = params.id_usuario
+      if (!params.id_usuario) {
+          throw { status: 401, message: 'No autorizado' };
+      }
 
-        const userRol = await Usuarios.findUsuario({ id_usuario: user });
-        if (userRol.rol_id !== 1 && params.rol_id !== 2) {
-            throw { status: 403, message: 'Acción no permitida' };
-        }
+      const userRol = await Usuarios.findUsuario({ id_usuario: user });
+      if (userRol.rol_id !== 1 && params.rol_id !== 2) {
+          throw { status: 403, message: 'Acción no permitida' };
+      }
 
 
-        if (!params.descripcion || !params.categoria) {
-            throw { status: 400, message: 'Faltan campos obligatorios' };
-        }
+      if (!params.descripcion || !params.categoria) {
+          throw { status: 400, message: 'Faltan campos obligatorios' };
+      }
 
-        const nuevoServicio = await Servicio.crearServicio({
-            descripcion,
-            categoria,
-            formulario,
-            reg_usuario: params.id_usuario
-        });
+      const nuevoServicio = await Servicio.crearServicio({
+          descripcion,
+          categoria,
+          formulario,
+          reg_usuario: params.id_usuario
+      });
 
     return nuevoServicio;
   },
-
 
   async crearServicioV2(id_usuario, data) {
     if (!id_usuario) {
@@ -117,5 +116,23 @@ module.exports = {
     }
 
     return true;
-  }
+  },
+
+  async obtenerFormularios(id_usuario) {
+    if (!id_usuario) {
+      throw { status: 401, message: 'Usuario no autenticado' };
+    }
+
+    const servicios = await Servicio.obtenerFomularios();
+    return servicios;
+  },
+
+   async listarFormularios(id_usuario) {
+    if (!id_usuario) {
+      throw { status: 401, message: 'Usuario no autenticado' };
+    }
+
+    const servicios = await Servicio.listarFormularios();
+    return servicios;
+  },
 };

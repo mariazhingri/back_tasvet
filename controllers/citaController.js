@@ -1,5 +1,6 @@
 const { obtenerCitas, getCitasByDate, getCitasByIdCita, getCitasByRangoMes } = require('../modelo/cita_model');
 const CitaService = require('../services/citaService');
+const { listarFormularios } = require('../services/servicioService');
 
 module.exports = {
   async obtenerCitas(req, res) {
@@ -143,5 +144,6 @@ module.exports = {
         message: error.message
       });
     }
-  }
+  },
+
 }

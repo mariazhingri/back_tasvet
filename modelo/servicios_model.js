@@ -100,4 +100,18 @@ Servicios.crearDetalleServicio = async (params) => {
   }
 
 };
+
+Servicios.obtenerFomularios = async () =>{
+  try {
+    const sql = `
+            select s.formulario, s.descripcion,s.categoria
+            from servicios s
+            where s.estado = 'A'
+            `;
+    const [rows] = await db.query(sql);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
 module.exports = Servicios;
