@@ -103,4 +103,46 @@ WHERE hc.mascota_id = ? AND hc.estado = 'A' AND cd.estado = 'A';
   }
 };
 
+HistoriaClinico.getSpaPorId = async (id_mascota) => {
+  console.log('🔍 Iniciando getSpaPorId con id_mascota:', id_mascota);
+  try {
+    const sql = `
+SELECT 
+  hc.mascota_id AS idMascota,
+  cs.id_carnet_spa AS idSpa,
+  hc.fecha AS fechaAplicacion,
+  cs.peso_kg AS peso,
+  cs.corte_pelo AS cortePelo,
+  cs.estilo AS estilo,
+  cs.baño AS banio,
+  cs.oidos AS oidos,
+  cs.uñas AS unias,
+  cs.hora_ingreso AS horaIngreso,
+  cs.hora_entrega AS horaEntrega,
+  CONCAT(p.nombre, ' ', p.apellido) AS nombreEmpleado
+FROM historial_clinico hc
+INNER JOIN evento_clinico ec ON hc.evento_clinico_id = ec.id_evento_clinico
+INNER JOIN carnets_spa cs ON ec.carnet_spa_id = cs.id_carnet_spa
+LEFT JOIN empleados e ON cs.empleado_id = e.id_empleado
+LEFT JOIN personas p ON e.persona_id = p.id_persona
+WHERE hc.mascota_id = ?
+  AND hc.estado = 'A'
+  AND cs.estado = 'A'
+  AND e.estado = 'A'
+  AND p.estado = 'A';
+        `;
+    const [result] = await db.query(sql, [id_mascota]);
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    console.log('🔍 Resultado de la consulta spa:', result);
+
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = HistoriaClinico;

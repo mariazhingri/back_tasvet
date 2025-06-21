@@ -3,6 +3,7 @@ const {
   getAtencionVeterinariaPorId,
   getVacunacionPorId,
   getDesparacitacionPorId,
+  getSpaPorId,
 } = require('../modelo/historialClinico_model');
 
 module.exports = {
@@ -126,7 +127,7 @@ module.exports = {
       }
 
       console.log('🔍 ID de mascota recibido:', id_mascota);
-      const spa = await getDesparacitacionPorId(id_mascota);
+      const spa = await getSpaPorId(id_mascota);
 
       if (!spa || spa.length === 0) {
         return res.status(404).json({
