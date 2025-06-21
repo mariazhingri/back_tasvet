@@ -22,4 +22,10 @@ module.exports = (app) => {
     verificarToken,
     HistorialClinicoController.obtenerSpaPorId,
   );
+
+  app.get(
+    '/historialClinico/obtener/mascotasAtendidas',
+    verificarToken,
+    HistorialClinicoController.obtenerMascotasAtendidas,
+  );
 };

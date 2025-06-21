@@ -4,6 +4,8 @@ const {
   getVacunacionPorId,
   getDesparacitacionPorId,
   getSpaPorId,
+  getMascotasAtendidas: getObtenerMascotasAtendidas,
+  getMascotasAtendidas,
 } = require('../modelo/historialClinico_model');
 
 module.exports = {
@@ -139,6 +141,32 @@ module.exports = {
       res.status(200).json({
         success: true,
         data: spa,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+      });
+    }
+  },
+
+  async obtenerMascotasAtendidas(req, res) {
+    console.log('🔍 Iniciando obtener mascotas atendidas');
+    try {
+      const mascotasAtendidas = await getMascotasAtendidas();
+
+      if (!mascotasAtendidas || mascotasAtendidas.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Historial de mascotas atendidas no obetenido',
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: mascotasAtendidas,
+        message: 'Mascotas atendidas obtenidas correctamente',
       });
     } catch (error) {
       console.error(error);
