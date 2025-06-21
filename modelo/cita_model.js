@@ -1,9 +1,9 @@
-const db = require('../config/conexion');
-const moment = require('moment-timezone');
+const db = require("../config/conexion");
+const moment = require("moment-timezone");
 
-const Citas = {}
+const Citas = {};
 
-Citas.obtenerCitas = async ()=> {
+Citas.obtenerCitas = async () => {
   try {
     sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_cita,
             s.id_servicio, ds.id_detalle_servicio, s.formulario, s.descripcion
@@ -29,9 +29,8 @@ Citas.obtenerCitas = async ()=> {
 };
 
 Citas.getCitasByDate = async (fecha) => {
-  console.log('Fecha recibida back:', fecha);
+  console.log("Fecha recibida back:", fecha);
   try {
-
     const sql = `
       SELECT c.id_cita, c.estado_cita,
              m.nombre_mascota, m.especie,
@@ -53,7 +52,7 @@ Citas.getCitasByDate = async (fecha) => {
     `;
 
     const [rows] = await db.query(sql, [fecha]);
-    console.log('Rows obtenidos:', rows);
+    console.log("Rows obtenidos:", rows);
     return rows;
   } catch (error) {
     throw error;
@@ -61,10 +60,10 @@ Citas.getCitasByDate = async (fecha) => {
 };
 
 Citas.getCitasByIdCita = async (id_cita) => {
-  console.log('📥 Id de cita recibida en getCitasByIdCita:', id_cita);
+  console.log("📥 Id de cita recibida en getCitasByIdCita:", id_cita);
 
   if (!id_cita || isNaN(Number(id_cita))) {
-    throw new Error('ID de cita inválido');
+    throw new Error("ID de cita inválido");
   }
 
   try {
@@ -95,19 +94,19 @@ Citas.getCitasByIdCita = async (id_cita) => {
       return null;
     }
 
-    console.log('✅ Cita obtenida:', rows[0]);
+    console.log("✅ Cita obtenida:", rows[0]);
     return rows[0]; // Devuelve solo el objeto
   } catch (error) {
-    console.error('❌ Error en getCitasByIdCita:', error.message);
-    throw new Error('Error al obtener la cita por ID');
+    console.error("❌ Error en getCitasByIdCita:", error.message);
+    throw new Error("Error al obtener la cita por ID");
   }
 };
 
 Citas.getCitasByRangoMes = async (inicioMes, finMes) => {
-  console.log('📥 Rango de citas recibido:', inicioMes, finMes);
+  console.log("📥 Rango de citas recibido:", inicioMes, finMes);
 
   if (!inicioMes || !finMes) {
-    throw new Error('Fechas de inicio y fin requeridas');
+    throw new Error("Fechas de inicio y fin requeridas");
   }
 
   try {
@@ -137,8 +136,8 @@ Citas.getCitasByRangoMes = async (inicioMes, finMes) => {
     console.log(`✅ ${rows.length} citas encontradas en el rango`);
     return rows;
   } catch (error) {
-    console.error('❌ Error al obtener citas por rango:', error.message);
-    throw new Error('Error al consultar citas por rango de fechas');
+    console.error("❌ Error al obtener citas por rango:", error.message);
+    throw new Error("Error al consultar citas por rango de fechas");
   }
 };
 
@@ -156,14 +155,14 @@ Citas.crearCita = async (params) => {
             )
             VALUES ( ?,?, ?,'Pendiente', ?, ?)
         `;
-        const [result] = await db.query(sql, [
-            params.cliente_id,
-            params.mascota_id,
+    const [result] = await db.query(sql, [
+      params.cliente_id,
+      params.mascota_id,
 
-            params.fecha_hora_cita,
-            currentDate,
-            params.reg_usuario
-        ]);
+      params.fecha_hora_cita,
+      currentDate,
+      params.reg_usuario,
+    ]);
 
     return result.insertId;
   } catch (err) {
@@ -171,39 +170,33 @@ Citas.crearCita = async (params) => {
   }
 };
 
-Citas.actualizarCita = async () => {
+Citas.actualizarCita = async () => {};
 
-}
+Citas.cambiarEstadoCita = async () => {};
 
-Citas.cambiarEstadoCita = async () => {
-
-}
-
-Citas.eliminarCita = async () => {
-
-}
+Citas.eliminarCita = async () => {};
 
 Citas.buscarCitaPorFechaHoraEmpleado = async (fecha_hora_cita) => {
   // Convertimos la fecha a la zona horaria de Ecuador
-  const inicio = moment(fecha_hora_cita).tz('America/Guayaquil');
-  const fin = inicio.clone().add(29, 'minutes');
+  const inicio = moment(fecha_hora_cita).tz("America/Guayaquil");
+  const fin = inicio.clone().add(29, "minutes");
 
   // Formateamos para MySQL (formato 'YYYY-MM-DD HH:mm:ss')
-  const inicioSQL = inicio.format('YYYY-MM-DD HH:mm:ss');
-  const finSQL = fin.format('YYYY-MM-DD HH:mm:ss');
+  const inicioSQL = inicio.format("YYYY-MM-DD HH:mm:ss");
+  const finSQL = fin.format("YYYY-MM-DD HH:mm:ss");
 
-  console.log('Rango búsqueda inicio:', inicioSQL);
-  console.log('Rango búsqueda fin:', finSQL);
+  console.log("Rango búsqueda inicio:", inicioSQL);
+  console.log("Rango búsqueda fin:", finSQL);
 
-  const result = await db.query(`
+  const result = await db.query(
+    `
         SELECT * FROM citas 
         WHERE fecha_hora_cita BETWEEN ? AND ?
-    `, [inicioSQL, finSQL]);
+    `,
+    [inicioSQL, finSQL],
+  );
 
   return result && result.length > 0 ? result[0] : null;
-
-
 };
-
 
 module.exports = Citas;
