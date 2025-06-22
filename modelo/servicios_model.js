@@ -1,5 +1,5 @@
-const db = require("../config/conexion");
-const Usuarios = require("./user_model");
+const db = require('../config/conexion');
+const Usuarios = require('./user_model');
 
 const Servicios = {};
 
@@ -14,7 +14,7 @@ Servicios.crearServicio = async (params) => {
       params.descripcion,
       params.categoria,
       params.formulario,
-      "A",
+      'A',
       currentDate,
       params.reg_usuario,
     ]);
@@ -36,7 +36,7 @@ Servicios.crearServicioV2 = async (params) => {
       params.descripcion,
       params.categoria,
       params.formulario,
-      "A",
+      'A',
       currentDate,
       params.reg_usuario,
     ]);
@@ -51,9 +51,11 @@ Servicios.obtenerServicios = async () => {
   try {
     // Consulta para obtener los servicios (descripcion y categoria) que estan resgistrados en la base de datos
     const sql = `
-            select s.id_servicio, s.descripcion, s.categoria, s.formulario,s.estado
-            from servicios s
-            inner join usuarios u on s.reg_usuario = u.id_usuario`;
+      SELECT s.id_servicio, s.descripcion, s.categoria, s.formulario, s.estado
+            FROM servicios s
+            INNER JOIN usuarios u ON s.reg_usuario = u.id_usuario
+            WHERE s.eliminado = 0
+      `;
     const [rows] = await db.query(sql);
     return rows;
   } catch (error) {
@@ -89,12 +91,23 @@ Servicios.eliminarServicio = async (id_servicio, eli_usuario) => {
             UPDATE servicios
             SET estado = 'I', eli_fecha = ?, eli_usuario = ?
             WHERE id_servicio = ?`;
-    const [result] = await db.query(sql, [
-      currentDate,
-      eli_usuario,
-      id_servicio,
-    ]);
+    const [result] = await db.query(sql, [currentDate, eli_usuario, id_servicio]);
 
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+Servicios.eliminarServicioV2 = async (id_servicio, eli_usuario) => {
+  try {
+    const currentDate = new Date();
+    const sql = `
+      UPDATE servicios
+      SET eliminado = 1, eli_fecha = ?, eli_usuario = ?
+      WHERE id_servicio = ?`;
+
+    const [result] = await db.query(sql, [currentDate, eli_usuario, id_servicio]);
     return result.affectedRows;
   } catch (error) {
     throw error;
@@ -110,7 +123,7 @@ Servicios.crearDetalleServicio = async (params) => {
     const [result] = await db.query(sql, [
       params.cita_id,
       params.servicio_id,
-      "A",
+      'A',
       currentDate,
       params.reg_usuario,
     ]);
