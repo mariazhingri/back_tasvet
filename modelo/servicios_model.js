@@ -162,4 +162,24 @@ Servicios.obtenerFomularios = async () => {
     throw error;
   }
 };
+
+  Servicios.verificarFormularioLlegando = async (IdFormulario) => {
+  try {
+    // 1. Obtenemos los formularios habilitados en el sistema
+    const formulariosHabilitados = await Servicios.obtenerFomularios();
+    
+    // 2. Mapeamos los formularios disponibles para facilitar la búsqueda
+    const formulariosDisponibles = formulariosHabilitados.map(f => f.formulario);
+    
+    // 3. Verificamos si el IdFormulario está habilitado
+    if (formulariosDisponibles.includes(IdFormulario)) {
+      return true; // El formulario está habilitado
+    } else {
+      return false; // El formulario no está habilitado
+    }
+  } catch (error) {
+    console.error("Error al verificar formulario:", error);
+    throw error;
+  }
+};
 module.exports = Servicios;

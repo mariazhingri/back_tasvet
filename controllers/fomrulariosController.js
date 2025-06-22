@@ -2,7 +2,7 @@ require("dotenv").config();
 const FormularioModel = require("../modelo/formularios_model");
 const FormulariosService = require("../services/formulariosServices");
 module.exports = {
-  async crearCarnetVacuna(req, res) {
+  async crearCarnets(req, res) {
     try {
       const usuario_creador = req.user?.id_usuario;
       const body = req.body;
@@ -20,7 +20,7 @@ module.exports = {
       };
       console.log("params: ", params);
       const CarnetsVacunaCreada =
-        await FormulariosService.crearCarnetVacuna(params);
+        await FormulariosService.crearCarnets(params);
 
       res.status(201).json({
         success: true,
@@ -179,17 +179,69 @@ module.exports = {
       console.log("params: ", params);
       const vacunas = await FormularioModel.obtenerVacunas(params);
 
-      res.status(201).json({
-        success: true,
-        data: vacunas,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Error interno del servidor",
-        error: error.message,
-      });
-    }
-  },
-};
+    
+        } catch (error) {
+            console.error(error); 
+            res.status(500).json({
+                success: false,
+                message: 'Error interno del servidor',
+                error: error.message
+            });
+        }
+    },
+
+    async obtenerVacunas(req, res) {
+       try{
+        const usuario_creador = req.user?.id_usuario;
+        const body = req.body;
+
+        const params = {
+            ...body,
+            reg_usuario: usuario_creador
+        }
+        console.log("params: ", params)
+        const vacunas = await FormularioModel.obtenerVacunas(params)
+
+        res.status(201).json({
+            success: true,
+            data: vacunas
+
+        });
+        } catch (error) {
+            console.error(error); 
+            res.status(500).json({
+                success: false,
+                message: 'Error interno del servidor',
+                error: error.message
+            });
+        }
+    },
+
+    async obtenerAntiparasitarios(req, res) {
+       try{
+        const usuario_creador = req.user?.id_usuario;
+        const body = req.body;
+
+        const params = {
+            ...body,
+            reg_usuario: usuario_creador
+        }
+        console.log("params: ", params)
+        const antiparasitario = await FormularioModel.obtenerAntiparasitarios(params)
+
+        res.status(201).json({
+            success: true,
+            data: antiparasitario
+
+        });
+        } catch (error) {
+            console.error(error); 
+            res.status(500).json({
+                success: false,
+                message: 'Error interno del servidor',
+                error: error.message
+            });
+        }
+    },
+
+}

@@ -14,9 +14,9 @@ module.exports = (app) => {
   );
 
   app.post(
-    "/api/carnet/vacuna/crear",
+    "/api/carnets/crear",
     verificarToken,
-    formularioController.crearCarnetVacuna,
+    formularioController.crearCarnets,
   );
   app.post(
     "/api/carnet/desparasitacion/crear",
