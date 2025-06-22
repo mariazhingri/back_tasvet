@@ -1,5 +1,5 @@
-const db = require('../config/conexion');
-const Usuarios = require('../modelo/user_model');
+const db = require("../config/conexion");
+const Usuarios = require("../modelo/user_model");
 
 const Mascota = {};
 
@@ -18,7 +18,7 @@ Mascota.obtenerMascota = async () => {
 };
 Mascota.obtenerMascotaPorId = async (idMascota) => {
   if (!idMascota || isNaN(Number(idMascota))) {
-    throw new Error('ID de mascota inválido');
+    throw new Error("ID de mascota inválido");
   }
 
   try {
@@ -53,11 +53,11 @@ Mascota.obtenerMascotaPorId = async (idMascota) => {
       return null;
     }
 
-    console.log('✅ Mascota obtenida:', rows[0]);
+    console.log("✅ Mascota obtenida:", rows[0]);
     return rows[0];
   } catch (error) {
-    console.error('❌ Error al obtener mascota:', error.message);
-    throw new Error('Error al obtener la mascota por ID');
+    console.error("❌ Error al obtener mascota:", error.message);
+    throw new Error("Error al obtener la mascota por ID");
   }
 };
 
@@ -72,7 +72,7 @@ Mascota.obtenerRazas = async () => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 Mascota.crearMascota = async (params) => {
   try {
@@ -94,14 +94,13 @@ Mascota.crearMascota = async (params) => {
       params.sexo,
       params.peso_kg,
       currentDate,
-      params.reg_usuario
+      params.reg_usuario,
     ]);
 
     return mascotaResult.insertId;
   } catch (err) {
     throw err;
   }
-
 };
 
 Mascota.actualizarMascota = async (params) => {
@@ -131,7 +130,7 @@ Mascota.actualizarMascota = async (params) => {
       params.peso_kg,
       currentDate,
       params.act_usuario,
-      params.id_mascota  // el id de la mascota a actualizar
+      params.id_mascota, // el id de la mascota a actualizar
     ]);
 
     return result;
@@ -142,7 +141,7 @@ Mascota.actualizarMascota = async (params) => {
 
 Mascota.eliminarMascota = async (eli_usuario, id_mascota) => {
   try {
-    const currentDate = new Date()
+    const currentDate = new Date();
     const sql = `
             UPDATE mascotas SET 
                 estado = 'I', 
@@ -153,7 +152,7 @@ Mascota.eliminarMascota = async (eli_usuario, id_mascota) => {
     const [result] = await db.query(sql, [
       currentDate,
       eli_usuario,
-      id_mascota
+      id_mascota,
     ]);
     return result;
   } catch (err) {
@@ -161,7 +160,11 @@ Mascota.eliminarMascota = async (eli_usuario, id_mascota) => {
   }
 };
 
-Mascota.verificarExistenciaMascota = async (nombre_mascota, especieId, razaId) => {
+Mascota.verificarExistenciaMascota = async (
+  nombre_mascota,
+  especieId,
+  razaId,
+) => {
   try {
     const sql = `
             SELECT m.* 
@@ -193,5 +196,5 @@ Mascota.obtenerMascotaDeCliente = async (id_cliente) => {
   } catch (error) {
     throw error;
   }
-}
+};
 module.exports = Mascota;

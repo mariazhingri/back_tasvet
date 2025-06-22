@@ -1,6 +1,6 @@
-const db = require('../config/conexion');
+const db = require("../config/conexion");
 
-const Usuarios = {}
+const Usuarios = {};
 Usuarios.cambiarRol = async () => {
   try {
     const id_usuario_admin = 1; // ID del administrador que realiza la acción
@@ -8,9 +8,9 @@ Usuarios.cambiarRol = async () => {
     const nuevo_rol_id = 2; // Nuevo rol (por ejemplo, veterinario)
 
     await Usuarios.changeUserRole(id_usuario_admin, id_usuario, nuevo_rol_id);
-    console.log('Rol cambiado exitosamente');
+    console.log("Rol cambiado exitosamente");
   } catch (error) {
-    console.error('Error al cambiar el rol:', error.message);
+    console.error("Error al cambiar el rol:", error.message);
   }
 };
 
@@ -26,23 +26,25 @@ Usuarios.findUsuario = async (params) => {
     let queryParams = [];
 
     if (params.id_usuario) {
-      where.push('u.id_usuario = ?');
+      where.push("u.id_usuario = ?");
       queryParams.push(params.id_usuario);
     }
     if (params.correo) {
-      where.push('p.correo = ?');
+      where.push("p.correo = ?");
       queryParams.push(params.correo);
     }
     if (params.cedula) {
-      where.push('p.cedula = ?');
+      where.push("p.cedula = ?");
       queryParams.push(params.cedula);
     }
 
     if (where.length === 0) {
-      throw new Error('Se requiere al menos un parámetro para buscar el usuario');
+      throw new Error(
+        "Se requiere al menos un parámetro para buscar el usuario",
+      );
     }
 
-    sql += ' WHERE ' + where.join(' AND ');
+    sql += " WHERE " + where.join(" AND ");
 
     const [rows] = await db.query(sql, queryParams);
     return rows[0];
@@ -74,10 +76,10 @@ Usuarios.createUser = async (datosUsuario) => {
           datosUsuario.persona.apellido,
           datosUsuario.persona.telefono_1,
           datosUsuario.persona.telefono_2 || null,
-          'A',
+          "A",
           currentDate,
-          datosUsuario.reg_usuario
-        ]
+          datosUsuario.reg_usuario,
+        ],
       );
       personaId = personaResult.insertId;
     }
@@ -90,10 +92,10 @@ Usuarios.createUser = async (datosUsuario) => {
         personaId,
         datosUsuario.clave,
         rol_id,
-        'A',
+        "A",
         currentDate,
-        datosUsuario.reg_usuario
-      ]
+        datosUsuario.reg_usuario,
+      ],
     );
 
     const usuarioId = usuarioResult.insertId;
@@ -108,14 +110,13 @@ Usuarios.createUser = async (datosUsuario) => {
   }
 };
 
-
 Usuarios.createUserAdministrador = async (datosUsuario) => {
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
 
     const currentDate = new Date();
-    const rol_id = 1; 
+    const rol_id = 1;
 
     let personaId = null;
 
@@ -130,10 +131,10 @@ Usuarios.createUserAdministrador = async (datosUsuario) => {
           datosUsuario.persona.apellido,
           datosUsuario.persona.telefono_1,
           datosUsuario.persona.telefono_2 || null,
-          'A',
+          "A",
           currentDate,
-          datosUsuario.reg_usuario
-        ]
+          datosUsuario.reg_usuario,
+        ],
       );
       personaId = personaResult.insertId;
     }
@@ -145,10 +146,10 @@ Usuarios.createUserAdministrador = async (datosUsuario) => {
         personaId,
         datosUsuario.clave,
         rol_id,
-        'A',
+        "A",
         currentDate,
-        datosUsuario.reg_usuario
-      ]
+        datosUsuario.reg_usuario,
+      ],
     );
 
     await connection.commit();
@@ -161,20 +162,19 @@ Usuarios.createUserAdministrador = async (datosUsuario) => {
   }
 };
 
-
 Usuarios.updateUser = async (id_usuario, datos, usuario_actualizador) => {
   try {
     const currentDate = new Date();
     const nombreActualizador = await Usuarios.getUserName(usuario_actualizador);
     const [result] = await db.query(
-      'UPDATE usuarios SET ? , act_fecha = ?, act_usuario = ? WHERE id_usuario = ?',
-      [datos, currentDate, nombreActualizador, id_usuario]
+      "UPDATE usuarios SET ? , act_fecha = ?, act_usuario = ? WHERE id_usuario = ?",
+      [datos, currentDate, nombreActualizador, id_usuario],
     );
     return result;
   } catch (error) {
     throw error;
   }
-}
+};
 
 Usuarios.deleteUser = async (nombre, usuario_eliminador) => {
   try {
@@ -182,13 +182,13 @@ Usuarios.deleteUser = async (nombre, usuario_eliminador) => {
     const nombreEliminador = await Usuarios.getUserName(usuario_eliminador);
     const [result] = await db.query(
       'UPDATE usuarios SET estado = "I", eli_fecha = ?, eli_usuario = ? WHERE id_usuario = ?',
-      [currentDate, nombreEliminador, nombre]
+      [currentDate, nombreEliminador, nombre],
     );
     return result;
   } catch (error) {
     throw error;
   }
-}
+};
 
 Usuarios.findEmpleado = async (params) => {
   try {
@@ -205,5 +205,5 @@ Usuarios.findEmpleado = async (params) => {
   } catch (error) {
     throw error;
   }
-}
+};
 module.exports = Usuarios;

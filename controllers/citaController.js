@@ -1,28 +1,32 @@
-const { obtenerCitas, getCitasByDate, getCitasByIdCita, getCitasByRangoMes } = require('../modelo/cita_model');
+const {
+  obtenerCitas,
+  getCitasByDate,
+  getCitasByIdCita,
+  getCitasByRangoMes,
+} = require('../modelo/cita_model');
 const CitaService = require('../services/citaService');
 const { listarFormularios } = require('../services/servicioService');
 
 module.exports = {
   async obtenerCitas(req, res) {
     try {
-      id_usuario = req.user?.id_usuario
+      id_usuario = req.user?.id_usuario;
 
       const citas = await obtenerCitas(id_usuario);
 
       res.status(200).json({
         success: true,
-        data: citas
+        data: citas,
       });
     } catch (error) {
       console.error(error);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
-        error: error.message
+        error: error.message,
       });
     }
   },
-
 
   async obtenerCitasPorFecha(req, res) {
     console.log(':_) Obteniendo citas por fecha');
@@ -45,8 +49,7 @@ module.exports = {
         message: 'Citas obtenidas correctamente',
       });
 
-      console.log('Citas obtenidas:', citas)
-
+      console.log('Citas obtenidas:', citas);
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -79,7 +82,6 @@ module.exports = {
       });
 
       // console.log('Cita obtenida:', cita)
-
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -114,7 +116,6 @@ module.exports = {
       });
 
       // console.log('Cita obtenida:', cita)
-
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -128,22 +129,21 @@ module.exports = {
   async crearCita(req, res) {
     try {
       const usuario_creador = req.user?.id_usuario;
-      body = req.body
+      body = req.body;
       const params = {
         ...body,
-        reg_usuario: usuario_creador
-      }
+        reg_usuario: usuario_creador,
+      };
       const result = await CitaService.crearCita(params);
       return res.status(201).json({
         success: true,
-        ...result
+        ...result,
       });
     } catch (error) {
       return res.status(400).json({
         success: false,
-        message: error.message
+        message: error.message,
       });
     }
   },
-
-}
+};

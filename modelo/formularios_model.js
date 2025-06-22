@@ -1,12 +1,12 @@
-const db = require('../config/conexion');
+const db = require("../config/conexion");
 
-const formularios = {}
+const formularios = {};
 
 formularios.crearCarnetVacuna = async (params) => {
-    try{
-        const currentDate = new Date()
+  try {
+    const currentDate = new Date();
 
-        const sql = `
+    const sql = `
             INSERT INTO carnets_vacunas (
                 empleado_id, 
                 vacuna_id,  
@@ -21,30 +21,30 @@ formularios.crearCarnetVacuna = async (params) => {
             )
             VALUES ( ?,?,?,?,?,?,?,?,?,?)
         `;
-        const [result] = await db.query(sql, [
-            params.empleado_id,
-            params.vacuna_id,
-            params.fecha_aplicacion,
-            params.peso_kg,
-            params.edad_meses,
-            params.proxima_dosis,
-            params.observaciones,
-            'A',
-            currentDate,
-            params.reg_usuario
-        ]);
+    const [result] = await db.query(sql, [
+      params.empleado_id,
+      params.vacuna_id,
+      params.fecha_aplicacion,
+      params.peso_kg,
+      params.edad_meses,
+      params.proxima_dosis,
+      params.observaciones,
+      "A",
+      currentDate,
+      params.reg_usuario,
+    ]);
 
     return result.insertId;
-    }catch(error){
-        throw error
-    }
+  } catch (error) {
+    throw error;
+  }
 };
 
 formularios.crearCarnetDesparacitacion = async (params) => {
-    try{
-        const currentDate = new Date()
+  try {
+    const currentDate = new Date();
 
-        const sql = `
+    const sql = `
             INSERT INTO carnets_desparasitacion (
                 empleado_id, 
                 antiparasitario_id,  
@@ -59,30 +59,30 @@ formularios.crearCarnetDesparacitacion = async (params) => {
             )
             VALUES ( ?,?,?,?,?,?,?,?,?,?)
         `;
-        const [result] = await db.query(sql, [
-            params.empleado_id,
-            params.antiparasitario_id,
-            params.fecha_aplicacion,
-            params.peso_kg,
-            params.edad_meses,
-            params.proxima_dosis,
-            params.observaciones,
-            'A',
-            currentDate,
-            params.reg_usuario
-        ]);
+    const [result] = await db.query(sql, [
+      params.empleado_id,
+      params.antiparasitario_id,
+      params.fecha_aplicacion,
+      params.peso_kg,
+      params.edad_meses,
+      params.proxima_dosis,
+      params.observaciones,
+      "A",
+      currentDate,
+      params.reg_usuario,
+    ]);
 
     return result.insertId;
-    }catch(error){
-        throw error
-    }
+  } catch (error) {
+    throw error;
+  }
 };
 
 formularios.crearAtencionVeterinaria = async (params) => {
-    try{
-        const currentDate = new Date()
+  try {
+    const currentDate = new Date();
 
-        const sql = `
+    const sql = `
             INSERT INTO atencion_veterinaria (
                 empleado_id, 
                 temperatura,  
@@ -99,32 +99,32 @@ formularios.crearAtencionVeterinaria = async (params) => {
             )
             VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?)
         `;
-        const [result] = await db.query(sql, [
-            params.empleado_id,
-            params.temperatura,
-            params.peso,
-            params.edad_meses,
-            params.sintomas,
-            params.diagnostico,
-            params.tratamiento,
-            params.resultados_examenes,
-            params.observaciones,
-            'A',
-            currentDate,
-            params.reg_usuario
-        ]);
+    const [result] = await db.query(sql, [
+      params.empleado_id,
+      params.temperatura,
+      params.peso,
+      params.edad_meses,
+      params.sintomas,
+      params.diagnostico,
+      params.tratamiento,
+      params.resultados_examenes,
+      params.observaciones,
+      "A",
+      currentDate,
+      params.reg_usuario,
+    ]);
 
     return result.insertId;
-    }catch(error){
-        throw error
-    }
+  } catch (error) {
+    throw error;
+  }
 };
 
 formularios.crearCarnetsSpa = async (params) => {
-    try{
-        const currentDate = new Date()
+  try {
+    const currentDate = new Date();
 
-        const sql = `
+    const sql = `
             INSERT INTO carnets_spa (
                 empleado_id, 
                 peso_kg,
@@ -142,33 +142,33 @@ formularios.crearCarnetsSpa = async (params) => {
             )
             VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?)
         `;
-        const [result] = await db.query(sql, [
-            params.empleado_id,
-            params.peso_kg,
-            params.corte_pelo,
-            params.estilo,
-            params.baño,
-            params.oidos,
-            params.uñas,
-            params.hora_inngreso,
-            params.hora_entrega,
-            params.observaciones,
-            'A',
-            currentDate,
-            params.reg_usuario
-        ]);
+    const [result] = await db.query(sql, [
+      params.empleado_id,
+      params.peso_kg,
+      params.corte_pelo,
+      params.estilo,
+      params.baño,
+      params.oidos,
+      params.uñas,
+      params.hora_inngreso,
+      params.hora_entrega,
+      params.observaciones,
+      "A",
+      currentDate,
+      params.reg_usuario,
+    ]);
 
     return result.insertId;
-    }catch(error){
-        throw error
-    }
+  } catch (error) {
+    throw error;
+  }
 };
 
-formularios.crearEventoClinico = async(params) => {
-    try{
-        const currentDate = new Date()
+formularios.crearEventoClinico = async (params) => {
+  try {
+    const currentDate = new Date();
 
-        const sql = `
+    const sql = `
             INSERT INTO evento_clinico (
                 carnet_vacuna_id, 
                 atencion_id,
@@ -180,28 +180,27 @@ formularios.crearEventoClinico = async(params) => {
             )
             VALUES ( ?,?,?,?,?,?,?)
         `;
-        const [result] = await db.query(sql, [
-            params.carnet_vacuna_id,
-            params.atencion_id,
-            params.carnet_spa_id,
-            params.carnet_desparasitacion_id,
-            'A',
-            currentDate,
-            params.reg_usuario
-        ]);
+    const [result] = await db.query(sql, [
+      params.carnet_vacuna_id,
+      params.atencion_id,
+      params.carnet_spa_id,
+      params.carnet_desparasitacion_id,
+      "A",
+      currentDate,
+      params.reg_usuario,
+    ]);
 
     return result.insertId;
-    }catch(error){
-        throw error
-    }
+  } catch (error) {
+    throw error;
+  }
+};
 
-}
+formularios.crearHistorialClinico = async (params) => {
+  try {
+    const currentDate = new Date();
 
-formularios.crearHistorialClinico = async(params) => {
-    try{
-        const currentDate = new Date()
-
-        const sql = `
+    const sql = `
             INSERT INTO historial_clinico (
                 mascota_id, 
                 evento_clinico_id,
@@ -214,25 +213,24 @@ formularios.crearHistorialClinico = async(params) => {
             )
             VALUES ( ?,?,?,?,?,?,?,?)
         `;
-        const [result] = await db.query(sql, [
-            params.mascota_id,
-            params.evento_clinico_id,
-            params.numero_historia_clinica,
-            params.antecedentes_veterinarios_id,
-            params.fecha,
-            'A',
-            currentDate,
-            params.reg_usuario
-        ]);
+    const [result] = await db.query(sql, [
+      params.mascota_id,
+      params.evento_clinico_id,
+      params.numero_historia_clinica,
+      params.antecedentes_veterinarios_id,
+      params.fecha,
+      "A",
+      currentDate,
+      params.reg_usuario,
+    ]);
 
     return result.insertId;
-    }catch(error){
-        throw error
-    }
+  } catch (error) {
+    throw error;
+  }
+};
 
-}
-
-formularios.obtenerEmpleados = async(params) =>{
+formularios.obtenerEmpleados = async (params) => {
   try {
     const sql = `
             select id_empleado, p.nombre,p.apellido,e.cargo, e.descripcion
@@ -246,9 +244,9 @@ formularios.obtenerEmpleados = async(params) =>{
   } catch (error) {
     throw error;
   }
-}
+};
 
-formularios.obtenerVacunas = async(params) =>{
+formularios.obtenerVacunas = async (params) => {
   try {
     const sql = `
             select id_vacuna, nombre_vacuna, descripcion
@@ -260,7 +258,7 @@ formularios.obtenerVacunas = async(params) =>{
   } catch (error) {
     throw error;
   }
-}
+};
 
 formularios.calcularNumeroHistoriaClinica = async(params) =>{
   try{
@@ -294,4 +292,3 @@ formularios.obtenerAntiparasitarios = async(params) =>{
 
 
 module.exports = formularios;
-

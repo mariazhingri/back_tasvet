@@ -1,66 +1,66 @@
-const db = require('../config/conexion');
+const db = require("../config/conexion");
 
-const Clientes = {}
+const Clientes = {};
 
 Clientes.obtenerDatosUsuario = async (params) => {
-    try {
-        sql = `select p.*, r.descripcion as rol
+  try {
+    sql = `select p.*, r.descripcion as rol
                 from personas p
                 inner join usuarios u on p.id_persona = u.persona_id
                 inner join roles r on u.rol_id = r.id_rol
                 where u.id_usuario = ?
                 and u.estado = 'A'`;
-        const [rows] = await db.query(sql, [params.id_usuario]);
-        if (rows.length === 0) {
-            return null; // No se encontró el cliente
-        }
-        return rows[0]; 
-    }catch (error) {
-        throw error;
+    const [rows] = await db.query(sql, [params.id_usuario]);
+    if (rows.length === 0) {
+      return null; // No se encontró el cliente
     }
-}
+    return rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
 
 Clientes.obtenerDatosCliente = async () => {
-    try {
-        sql = `select c.id_cliente, p.id_persona,p.nombre, p.apellido, p.cedula, p.telefono_1, p.telefono_2, p.correo, c.direccion
+  try {
+    sql = `select c.id_cliente, p.id_persona,p.nombre, p.apellido, p.cedula, p.telefono_1, p.telefono_2, p.correo, c.direccion
                 from clientes c
                 inner join personas p on c.persona_id = p.id_persona
                 and c.estado = 'A'
                 `;
-        const [rows] = await db.query(sql);
-        return rows; 
-    }catch (error) {
-        throw error;
-    }
+    const [rows] = await db.query(sql);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
 };
 
-Clientes.crearCliente = async(params) => {
-    try{
-        const currentDate = new Date();
-        const sql = `
+Clientes.crearCliente = async (params) => {
+  try {
+    const currentDate = new Date();
+    const sql = `
             INSERT INTO clientes (
                 persona_id, direccion,
                 estado, reg_fecha,reg_usuario
             )
             VALUES ( ?, ?,'A', ?, ?)
         `;
-        const [result] = await db.query(sql, [
-            params.persona_id,
-            params.direccion,
-            currentDate,
-            params.reg_usuario
-        ]);
+    const [result] = await db.query(sql, [
+      params.persona_id,
+      params.direccion,
+      currentDate,
+      params.reg_usuario,
+    ]);
 
-        return result.insertId;
-    }catch(err){
-        throw err;
-    }
+    return result.insertId;
+  } catch (err) {
+    throw err;
+  }
 };
 
 Clientes.actualizarCliente = async (params) => {
-    try {
-        const currentDate = new Date();
-        const sql = `
+  try {
+    const currentDate = new Date();
+    const sql = `
             UPDATE clientes SET 
                 direccion = ?, 
                 act_fecha = ?, 
@@ -68,23 +68,23 @@ Clientes.actualizarCliente = async (params) => {
             WHERE id_cliente = ?
         `;
 
-        const [result] = await db.query(sql, [
-            params.direccion,
-            currentDate,
-            params.act_usuario,
-            params.id_cliente
-        ]);
+    const [result] = await db.query(sql, [
+      params.direccion,
+      currentDate,
+      params.act_usuario,
+      params.id_cliente,
+    ]);
 
-        return result.affectedRows;
-    } catch (err) {
-        throw err;
-    }
+    return result.affectedRows;
+  } catch (err) {
+    throw err;
+  }
 };
 
 Clientes.eliminarCliente = async (params) => {
-    try {
-        const currentDate = new Date();
-        const sql = `
+  try {
+    const currentDate = new Date();
+    const sql = `
             UPDATE clientes 
             SET estado = 'I', 
                 eli_fecha = ?, 
@@ -92,18 +92,16 @@ Clientes.eliminarCliente = async (params) => {
             WHERE id_cliente = ?
         `;
 
-        const [result] = await db.query(sql, [
-            currentDate,
-            params.eli_usuario,
-            params.id_cliente
-        ]);
+    const [result] = await db.query(sql, [
+      currentDate,
+      params.eli_usuario,
+      params.id_cliente,
+    ]);
 
-        return result.affectedRows;
-    } catch (err) {
-        throw err;
-    }
+    return result.affectedRows;
+  } catch (err) {
+    throw err;
+  }
 };
-
-
 
 module.exports = Clientes;
