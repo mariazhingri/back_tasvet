@@ -7,9 +7,20 @@ module.exports = (app) => {
 
   app.post('/servicio/crear', verificarToken, ServicioController.crearServicio);
   app.put('/servicio/actualizar', verificarToken, ServicioController.actualizarServicio);
-  app.put('/servicio/eliminar', verificarToken, ServicioController.eliminarServicio);
 
-  // Rutas para la versión 2 de los servicios
+  // Ruta para cambiar estado del servicio :)
+  app.put(
+    '/servicio/estado/disponible',
+    verificarToken,
+    ServicioController.cambiarEstadoDisponible,
+  );
+  app.put(
+    '/servicio/estado/noDisponible',
+    verificarToken,
+    ServicioController.cambiarEstadoNoDisponible,
+  );
+
+  // Rutas para la versión 2 de los servicios :)
   app.post('/servicio/crearV2', verificarToken, ServicioController.crearServicioV2);
   app.put('/servicio/eliminarV2', verificarToken, ServicioController.eliminarServicioV2);
 };

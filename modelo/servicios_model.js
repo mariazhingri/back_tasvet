@@ -84,12 +84,27 @@ Servicios.actualizarServicio = async (params) => {
   }
 };
 
-Servicios.eliminarServicio = async (id_servicio, eli_usuario) => {
+Servicios.putEstadoNoDisponible = async (id_servicio, eli_usuario) => {
   try {
     const currentDate = new Date();
     const sql = `
             UPDATE servicios
             SET estado = 'I', eli_fecha = ?, eli_usuario = ?
+            WHERE id_servicio = ?`;
+    const [result] = await db.query(sql, [currentDate, eli_usuario, id_servicio]);
+
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+Servicios.putEstadoDisponible = async (id_servicio, eli_usuario) => {
+  try {
+    const currentDate = new Date();
+    const sql = `
+            UPDATE servicios
+            SET estado = 'A', eli_fecha = ?, eli_usuario = ?
             WHERE id_servicio = ?`;
     const [result] = await db.query(sql, [currentDate, eli_usuario, id_servicio]);
 

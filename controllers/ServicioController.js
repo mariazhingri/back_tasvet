@@ -169,11 +169,31 @@ module.exports = {
     }
   },
 
-  async eliminarServicio(req, res) {
+  async cambiarEstadoNoDisponible(req, res) {
     try {
       const id_usuario = req.user?.id_usuario;
       const { id_servicio } = req.body;
-      await servicioService.eliminarServicio({ id_usuario, id_servicio });
+      await servicioService.cambioEstadoNoDisponible({ id_usuario, id_servicio });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Servicio eliminado exitosamente',
+      });
+    } catch (error) {
+      console.error('Error al eliminar el servicio:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  async cambiarEstadoDisponible(req, res) {
+    try {
+      const id_usuario = req.user?.id_usuario;
+      const { id_servicio } = req.body;
+      await servicioService.cambioEstadoDisponible({ id_usuario, id_servicio });
 
       return res.status(200).json({
         success: true,
