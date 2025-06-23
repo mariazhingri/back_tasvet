@@ -172,10 +172,12 @@ Citas.crearCita = async (params) => {
 
 Citas.marcarCitasRestrasadas = async () => {
   const sql = `
-    UPDATE citas
-    SET estado_cita = 'Retrasada'
-    WHERE fecha_hora_cita < NOW() AND estado_cita = 'Pendiente'
-`;
+      UPDATE citas
+      SET estado_cita = 'Retrasada'
+      WHERE 
+        DATE_ADD(fecha_hora_cita, INTERVAL 60 MINUTE) < NOW()
+        AND estado_cita = 'Pendiente';
+    `;
   await db.query(sql);
 };
 Citas.actualizarCita = async () => {};
