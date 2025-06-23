@@ -1,5 +1,7 @@
 const {
   obtenerCitas,
+  getCitasRetrasadas,
+  getCitasCanceladas,
   getCitasByDate,
   getCitasByIdCita,
   getCitasByRangoMes,
@@ -13,6 +15,46 @@ module.exports = {
       id_usuario = req.user?.id_usuario;
 
       const citas = await obtenerCitas(id_usuario);
+
+      res.status(200).json({
+        success: true,
+        data: citas,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  async obtenerCitasRetrasadas(req, res) {
+    try {
+      id_usuario = req.user?.id_usuario;
+
+      const citas = await getCitasRetrasadas(id_usuario);
+
+      res.status(200).json({
+        success: true,
+        data: citas,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  async obtenerCitasCanceladas(req, res) {
+    try {
+      id_usuario = req.user?.id_usuario;
+
+      const citas = await getCitasCanceladas(id_usuario);
 
       res.status(200).json({
         success: true,

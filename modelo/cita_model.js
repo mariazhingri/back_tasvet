@@ -28,6 +28,56 @@ Citas.obtenerCitas = async () => {
   }
 };
 
+Citas.getCitasRetrasadas = async () => {
+  try {
+    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_cita,
+            s.id_servicio, ds.id_detalle_servicio, s.formulario, s.descripcion
+            from citas c
+            inner join clientes cl on c.cliente_id = cl.id_cliente
+            inner join personas p on cl.persona_id = p.id_persona
+            inner join mascotas m on c.mascota_id  = m.id_mascota
+            inner join razas r on m.raza_id = r.id_raza
+            inner join detalle_servicios ds on c.id_cita = ds.cita_id
+            inner join servicios s on ds.servicio_id = s.id_servicio
+            where c.estado_cita = 'Retrasada'
+            and cl.estado = 'A'
+            and p.estado = 'A'
+            and m.estado  = 'A'
+            and r.estado = 'A'
+            ORDER BY c.id_cita
+            `;
+    const [rows] = await db.query(sql);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+Citas.getCitasCanceladas = async () => {
+  try {
+    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_cita,
+            s.id_servicio, ds.id_detalle_servicio, s.formulario, s.descripcion
+            from citas c
+            inner join clientes cl on c.cliente_id = cl.id_cliente
+            inner join personas p on cl.persona_id = p.id_persona
+            inner join mascotas m on c.mascota_id  = m.id_mascota
+            inner join razas r on m.raza_id = r.id_raza
+            inner join detalle_servicios ds on c.id_cita = ds.cita_id
+            inner join servicios s on ds.servicio_id = s.id_servicio
+            where c.estado_cita = 'Cancelada'
+            and cl.estado = 'A'
+            and p.estado = 'A'
+            and m.estado  = 'A'
+            and r.estado = 'A'
+            ORDER BY c.id_cita
+            `;
+    const [rows] = await db.query(sql);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
 Citas.getCitasByDate = async (fecha) => {
   console.log('Fecha recibida back:', fecha);
   try {
