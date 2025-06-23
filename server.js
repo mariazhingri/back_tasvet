@@ -1,15 +1,17 @@
-const express = require("express");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const passport = require("passport");
+const express = require('express');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
 
-const auth_outes = require("./routes/authRoutes");
-const mascotas = require("./routes/mascotaRoutes");
-const clientes = require("./routes/clienteRoutes");
-const servicios = require("./routes/servicioRoutes");
-const citas = require("./routes/citaRoutes");
-const formulario = require("./routes/formulariosRoutes");
-const historialClinicoRoutes = require("./routes/historialClinicoRoutes");
+const auth_outes = require('./routes/authRoutes');
+const mascotas = require('./routes/mascotaRoutes');
+const clientes = require('./routes/clienteRoutes');
+const servicios = require('./routes/servicioRoutes');
+const citas = require('./routes/citaRoutes');
+const formulario = require('./routes/formulariosRoutes');
+const historialClinicoRoutes = require('./routes/historialClinicoRoutes');
+
+require('./services/task/actualizarCitasRetrasadas');
 
 const app = express();
 const port = 5000;
@@ -17,7 +19,7 @@ const port = 5000;
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: 'http://localhost:3000',
     credentials: true,
   }),
 );
@@ -27,7 +29,7 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 // Configurar passport
-require("./config/passport")(passport);
+require('./config/passport')(passport);
 
 // Rutas
 clientes(app);
@@ -41,8 +43,8 @@ historialClinicoRoutes(app);
 // Agregar logging para debugging
 app.use((req, res, next) => {
   console.log(`📡 ${req.method} ${req.path}`);
-  console.log("📨 Body:", req.body);
-  console.log("🍪 Cookies:", req.cookies);
+  console.log('📨 Body:', req.body);
+  console.log('🍪 Cookies:', req.cookies);
   next();
 });
 
