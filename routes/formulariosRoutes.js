@@ -34,9 +34,4 @@ module.exports = (app) => {
     formularioController.crearCarnetSpa,
   );
 
-  app.delete(
-    "/api/carnets/eliminar/:IdCita/:IdServicio",
-    verificarToken,
-    formularioController.eliminarFormulario,
-  ); 
 };

@@ -19,6 +19,18 @@ module.exports = (app) => {
     verificarToken,
     ServicioController.cambiarEstadoNoDisponible,
   );
+  /*Rutas para agregar y eliminar un servico a una cita agendada*/
+  app.delete(
+    "/api/servicio/eliminar/:IdCita/:IdServicio",
+    verificarToken,
+    ServicioController.eliminarServicioDeCita,
+  ); 
+
+  app.post(
+    "/api/servicio/agregar",
+    verificarToken,
+    ServicioController.agregarServicioaCita,
+  ); 
 
   // Rutas para la versión 2 de los servicios :)
   app.post('/servicio/crearV2', verificarToken, ServicioController.crearServicioV2);
