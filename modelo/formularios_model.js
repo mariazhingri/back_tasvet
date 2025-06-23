@@ -133,7 +133,7 @@ formularios.crearCarnetsSpa = async (params) => {
                 baño,
                 oidos,
                 uñas,
-                hora_inngreso,
+                hora_ingreso,
                 hora_entrega,
                 observaciones,
                 estado,
@@ -150,7 +150,7 @@ formularios.crearCarnetsSpa = async (params) => {
       params.baño,
       params.oidos,
       params.uñas,
-      params.hora_inngreso,
+      params.hora_ingreso,
       params.hora_entrega,
       params.observaciones,
       "A",
@@ -289,6 +289,26 @@ formularios.obtenerAntiparasitarios = async(params) =>{
     throw error;
   }
 }
+
+formularios.eliminarServicioDeCita = async ({ cita_id, servicio_id }) => {
+  console.log('Eliminar detalle_servicio con:', { cita_id, servicio_id });
+
+  if (cita_id == null || servicio_id == null) {
+    throw new Error('cita_id y servicio_id son obligatorios');
+  }
+
+  try {
+    const sql = `
+      DELETE FROM detalle_servicios
+      WHERE cita_id = ? AND servicio_id = ?
+    `;
+    const [rows] = await db.query(sql, [cita_id, servicio_id]);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 
 module.exports = formularios;

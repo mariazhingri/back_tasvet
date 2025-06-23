@@ -77,7 +77,7 @@ module.exports = {
         baño: formulario.baño,
         oidos: formulario.oidos,
         uñas: formulario.uñas,
-        hora_inngreso: formulario.horaIngreso,
+        hora_ingreso: formulario.horaIngreso,
         hora_entrega: formulario.horaEntrega,
         observaciones: formulario.observaciones,
         reg_usuario: user,
@@ -118,9 +118,6 @@ module.exports = {
     historialClinico,
   };
 },
-
-
-
 
   async crearCarnetDesparacitacion(params) {
     console.log("params service: ", params);
@@ -269,6 +266,19 @@ module.exports = {
     };
   },
 
+  async eliminarFomrularios({IdCita, IdServicio}){
 
+    // const userRol = await Usuarios.findUsuario({ id_usuario: user });
+    // if (userRol.rol_id !== 1 && userRol.rol_id !== 2) {
+    //   throw { status: 403, message: "Acción no permitida" };
+    // }
+    const eliminar = await FormularioModel.eliminarServicioDeCita({
+      cita_id: IdCita,
+      servicio_id: IdServicio,
+    })
+
+    return eliminar
+
+  }
 
 };

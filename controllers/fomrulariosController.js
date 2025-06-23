@@ -244,4 +244,26 @@ module.exports = {
         }
     },
 
+async eliminarFormulario(req, res) {
+  try {
+    const { IdCita, IdServicio } = req.params;
+    console.log('data: ', req.params)
+
+    console.log("cita_id:", IdCita, "servicio_id:", IdServicio);
+
+    const eliminar = await FormulariosService.eliminarFomrularios({ IdCita, IdServicio });
+
+    res.status(200).json({
+      success: true,
+      data: eliminar
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error?.message || 'Error interno del servidor'
+    });
+  }
+}
+
+
 }
