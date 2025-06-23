@@ -1,15 +1,10 @@
-const CitaModel = require("../modelo/cita_model");
-const ServicioModel = require("../modelo/servicios_model");
+const CitaModel = require('../modelo/cita_model');
+const ServicioModel = require('../modelo/servicios_model');
 module.exports = {
   async crearCita(params) {
     try {
       // 1️⃣ Validar campos obligatorios
-      const camposObligatorios = [
-        "id_cliente",
-        "id_mascota",
-        "id_servicio",
-        "fechaHora",
-      ];
+      const camposObligatorios = ['id_cliente', 'id_mascota', 'id_servicio', 'fechaHora'];
       for (let campo of camposObligatorios) {
         if (!params[campo]) {
           return {
@@ -25,7 +20,7 @@ module.exports = {
       if (isNaN(fechaHora)) {
         return {
           success: false,
-          message: "La fechaHora no tiene un formato válido.",
+          message: 'La fechaHora no tiene un formato válido.',
         };
       }
 
@@ -33,21 +28,16 @@ module.exports = {
       if (fechaHora < new Date()) {
         return {
           success: false,
-          message: "No se pueden agendar citas en el pasado.",
+          message: 'No se pueden agendar citas en el pasado.',
         };
       }
 
       // 4️⃣ Validar duplicados (empleado, fecha y hora exacta)
-      const fechaHoraMysql = fechaHora
-        .toISOString()
-        .slice(0, 16)
-        .replace("T", " "); // solo hasta minutos
+      const fechaHoraMysql = fechaHora.toISOString().slice(0, 16).replace('T', ' '); // solo hasta minutos
 
-      const citaExistente = await CitaModel.buscarCitaPorFechaHoraEmpleado(
-        params.fechaHora,
-      );
+      const citaExistente = await CitaModel.buscarCitaPorFechaHoraEmpleado(params.fechaHora);
       if (Array.isArray(citaExistente) && citaExistente.length > 0) {
-        return { success: false, message: "Ya existe una cita en ese horario" };
+        return { success: false, message: 'Ya existe una cita en ese horario' };
       }
 
       const citaId = await CitaModel.crearCita({
@@ -78,5 +68,9 @@ module.exports = {
         message: err.message,
       };
     }
+  },
+
+  async actualizarCitaRetrasadas() {
+    await CitaModel.marcarCitasRestrasadas();
   },
 };

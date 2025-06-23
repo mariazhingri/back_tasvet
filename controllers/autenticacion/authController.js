@@ -1,31 +1,31 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const key = require("../../config/key");
-const User = require("../../modelo/user_model");
-const { enviarCodigoVerificacion } = require("../../services/mailSend");
-const { guardarCodigo } = require("../../modelo/CodigoVerificacionModel");
-const { verificarCodigoDB } = require("../../modelo/CodigoVerificacionModel");
-require("dotenv").config();
-const authService = require("../../services/authService");
-const Usuarios = require("../../modelo/user_model");
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const key = require('../../config/key');
+const User = require('../../modelo/user_model');
+const { enviarCodigoVerificacion } = require('../../services/mailSend');
+const { guardarCodigo } = require('../../modelo/CodigoVerificacionModel');
+const { verificarCodigoDB } = require('../../modelo/CodigoVerificacionModel');
+require('dotenv').config();
+const authService = require('../../services/authService');
+const Usuarios = require('../../modelo/user_model');
 
-const ADMIN_SECRET =
-  process.env.ADMIN_CREATION_SECRET || "AdminSecretKey2024VetSystem";
+const ADMIN_SECRET = process.env.ADMIN_CREATION_SECRET || 'AdminSecretKey2024VetSystem';
 
 module.exports = {
   async login(req, res) {
+    console.log('🔍 Datos de login recibidos:', req.body);
     try {
       const result = await authService.login(req.body);
       return res.status(200).json({
-        message: "Login exitoso",
+        message: 'Login exitoso',
         ...result,
         // user: correo,
-        // token: `JWT ${token}`
+        // token: `JWT ${token}`,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: "Error al obtener los datoss",
+        message: 'Error al obtener los datoss',
         error: err.message,
       });
     }
@@ -38,22 +38,22 @@ module.exports = {
 
       return res.status(201).json({
         success: true,
-        message: "Persona y usuario registrados exitosamente",
+        message: 'Persona y usuario registrados exitosamente',
         data: data,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: "Error al registrar el usuario",
+        message: 'Error al registrar el usuario',
         error: err.message,
       });
     }
   },
 
   async registerAdmin(req, res) {
-    console.log("🔍 ADMIN_SECRET:", ADMIN_SECRET);
-    console.log("🔍 Secret recibido:", req.body.secret);
-    console.log("🔍 Son iguales?", req.body.secret === ADMIN_SECRET);
+    console.log('🔍 ADMIN_SECRET:', ADMIN_SECRET);
+    console.log('🔍 Secret recibido:', req.body.secret);
+    console.log('🔍 Son iguales?', req.body.secret === ADMIN_SECRET);
     try {
       const { clave, persona, secret } = req.body;
 
@@ -61,7 +61,7 @@ module.exports = {
       if (secret !== ADMIN_SECRET) {
         return res.status(403).json({
           success: false,
-          message: "Clave secreta inválida para crear administrador",
+          message: 'Clave secreta inválida para crear administrador',
         });
       }
 
@@ -69,7 +69,7 @@ module.exports = {
       if (!clave || !persona?.cedula) {
         return res.status(400).json({
           success: false,
-          message: "Faltan datos obligatorios (clave, cédula)",
+          message: 'Faltan datos obligatorios (clave, cédula)',
         });
       }
 
@@ -84,13 +84,13 @@ module.exports = {
 
       return res.status(201).json({
         success: true,
-        message: "Administrador creado exitosamente",
+        message: 'Administrador creado exitosamente',
         data: nuevoUsuario,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: "Error al crear administrador",
+        message: 'Error al crear administrador',
         error: err.message,
       });
     }
@@ -110,18 +110,18 @@ module.exports = {
       if (result && result.success) {
         return res.status(200).json({
           success: true,
-          message: "Usuario actualizado exitosamente",
+          message: 'Usuario actualizado exitosamente',
         });
       } else {
         return res.status(404).json({
           success: false,
-          message: "Usuario no encontrado o no se realizaron cambios",
+          message: 'Usuario no encontrado o no se realizaron cambios',
         });
       }
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: "Error al actualizar el usuario",
+        message: 'Error al actualizar el usuario',
         error: err.message,
       });
     }
@@ -136,7 +136,7 @@ module.exports = {
       if (!usuario_eliminador) {
         return res.status(401).json({
           success: false,
-          message: "No autorizado",
+          message: 'No autorizado',
         });
       }
 
@@ -145,7 +145,7 @@ module.exports = {
       if (!userToDelete) {
         return res.status(404).json({
           success: false,
-          message: "Usuario no encontrado",
+          message: 'Usuario no encontrado',
         });
       }
 
@@ -156,7 +156,7 @@ module.exports = {
           // Si no es su propio usuario
           return res.status(403).json({
             success: false,
-            message: "Solo puede eliminar su propio usuario",
+            message: 'Solo puede eliminar su propio usuario',
           });
         }
       }
@@ -167,18 +167,18 @@ module.exports = {
       if (result && result.affectedRows > 0) {
         return res.status(200).json({
           success: true,
-          message: "Usuario eliminado exitosamente",
+          message: 'Usuario eliminado exitosamente',
         });
       } else {
         return res.status(400).json({
           success: false,
-          message: "No se pudo eliminar el usuario",
+          message: 'No se pudo eliminar el usuario',
         });
       }
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: "Error al eliminar el usuario",
+        message: 'Error al eliminar el usuario',
         //error: err.message
       });
     }
@@ -190,7 +190,7 @@ module.exports = {
       if (!cedula) {
         return res.status(400).json({
           success: false,
-          message: "Cédula es requerida",
+          message: 'Cédula es requerida',
         });
       }
 
@@ -201,7 +201,7 @@ module.exports = {
       if (!persona) {
         return res.status(404).json({
           success: false,
-          message: "Persona no encontrada",
+          message: 'Persona no encontrada',
           caso: 4,
         });
       }
@@ -210,7 +210,7 @@ module.exports = {
       if (persona.id_usuario) {
         return res.status(200).json({
           success: true,
-          message: "La persona ya tiene un usuario asociado",
+          message: 'La persona ya tiene un usuario asociado',
           data: persona,
           caso: 1,
           cuentaAsociada: true,
@@ -221,7 +221,7 @@ module.exports = {
       if (persona.correo) {
         return res.status(200).json({
           success: true,
-          message: "La persona tiene correo pero no tiene usuario asociado",
+          message: 'La persona tiene correo pero no tiene usuario asociado',
           data: persona,
           caso: 2,
           cuentaAsociada: false,
@@ -232,7 +232,7 @@ module.exports = {
       // Caso 3: Persona no tiene correo ni usuario
       return res.status(200).json({
         success: true,
-        message: "La persona no tiene correo ni usuario asociado",
+        message: 'La persona no tiene correo ni usuario asociado',
         data: persona,
         caso: 3,
         cuentaAsociada: false,
@@ -241,7 +241,7 @@ module.exports = {
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: "Error al buscar la persona",
+        message: 'Error al buscar la persona',
         error: err.message,
       });
     }
@@ -257,11 +257,11 @@ module.exports = {
       await guardarCodigo(correo, codigo);
 
       res.status(200).json({
-        mensaje: "Código enviado correctamente",
+        mensaje: 'Código enviado correctamente',
       });
     } catch (error) {
-      console.error("Error detallado:", error);
-      res.status(500).json({ error: "No se pudo enviar el código" });
+      console.error('Error detallado:', error);
+      res.status(500).json({ error: 'No se pudo enviar el código' });
     }
   },
 
@@ -274,17 +274,17 @@ module.exports = {
       if (valido) {
         res.status(200).json({
           success: true,
-          mensaje: "Código válido",
+          mensaje: 'Código válido',
         });
       } else {
         res.status(400).json({
           success: false,
-          error: "Código inválido o expirado",
+          error: 'Código inválido o expirado',
         });
       }
     } catch (error) {
-      console.error("Error verificando código:", error);
-      res.status(500).json({ error: "Error interno" });
+      console.error('Error verificando código:', error);
+      res.status(500).json({ error: 'Error interno' });
     }
   },
 };
