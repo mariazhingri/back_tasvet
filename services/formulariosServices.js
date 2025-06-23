@@ -77,7 +77,7 @@ module.exports = {
         baño: formulario.baño,
         oidos: formulario.oidos,
         uñas: formulario.uñas,
-        hora_inngreso: formulario.horaIngreso,
+        hora_ingreso: formulario.horaIngreso,
         hora_entrega: formulario.horaEntrega,
         observaciones: formulario.observaciones,
         reg_usuario: user,
@@ -118,9 +118,6 @@ module.exports = {
     historialClinico,
   };
 },
-
-
-
 
   async crearCarnetDesparacitacion(params) {
     console.log("params service: ", params);
@@ -268,7 +265,6 @@ module.exports = {
       historialClinico,
     };
   },
-
 
 
 };

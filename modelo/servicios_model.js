@@ -152,7 +152,7 @@ Servicios.crearDetalleServicio = async (params) => {
 Servicios.obtenerFomularios = async () => {
   try {
     const sql = `
-            select s.formulario, s.descripcion,s.categoria
+            select s.id_servicio, s.formulario, s.descripcion,s.categoria
             from servicios s
             where s.estado = 'A'
             `;
@@ -179,6 +179,49 @@ Servicios.obtenerFomularios = async () => {
     }
   } catch (error) {
     console.error("Error al verificar formulario:", error);
+    throw error;
+  }
+};
+
+Servicios.eliminarServicioDeCita = async ({ cita_id, servicio_id }) => {
+  console.log('Eliminar detalle_servicio con:', { cita_id, servicio_id });
+
+  if (cita_id == null || servicio_id == null) {
+    throw new Error('cita_id y servicio_id son obligatorios');
+  }
+
+  try {
+    const sql = `
+      DELETE FROM detalle_servicios
+      WHERE cita_id = ? AND servicio_id = ?
+    `;
+    const [rows] = await db.query(sql, [cita_id, servicio_id]);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+Servicios.agregarServicioaCita = async (params) => {
+  console.log('agregar servicio:', params);
+  try {
+    const sql = `
+      INSERT INTO detalle_servicios (
+        cita_id,
+        servicio_id,
+        estado,
+        reg_usuario
+      ) VALUES (?, ?, ?, ?);
+    `;
+    const [rows] = await db.query(sql, 
+      [
+        params.cita_id, 
+        params.servicio_id,
+        'A',
+        params.reg_usuario
+      ]);
+    return rows;
+  } catch (error) {
     throw error;
   }
 };

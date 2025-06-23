@@ -180,4 +180,35 @@ module.exports = {
     const servicios = await Servicio.listarFormularios();
     return servicios;
   },
+
+  async eliminarServicioDeCita({IdCita, IdServicio}){
+
+    // const userRol = await Usuarios.findUsuario({ id_usuario: user });
+    // if (userRol.rol_id !== 1 && userRol.rol_id !== 2) {
+    //   throw { status: 403, message: "Acción no permitida" };
+    // }
+    const eliminar = await Servicio.eliminarServicioDeCita({
+      cita_id: IdCita,
+      servicio_id: IdServicio,
+    })
+    return eliminar
+  },
+
+  async agregarServicioaCita(params){
+
+    // const userRol = await Usuarios.findUsuario({ id_usuario: user });
+    // if (userRol.rol_id !== 1 && userRol.rol_id !== 2) {
+    //   throw { status: 403, message: "Acción no permitida" };
+    // }
+    const eliminar = await Servicio.agregarServicioaCita({
+      cita_id: params.IdCita,
+      servicio_id: params.IdServicio,
+      reg_usuario: params.reg_usuario
+    })
+
+    return eliminar
+
+  },
+
+
 };

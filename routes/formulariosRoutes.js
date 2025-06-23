@@ -33,4 +33,5 @@ module.exports = (app) => {
     verificarToken,
     formularioController.crearCarnetSpa,
   );
+
 };

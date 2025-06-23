@@ -133,7 +133,7 @@ formularios.crearCarnetsSpa = async (params) => {
                 baño,
                 oidos,
                 uñas,
-                hora_inngreso,
+                hora_ingreso,
                 hora_entrega,
                 observaciones,
                 estado,
@@ -150,7 +150,7 @@ formularios.crearCarnetsSpa = async (params) => {
       params.baño,
       params.oidos,
       params.uñas,
-      params.hora_inngreso,
+      params.hora_ingreso,
       params.hora_entrega,
       params.observaciones,
       "A",
@@ -289,6 +289,7 @@ formularios.obtenerAntiparasitarios = async(params) =>{
     throw error;
   }
 }
+
 
 
 module.exports = formularios;
