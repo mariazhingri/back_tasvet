@@ -224,5 +224,18 @@ Citas.buscarCitasEntre = async (desde, hasta) => {
   }
 };
 
+Citas.buscarCitaPendientePorMascota = async (params) => {
+  try{
+    sql = `SELECT * 
+            FROM citas 
+            WHERE mascota_id = ? 
+            AND estado_cita = 'pendiente';
+          `
+    const [result] = await db.query(sql,[params.mascota_id]);
+    return result;
+  }catch(err){
+    throw err
+  }
+}
 
 module.exports = Citas;

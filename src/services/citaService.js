@@ -44,6 +44,15 @@ module.exports = {
         return { success: false, message: 'Ya existe una cita en ese horario' };
       }
 
+      // 4️⃣.1 Validar si ya tiene una cita pendiente
+      const citaPendiente = await CitaModel.buscarCitaPendientePorMascota({mascota_id: params.id_mascota});
+      if (Array.isArray(citaPendiente) && citaPendiente.length > 0) {
+        return {
+          success: false,
+          message: 'Ya tiene una cita que no ha sido atendida aún.',
+        };
+      }
+
       const citaId = await CitaModel.crearCita({
         cliente_id: params.id_cliente,
         mascota_id: params.id_mascota,
