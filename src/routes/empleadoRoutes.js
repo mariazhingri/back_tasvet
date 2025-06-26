@@ -7,4 +7,11 @@ module.exports = (app) => {
     verificarToken,
     empleadoController.obtenerCitasPorEmpleados,
   );
+
+  app.post(
+    "/api/empleado/obtener/citas/idUsuario",
+    verificarToken,
+    empleadoController.obtenerCitasPorEmpleados,
+  );
+
 }
