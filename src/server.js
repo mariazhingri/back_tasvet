@@ -10,6 +10,7 @@ const servicios = require('./routes/servicioRoutes');
 const citas = require('./routes/citaRoutes');
 const formulario = require('./routes/formulariosRoutes');
 const historialClinicoRoutes = require('./routes/historialClinicoRoutes');
+const empleados = require('./routes/empleadoRoutes')
 
 require('./services/task/actualizarCitasRetrasadas');
 
@@ -39,6 +40,7 @@ servicios(app);
 citas(app);
 formulario(app);
 historialClinicoRoutes(app);
+empleados(app);
 
 // Agregar logging para debugging
 app.use((req, res, next) => {
