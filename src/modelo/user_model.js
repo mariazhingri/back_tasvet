@@ -206,4 +206,63 @@ Usuarios.findEmpleado = async (params) => {
     throw error;
   }
 };
+
+
+Usuarios.createUserAux = async (datosUsuario) => {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const currentDate = new Date();
+    const rol_id = 4;
+
+    let personaId = null;
+
+    // Insertar en la tabla personas si se proporcionan datos adicionales
+    if (datosUsuario.persona) {
+      const [personaResult] = await connection.query(
+        `INSERT INTO personas (cedula,correo,nombre, apellido, telefono_1,telefono_2, estado, reg_fecha, reg_usuario) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          datosUsuario.persona.cedula,
+          datosUsuario.persona.correo || null,
+          datosUsuario.persona.nombre,
+          datosUsuario.persona.apellido,
+          datosUsuario.persona.telefono_1,
+          datosUsuario.persona.telefono_2 || null,
+          "A",
+          currentDate,
+          datosUsuario.reg_usuario,
+        ],
+      );
+      personaId = personaResult.insertId;
+    }
+
+    // Insertar en la tabla usuarios
+    const [usuarioResult] = await connection.query(
+      `INSERT INTO usuarios (persona_id, clave, rol_id, estado, reg_fecha, reg_usuario) 
+             VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        personaId,
+        datosUsuario.clave,
+        rol_id,
+        "A",
+        currentDate,
+        datosUsuario.reg_usuario,
+      ],
+    );
+
+    const usuarioId = usuarioResult.insertId;
+
+    await connection.commit();
+    return { id_usuario: usuarioId };
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
+
+
 module.exports = Usuarios;

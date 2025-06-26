@@ -12,4 +12,6 @@ module.exports = (app) => {
   app.post('/api/cita/obtener/fecha', verificarToken, CitaController.obtenerCitasPorFecha);
   app.post('/api/cita/obtener/porId', verificarToken, CitaController.obtenerCitasPorId);
   app.post('/api/cita/obtener/rangoMes', verificarToken, CitaController.obtenerCitaPorRangoMes);
+  // app.post('/api/cita/obtener/rangoIdEmpleado', verificarToken, CitaController.obtenerCitaPorRangoIdEmpleado);
+
 };

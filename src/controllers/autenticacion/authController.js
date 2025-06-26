@@ -117,7 +117,7 @@ module.exports = {
       });
     }
   },
-  /*  Registrar una cuenta  */ 
+  /*  Registrar una cuenta  */
   async VerificarCedula(req, res) {
     try {
       const { cedula } = req.params;
@@ -221,7 +221,7 @@ module.exports = {
       res.status(500).json({ error: 'Error interno' });
     }
   },
-  
+
   async register(req, res) {
     try {
       const usuarioCreador = req.user?.id_usuario || 1;
@@ -282,6 +282,25 @@ module.exports = {
       return res.status(500).json({
         success: false,
         message: 'Error al crear administrador',
+        error: err.message,
+      });
+    }
+  },
+
+  async registerAuxiliar(req, res) {
+    try {
+      const usuarioCreador = req.user?.id_usuario || 1;
+      const data = await authService.userRegisterAux(req.body, usuarioCreador);
+
+      return res.status(201).json({
+        success: true,
+        message: 'Persona y usuario registrados exitosamente',
+        data: data,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error al registrar el usuario',
         error: err.message,
       });
     }

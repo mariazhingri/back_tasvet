@@ -230,11 +230,11 @@ Citas.marcarCitasRestrasadas = async () => {
     `;
   await db.query(sql);
 };
-Citas.actualizarCita = async () => {};
+Citas.actualizarCita = async () => { };
 
-Citas.cambiarEstadoCita = async () => {};
+Citas.cambiarEstadoCita = async () => { };
 
-Citas.eliminarCita = async () => {};
+Citas.eliminarCita = async () => { };
 
 Citas.buscarCitaPorFechaHoraEmpleado = async (fecha_hora_cita) => {
   // Convertimos la fecha a la zona horaria de Ecuador
@@ -275,15 +275,15 @@ Citas.buscarCitasEntre = async (desde, hasta) => {
 };
 
 Citas.buscarCitaPendientePorMascota = async (params) => {
-  try{
+  try {
     sql = `SELECT * 
             FROM citas 
             WHERE mascota_id = ? 
             AND estado_cita = 'pendiente';
           `
-    const [result] = await db.query(sql,[params.mascota_id]);
+    const [result] = await db.query(sql, [params.mascota_id]);
     return result;
-  }catch(err){
+  } catch (err) {
     throw err
   }
 }

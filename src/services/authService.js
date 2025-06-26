@@ -104,5 +104,36 @@ module.exports = {
     return result;
   },
 
-  async deleteClient() {},
+  async deleteClient() { },
+
+
+  //para auxiliar
+  async userRegisterAux({ clave, persona }, usuario_creador) {
+    if (!clave || !persona?.cedula) {
+      throw {
+        status: 400,
+        message: "Faltan datos obligatorios (clave, cédula)",
+      };
+    }
+
+    const salt = bcrypt.genSaltSync(10);
+    const claveEncriptada = bcrypt.hashSync(clave, salt);
+
+    const nuevaPersonawithusuario = await User.createUser({
+      clave: claveEncriptada,
+      persona: {
+        cedula: persona.cedula,
+        correo: persona.correo,
+        nombre: persona.nombre,
+        apellido: persona.apellido,
+        telefono_1: persona.telefono_1,
+        telefono_2: persona.telefono_2 || null,
+        estado: "A",
+        reg_usuario: usuario_creador,
+      },
+    });
+
+    return nuevaPersonawithusuario;
+  },
+
 };
