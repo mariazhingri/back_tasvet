@@ -8,6 +8,8 @@ module.exports = (app) => {
   app.post("/verificacion/codigo", usersController.verificarCodigo);
   app.post("/api/users/registrar_admin", usersController.registerAdmin);
   app.post("/api/users/registrar/auxiliar", usersController.registerAuxiliar);
+  app.post("/api/users/registrar/veterinario", usersController.registerVeterinario);
+
 
 
   app.put("/api/users/actualizar", usersController.updateUserController);

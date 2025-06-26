@@ -59,8 +59,7 @@ Usuarios.createUser = async (datosUsuario) => {
     await connection.beginTransaction();
 
     const currentDate = new Date();
-    // const rol_id = 3;
-    const rol_id = 1;
+    const rol_id = 3;
 
     let personaId = null;
 
@@ -214,15 +213,18 @@ Usuarios.createUserAux = async (datosUsuario) => {
     await connection.beginTransaction();
 
     const currentDate = new Date();
-    const rol_id = 4;
+    const rol_id = 4; // Auxiliar
 
     let personaId = null;
 
-    // Insertar en la tabla personas si se proporcionan datos adicionales
+    // 1. Insertar en personas
     if (datosUsuario.persona) {
       const [personaResult] = await connection.query(
-        `INSERT INTO personas (cedula,correo,nombre, apellido, telefono_1,telefono_2, estado, reg_fecha, reg_usuario) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO personas (
+            cedula, correo, nombre, apellido,
+            telefono_1, telefono_2,
+            estado, reg_fecha, reg_usuario
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           datosUsuario.persona.cedula,
           datosUsuario.persona.correo || null,
@@ -233,15 +235,19 @@ Usuarios.createUserAux = async (datosUsuario) => {
           "A",
           currentDate,
           datosUsuario.reg_usuario,
-        ],
+        ]
       );
       personaId = personaResult.insertId;
+    } else {
+      throw new Error("Datos de persona son requeridos");
     }
 
-    // Insertar en la tabla usuarios
+    // 2. Insertar en usuarios
     const [usuarioResult] = await connection.query(
-      `INSERT INTO usuarios (persona_id, clave, rol_id, estado, reg_fecha, reg_usuario) 
-             VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO usuarios (
+          persona_id, clave, rol_id,
+          estado, reg_fecha, reg_usuario
+      ) VALUES (?, ?, ?, ?, ?, ?)`,
       [
         personaId,
         datosUsuario.clave,
@@ -249,12 +255,29 @@ Usuarios.createUserAux = async (datosUsuario) => {
         "A",
         currentDate,
         datosUsuario.reg_usuario,
-      ],
+      ]
     );
 
     const usuarioId = usuarioResult.insertId;
 
+    // 3. Insertar en empleados
+    await connection.query(
+      `INSERT INTO empleados (
+          persona_id, cargo, descripcion,
+          estado, reg_fecha, reg_usuario
+      ) VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        personaId,
+        'Auxiliar',
+        'Soporte administrativo y asistencial',
+        'A',
+        currentDate,
+        datosUsuario.reg_usuario,
+      ]
+    );
+
     await connection.commit();
+
     return { id_usuario: usuarioId };
   } catch (error) {
     await connection.rollback();
@@ -263,6 +286,77 @@ Usuarios.createUserAux = async (datosUsuario) => {
     connection.release();
   }
 };
+Usuarios.createUserVeterinario = async (datosUsuario) => {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
 
+    const currentDate = new Date();
+    const rol_id = 2; // Veterinario
+
+    // 1. Insertar persona
+    const [personaResult] = await connection.query(
+      `INSERT INTO personas (
+          cedula, correo, nombre, apellido,
+          telefono_1, telefono_2,
+          estado, reg_fecha, reg_usuario
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        datosUsuario.persona.cedula,
+        datosUsuario.persona.correo || null,
+        datosUsuario.persona.nombre,
+        datosUsuario.persona.apellido,
+        datosUsuario.persona.telefono_1,
+        datosUsuario.persona.telefono_2 || null,
+        'A',
+        currentDate,
+        datosUsuario.reg_usuario,
+      ]
+    );
+    const personaId = personaResult.insertId;
+
+    // 2. Insertar usuario
+    const [usuarioResult] = await connection.query(
+      `INSERT INTO usuarios (
+          persona_id, clave, rol_id,
+          estado, reg_fecha, reg_usuario
+      ) VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        personaId,
+        datosUsuario.clave,
+        rol_id,
+        'A',
+        currentDate,
+        datosUsuario.reg_usuario,
+      ]
+    );
+    const usuarioId = usuarioResult.insertId;
+
+    // 3. Insertar empleado
+    await connection.query(
+      `INSERT INTO empleados (
+          persona_id, cargo, descripcion,
+          estado, reg_fecha, reg_usuario
+      ) VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        personaId,
+        'Veterinario',
+        'Atención médica veterinaria',
+        'A',
+        currentDate,
+        datosUsuario.reg_usuario,
+      ]
+    );
+
+    await connection.commit();
+
+    return { id_usuario: usuarioId };
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
 
 module.exports = Usuarios;

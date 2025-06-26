@@ -294,7 +294,7 @@ module.exports = {
 
       return res.status(201).json({
         success: true,
-        message: 'Persona y usuario registrados exitosamente',
+        message: 'Persona y usuario auxiliar registrados exitosamente',
         data: data,
       });
     } catch (err) {
@@ -305,4 +305,24 @@ module.exports = {
       });
     }
   },
+
+  async registerVeterinario(req, res) {
+    try {
+      const usuarioCreador = req.user?.id_usuario || 1;
+      const data = await authService.userRegisterVet(req.body, usuarioCreador);
+
+      return res.status(201).json({
+        success: true,
+        message: 'persona y usuario veterinario registrados exitosamente',
+        data: data,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error al registrar el usuario',
+        error: err.message,
+      });
+    }
+  },
+
 };
