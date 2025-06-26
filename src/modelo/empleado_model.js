@@ -21,10 +21,11 @@ empleados.obtenerEmpleados = async () => {
 
 empleados.obtenerCitasPorEmpleados = async (params) => {
   try {
-    const sql = `select c.id_cita, ds.empleado_id , ds.fecha_hora
+    const sql = `select c.id_cita, ds.empleado_id , ds.servicio_id, s.descripcion  ,ds.fecha_hora
             from detalle_servicios ds
             inner join citas c on ds.cita_id = c.id_cita
-            where ds.empleado_id  = ?
+            inner join servicios s on ds.servicio_id = s.id_servicio
+            where ds.empleado_id  = 1
             AND ds.estado = 'A'
             AND c.estado_cita = 'Pendiente'
             `;
