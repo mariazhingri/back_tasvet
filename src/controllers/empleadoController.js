@@ -23,5 +23,24 @@ module.exports = {
           });
         }
       },
+
+      async obtenerCitasPorUsuarioId(req, res) {
+        try {
+          const id_usuario = req.user?.id_usuario;
+          const CitasPorEmpleado = await EmpleadoServices.obtenerCitasPorUsuarioId(id_usuario);
+
+          res.status(200).json({
+            success: true,
+            data: CitasPorEmpleado,
+          });
+        } catch (error) {
+          console.error(error); // Registrar el error en el servidor
+          res.status(500).json({
+            success: false,
+            message: "Error interno del servidor",
+          });
+        }
+      },
+    
     
 }

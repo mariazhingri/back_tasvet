@@ -37,6 +37,26 @@ empleados.obtenerCitasPorEmpleados = async (params) => {
   }
 };
 
+empleados.obtenerCitasPorUsuarioId = async (id_usuario) => {
+  try {
+    const sql = `select c.id_cita, e.id_empleado  , ds.servicio_id  ,ds.fecha_hora_inicio, ds.fecha_hora_fin
+              from usuarios u 
+              inner join personas p on u.persona_id = p.id_persona
+              inner join empleados e on p.id_persona  = e.persona_id
+              inner join detalle_servicios ds on e.id_empleado = ds.empleado_id
+              inner join citas c on ds.cita_id = c.id_cita
+              where u.id_usuario = ?
+              AND ds.estado = 'A'
+              AND c.estado_cita = 'Pendiente'
+              AND e.estado = 'A';
+            `;
+    const [rows] = await db.query(sql, [id_usuario]);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}; 
+
 
 
 

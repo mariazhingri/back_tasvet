@@ -10,5 +10,13 @@ module.exports = {
         });
     
         return CitasPorEmpelados;
-  }
+  },
+    async obtenerCitasPorUsuarioId(id_usuario) {
+        if (!id_usuario) {
+          throw { status: 401, message: "Usuario no autenticado" };
+        }
+        const CitasPorEmpelados = await EmpleadoModel.obtenerCitasPorUsuarioId(id_usuario);
+    
+        return CitasPorEmpelados;
+  },
 }
