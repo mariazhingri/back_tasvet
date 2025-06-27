@@ -155,9 +155,21 @@ Servicios.crearDetalleServicio = async (params) => {
 Servicios.obtenerFomularios = async () => {
   try {
     const sql = `
-            select s.id_servicio, s.formulario, s.descripcion,s.categoria
-            from servicios s
-            where s.estado = 'A'
+        SELECT 
+          id_servicio,
+          descripcion,
+          categoria,
+          formulario,
+          estado,
+          reg_fecha,
+          reg_usuario,
+          act_fecha,
+          act_usuario
+        FROM servicios
+        WHERE formulario IS NOT NULL
+          AND eliminado = 0
+          AND estado = 'A';
+        
             `;
     const [rows] = await db.query(sql);
     return rows;
@@ -166,14 +178,14 @@ Servicios.obtenerFomularios = async () => {
   }
 };
 
-  Servicios.verificarFormularioLlegando = async (IdFormulario) => {
+Servicios.verificarFormularioLlegando = async (IdFormulario) => {
   try {
     // 1. Obtenemos los formularios habilitados en el sistema
     const formulariosHabilitados = await Servicios.obtenerFomularios();
-    
+
     // 2. Mapeamos los formularios disponibles para facilitar la búsqueda
     const formulariosDisponibles = formulariosHabilitados.map(f => f.formulario);
-    
+
     // 3. Verificamos si el IdFormulario está habilitado
     if (formulariosDisponibles.includes(IdFormulario)) {
       return true; // El formulario está habilitado
@@ -216,9 +228,9 @@ Servicios.agregarServicioaCita = async (params) => {
         reg_usuario
       ) VALUES (?, ?, ?, ?);
     `;
-    const [rows] = await db.query(sql, 
+    const [rows] = await db.query(sql,
       [
-        params.cita_id, 
+        params.cita_id,
         params.servicio_id,
         'A',
         params.reg_usuario
