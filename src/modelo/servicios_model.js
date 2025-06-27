@@ -129,14 +129,18 @@ Servicios.eliminarServicioV2 = async (id_servicio, eli_usuario) => {
 };
 
 Servicios.crearDetalleServicio = async (params) => {
+  console.log('Crear detalle_servicio con:', params);
   try {
     const currentDate = new Date();
     const sql = `
-            INSERT INTO detalle_servicios (cita_id, servicio_id,estado, reg_fecha,reg_usuario)
-            VALUES (?,?,?,?,?)`;
+            INSERT INTO detalle_servicios (cita_id, servicio_id, empleado_id, fecha_hora_inicio, fecha_hora_fin, estado, reg_fecha, reg_usuario)
+            VALUES (?,?,?,?,?,?,?,?)`;
     const [result] = await db.query(sql, [
       params.cita_id,
       params.servicio_id,
+      params.empleado_id,
+      params.fecha_hora_inicio,
+      params.fecha_hora_fin,
       'A',
       currentDate,
       params.reg_usuario,

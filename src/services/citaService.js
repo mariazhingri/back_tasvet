@@ -8,7 +8,7 @@ module.exports = {
     try {
       console.log('👤 Cliente a buscar mas arriba:', params.id_cliente);
       // 1️⃣ Validar campos obligatorios
-      const camposObligatorios = ['id_cliente', 'id_mascota', 'id_servicio', 'fechaHora'];
+      const camposObligatorios = ['id_cliente', 'id_mascota', 'id_servicio', 'FechaHoraInicio', 'FechaHoraFin','IdEmpleado'];
       for (let campo of camposObligatorios) {
         if (!params[campo]) {
           return {
@@ -19,9 +19,9 @@ module.exports = {
       }
 
       // 2️⃣ Validar que la fecha sea válida
-      const fechaHora = new Date(params.fechaHora);
-      //fechaHora.setHours(fechaHora.getHours() - 5); // ajustar según tu zona
-      if (isNaN(fechaHora)) {
+      const fechaHoraInicio = new Date(params.FechaHoraInicio);
+      const fechaHoraFin = new Date(params.FechaHoraFin);
+      if (isNaN(fechaHoraInicio) || isNaN(fechaHoraFin)) {
         return {
           success: false,
           message: 'La fechaHora no tiene un formato válido.',
@@ -29,7 +29,7 @@ module.exports = {
       }
 
       // 3️⃣ Validar que la fecha no sea pasada
-      if (fechaHora < new Date()) {
+      if (fechaHoraInicio < new Date()) {
         return {
           success: false,
           message: 'No se pueden agendar citas en el pasado.',
@@ -37,9 +37,9 @@ module.exports = {
       }
 
       // 4️⃣ Validar duplicados (empleado, fecha y hora exacta)
-      const fechaHoraMysql = fechaHora.toISOString().slice(0, 16).replace('T', ' '); // solo hasta minutos
+      const fechaHoraMysql = fechaHoraInicio.toISOString().slice(0, 16).replace('T', ' '); // solo hasta minutos
 
-      const citaExistente = await CitaModel.buscarCitaPorFechaHoraEmpleado(params.fechaHora);
+      const citaExistente = await CitaModel.buscarCitaPorFechaHoraEmpleado(fechaHoraMysql, params.IdEmpleado);
       if (Array.isArray(citaExistente) && citaExistente.length > 0) {
         return { success: false, message: 'Ya existe una cita en ese horario' };
       }
@@ -56,7 +56,6 @@ module.exports = {
       const citaId = await CitaModel.crearCita({
         cliente_id: params.id_cliente,
         mascota_id: params.id_mascota,
-        fecha_hora_cita: params.fechaHora,
         reg_usuario: params.reg_usuario,
       });
 
@@ -65,6 +64,9 @@ module.exports = {
         const detalle = await ServicioModel.crearDetalleServicio({
           cita_id: citaId,
           servicio_id: servicioId,
+          empleado_id: params.IdEmpleado,
+          fecha_hora_inicio: params.FechaHoraInicio,
+          fecha_hora_fin: params.FechaHoraFin,
           reg_usuario: params.reg_usuario,
         });
         detallesInsertados.push(detalle);

@@ -8,10 +8,9 @@ module.exports = (app) => {
     empleadoController.obtenerCitasPorEmpleados,
   );
 
-  app.post(
-    "/api/empleado/obtener/citas/idUsuario",
+  app.get(
+    "/api/empleado/obtener/citas_veterinario",
     verificarToken,
-    empleadoController.obtenerCitasPorIdUsuario,
+    empleadoController.obtenerCitasPorUsuarioId,
   );
-
 }
