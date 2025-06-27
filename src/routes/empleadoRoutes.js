@@ -16,6 +16,13 @@ module.exports = (app) => {
 
 
   app.get(
+    "/api/empleado/obtener/citas_veterinarioV2",
+    verificarToken,
+    empleadoController.obtenerCitasPorUsuarioIdV2,
+  );
+
+
+  app.get(
     "/api/empleado/obtener/citas_veterinario/rangoFecha",
     verificarToken,
     empleadoController.obtenerCitasPorRangoFechaIdUsuario,

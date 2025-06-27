@@ -46,6 +46,27 @@ module.exports = {
   },
 
 
+  async obtenerCitasPorUsuarioIdV2(req, res) {
+    console.log("Iniciando obtenerCitasPorUsuarioId");
+    try {
+      const id_usuario = req.user?.id_usuario;
+      console.log("ID de usuario recibido:", id_usuario);
+      const CitasPorEmpleado = await EmpleadoServices.obtenerCitasPorUsuarioIdV2(id_usuario);
+
+      res.status(200).json({
+        success: true,
+        data: CitasPorEmpleado,
+      });
+    } catch (error) {
+      console.error(error); // Registrar el error en el servidor
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  },
+
+
   async obtenerCitasPorRangoFechaIdUsuario(req, res) {
     try {
       const id_usuario = req.user?.id_usuario;

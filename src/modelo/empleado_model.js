@@ -59,6 +59,41 @@ empleados.obtenerCitasPorUsuarioId = async (id_usuario) => {
 };
 
 
+empleados.obtenerCitasPorUsuarioIdV2 = async (id_usuario) => {
+  try {
+    const sql = `
+      SELECT 
+        c.id_cita,
+        c.estado_cita,
+        m.nombre_mascota,
+        m.especie,
+        r.nombre_raza,
+        c.fecha_hora_cita,
+        cli_persona.nombre,
+        cli_persona.apellido,
+        cli_persona.telefono_1,
+        cli.direccion
+      FROM empleados e
+      INNER JOIN usuarios u ON u.persona_id = e.persona_id
+      INNER JOIN detalle_servicios ds ON ds.empleado_id = e.id_empleado
+      INNER JOIN citas c ON c.id_cita = ds.cita_id
+      INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
+      INNER JOIN razas r ON m.raza_id = r.id_raza
+      INNER JOIN clientes cli ON m.cliente_id = cli.id_cliente
+      INNER JOIN personas cli_persona ON cli.persona_id = cli_persona.id_persona
+      WHERE u.id_usuario = ?
+        AND ds.estado = 'A'
+        AND c.estado_cita = 'Pendiente'
+        AND e.estado = 'A';
+            `;
+    const [rows] = await db.query(sql, [id_usuario]);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 empleados.obtenerCitasPorRangoFecha = async (id_usuario, fechaInicio, fechaFin) => {
   try {
     const sql = `

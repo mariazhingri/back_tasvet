@@ -36,4 +36,11 @@ module.exports = (app) => {
     verificarToken,
     clienteController.crearCliente,
   );
+
+  app.get(
+    "/api/obtener/datos/usuario",
+    verificarToken,
+    clienteController.obtenerDatosUsuario,
+  );
+
 };

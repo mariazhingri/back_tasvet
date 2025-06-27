@@ -29,7 +29,19 @@ module.exports = {
     const citasFiltradas = await EmpleadoModel.obtenerCitasPorRangoFecha(id_usuario, fechaInicio, fechaFin);
 
     return citasFiltradas;
-  }
+  },
+
+  async obtenerCitasPorUsuarioIdV2(id_usuario) {
+    if (!id_usuario) {
+      throw { status: 401, message: "Usuario no autenticado" };
+    }
+    const CitasPorEmpelados = await EmpleadoModel.obtenerCitasPorUsuarioIdV2(id_usuario);
+
+    return CitasPorEmpelados;
+  },
+
+
+
 
 
 }
