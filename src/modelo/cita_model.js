@@ -198,18 +198,14 @@ Citas.crearCita = async (params) => {
             INSERT INTO citas (
                 cliente_id, 
                 mascota_id,  
-                fecha_hora_cita,
-                estado_cita,
                 reg_fecha,
                 reg_usuario
             )
-            VALUES ( ?,?, ?,'Pendiente', ?, ?)
+            VALUES ( ?,?, ?, ?)
         `;
     const [result] = await db.query(sql, [
       params.cliente_id,
       params.mascota_id,
-
-      params.fecha_hora_cita,
       currentDate,
       params.reg_usuario,
     ]);
@@ -236,9 +232,10 @@ Citas.cambiarEstadoCita = async () => {};
 
 Citas.eliminarCita = async () => {};
 
-Citas.buscarCitaPorFechaHoraEmpleado = async (fecha_hora_cita) => {
+
+Citas.buscarCitaPorFechaHoraEmpleado = async (fecha_hora_inicio, empleado_id) => {
   // Convertimos la fecha a la zona horaria de Ecuador
-  const inicio = moment(fecha_hora_cita).tz('America/Guayaquil');
+  const inicio = moment(fecha_hora_inicio).tz('America/Guayaquil');
   const fin = inicio.clone().add(29, 'minutes');
 
   // Formateamos para MySQL (formato 'YYYY-MM-DD HH:mm:ss')
@@ -248,23 +245,34 @@ Citas.buscarCitaPorFechaHoraEmpleado = async (fecha_hora_cita) => {
   console.log('Rango búsqueda inicio:', inicioSQL);
   console.log('Rango búsqueda fin:', finSQL);
 
-  const result = await db.query(
-    `
-        SELECT * FROM citas 
-        WHERE fecha_hora_cita BETWEEN ? AND ?
-    `,
-    [inicioSQL, finSQL],
-  );
+const sql = `
+  SELECT c.*, ds.*
+  FROM citas c
+  INNER JOIN detalle_servicios ds ON c.id_cita = ds.cita_id
+  WHERE ds.empleado_id = ?
+    AND (
+      (ds.fecha_hora_inicio BETWEEN ? AND ?)
+      OR (ds.fecha_hora_fin BETWEEN ? AND ?)
+      OR (? BETWEEN ds.fecha_hora_inicio AND ds.fecha_hora_fin)
+    )
+`;
 
-  return result && result.length > 0 ? result[0] : null;
+const [result] = await db.query(sql, [
+  empleado_id,
+  inicioSQL, finSQL,
+  inicioSQL, finSQL,
+  inicioSQL
+]);
+  return result && result.length > 0 ? result : [];
 };
 
 Citas.buscarCitasEntre = async (desde, hasta) => {
   try {
     const sql = `
-      SELECT *
-      FROM citas
-      WHERE fecha_hora_cita BETWEEN ? AND ?
+      SELECT c.*, ds.*
+      FROM citas c
+      INNER JOIN detalle_servicios ds ON c.id_cita = ds.cita_id
+      WHERE ds.fecha_hora_inicio BETWEEN ? AND ?
     `;
     const [rows] = await db.query(sql, [desde, hasta]);
     return rows;
