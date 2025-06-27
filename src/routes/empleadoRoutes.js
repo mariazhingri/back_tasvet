@@ -13,4 +13,12 @@ module.exports = (app) => {
     verificarToken,
     empleadoController.obtenerCitasPorUsuarioId,
   );
+
+
+  app.get(
+    "/api/empleado/obtener/citas_veterinario/rangoFecha",
+    verificarToken,
+    empleadoController.obtenerCitasPorRangoFechaIdUsuario,
+  );
+
 }

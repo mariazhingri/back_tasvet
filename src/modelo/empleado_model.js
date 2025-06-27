@@ -56,38 +56,79 @@ empleados.obtenerCitasPorUsuarioId = async (id_usuario) => {
   } catch (error) {
     throw error;
   }
-}; 
+};
 
 
-
-empleados.obtenerCitasPorIdUsuario = async (params) => {
+empleados.obtenerCitasPorRangoFecha = async (id_usuario, fechaInicio, fechaFin) => {
   try {
     const sql = `
       SELECT 
-        c.id_cita,
-        c.fecha_hora_cita,
-        c.estado_cita,
-        c.mascota_id,
-        c.cliente_id,
-        ds.id_detalle_servicio,
-        ds.servicio_id,
-        ds.fecha_hora_inicio,
-        ds.fecha_hora_fin
+        c.id_cita AS idCita,
+        c.estado_cita AS estadoCita,
+        m.nombre_mascota AS mascotaNombre,
+        m.especie AS mascotaEspecie,
+        r.nombre_raza AS mascotaRaza,
+        c.fecha_hora_cita AS citaFecha,
+        CONCAT(cli_persona.nombre, ' ', cli_persona.apellido) AS clienteNombre,
+        cli_persona.telefono_1 AS clienteContacto,
+        NULL AS clienteDireccion, -- no existe campo direccion en personas
+        e.id_empleado AS idEmpleado,
+        CONCAT(emp_persona.nombre, ' ', emp_persona.apellido) AS empleadoNombre,
+        ds.fecha_hora_inicio AS fechaHoraCita,
+        ds.fecha_hora_fin AS fechaHoraFin
       FROM usuarios u
-      JOIN personas p ON u.persona_id = p.id_persona
-      JOIN empleados e ON e.persona_id = p.id_persona
-      JOIN detalle_servicios ds ON ds.empleado_id = e.id_empleado
-      JOIN citas c ON c.id_cita = ds.cita_id
+      INNER JOIN personas emp_persona ON u.persona_id = emp_persona.id_persona
+      INNER JOIN empleados e ON emp_persona.id_persona = e.persona_id
+      INNER JOIN detalle_servicios ds ON e.id_empleado = ds.empleado_id
+      INNER JOIN citas c ON ds.cita_id = c.id_cita
+      INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
+      INNER JOIN razas r ON m.raza_id = r.id_raza
+      INNER JOIN clientes cli ON m.cliente_id = cli.id_cliente
+      INNER JOIN personas cli_persona ON cli.persona_id = cli_persona.id_persona
       WHERE u.id_usuario = ?
         AND ds.estado = 'A'
-        AND c.estado_cita IS NOT NULL;
-                  `;
-    const [rows] = await db.query(sql, [params.id_usuario]);
+        AND c.estado_cita = 'Pendiente'
+        AND e.estado = 'A'
+        AND ds.fecha_hora_inicio BETWEEN ? AND ?;
+    `;
+
+    const [rows] = await db.query(sql, [id_usuario, fechaInicio, fechaFin]);
     return rows;
   } catch (error) {
     throw error;
   }
 };
+
+
+
+// empleados.obtenerCitasPorIdUsuario = async (params) => {
+//   try {
+//     const sql = `
+//       SELECT 
+//         c.id_cita,
+//         c.fecha_hora_cita,
+//         c.estado_cita,
+//         c.mascota_id,
+//         c.cliente_id,
+//         ds.id_detalle_servicio,
+//         ds.servicio_id,
+//         ds.fecha_hora_inicio,
+//         ds.fecha_hora_fin
+//       FROM usuarios u
+//       JOIN personas p ON u.persona_id = p.id_persona
+//       JOIN empleados e ON e.persona_id = p.id_persona
+//       JOIN detalle_servicios ds ON ds.empleado_id = e.id_empleado
+//       JOIN citas c ON c.id_cita = ds.cita_id
+//       WHERE u.id_usuario = ?
+//         AND ds.estado = 'A'
+//         AND c.estado_cita IS NOT NULL;
+//                   `;
+//     const [rows] = await db.query(sql, [params.id_usuario]);
+//     return rows;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 
 
 
