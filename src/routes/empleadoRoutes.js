@@ -11,7 +11,7 @@ module.exports = (app) => {
   app.post(
     "/api/empleado/obtener/citas/idUsuario",
     verificarToken,
-    empleadoController.obtenerCitasPorEmpleados,
+    empleadoController.obtenerCitasPorIdUsuario,
   );
 
 }
