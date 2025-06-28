@@ -221,7 +221,7 @@ Citas.marcarCitasRestrasadas = async () => {
       UPDATE citas
       SET estado_cita = 'Retrasada'
       WHERE 
-        DATE_ADD(fecha_hora_cita, INTERVAL 60 MINUTE) < NOW()
+        DATE_ADD(fecha_hora_fin, INTERVAL 60 MINUTE) < NOW()
         AND estado_cita = 'Pendiente';
     `;
   await db.query(sql);
@@ -245,7 +245,7 @@ Citas.buscarCitaPorFechaHoraEmpleado = async (fecha_hora_inicio, empleado_id) =>
   console.log('Rango búsqueda inicio:', inicioSQL);
   console.log('Rango búsqueda fin:', finSQL);
 
-const sql = `
+  const sql = `
   SELECT c.*, ds.*
   FROM citas c
   INNER JOIN detalle_servicios ds ON c.id_cita = ds.cita_id
@@ -257,12 +257,12 @@ const sql = `
     )
 `;
 
-const [result] = await db.query(sql, [
-  empleado_id,
-  inicioSQL, finSQL,
-  inicioSQL, finSQL,
-  inicioSQL
-]);
+  const [result] = await db.query(sql, [
+    empleado_id,
+    inicioSQL, finSQL,
+    inicioSQL, finSQL,
+    inicioSQL
+  ]);
   return result && result.length > 0 ? result : [];
 };
 

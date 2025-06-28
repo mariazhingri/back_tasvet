@@ -169,7 +169,6 @@ Servicios.obtenerFomularios = async () => {
         WHERE formulario IS NOT NULL
           AND eliminado = 0
           AND estado = 'A';
-        
             `;
     const [rows] = await db.query(sql);
     return rows;
