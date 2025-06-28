@@ -1,7 +1,31 @@
 const CitaModel = require('../modelo/cita_model');
 const ServicioModel = require('../modelo/servicios_model');
 const ClienteModel = require('../modelo/cliente_model');
+
 const { enviarCorreoCitaAgendada } = require("./mailSend");
+const Citas = require('../modelo/cita_model');
+
+
+const agruparCitas = (filas) => {
+  return filas.map(row => ({
+    id_cita: row.id_cita,
+    estado_cita: row.estado_cita,
+
+      id_mascota: row.id_mascota,
+      nombre_mascota: row.nombre_mascota,
+      especie: row.especie,
+      nombre_raza: row.nombre_raza,
+      fecha_nacimiento: row.fecha_nacimiento,
+  
+      nombre: row.nombre,
+      apellido: row.apellido,
+      telefono: row.telefono_1,
+      direccion: row.direccion,
+    
+    servicios: JSON.parse(`[${row.servicios}]`) // <- parseamos el string JSON en array
+  }));
+};
+
 
 module.exports = {
   async crearCita(params) {
@@ -11,10 +35,7 @@ module.exports = {
       const camposObligatorios = ['id_cliente', 'id_mascota', 'id_servicio', 'FechaHoraInicio', 'FechaHoraFin','IdEmpleado'];
       for (let campo of camposObligatorios) {
         if (!params[campo]) {
-          return {
-            success: false,
-            message: `El campo ${campo} es obligatorio.`,
-          };
+          return {success: false, message: `El campo ${campo} es obligatorio.`};
         }
       }
 
@@ -22,18 +43,12 @@ module.exports = {
       const fechaHoraInicio = new Date(params.FechaHoraInicio);
       const fechaHoraFin = new Date(params.FechaHoraFin);
       if (isNaN(fechaHoraInicio) || isNaN(fechaHoraFin)) {
-        return {
-          success: false,
-          message: 'La fechaHora no tiene un formato válido.',
-        };
+        return {success: false, message: 'La fechaHora no tiene un formato válido.'};
       }
 
       // 3️⃣ Validar que la fecha no sea pasada
       if (fechaHoraInicio < new Date()) {
-        return {
-          success: false,
-          message: 'No se pueden agendar citas en el pasado.',
-        };
+        return {success: false, message: 'No se pueden agendar citas en el pasado.'};
       }
 
       // 4️⃣ Validar duplicados (empleado, fecha y hora exacta)
@@ -47,10 +62,7 @@ module.exports = {
       // 4️⃣.1 Validar si ya tiene una cita pendiente
       const citaPendiente = await CitaModel.buscarCitaPendientePorMascota({mascota_id: params.id_mascota});
       if (Array.isArray(citaPendiente) && citaPendiente.length > 0) {
-        return {
-          success: false,
-          message: 'Ya tiene una cita que no ha sido atendida aún.',
-        };
+        return {success: false, message: 'Ya tiene una cita que no ha sido atendida aún.'};
       }
 
       const citaId = await CitaModel.crearCita({
@@ -117,12 +129,27 @@ module.exports = {
     } catch (err) {
       return {
         success: false,
-        message: err.message,
+        message: 'Error al crear la cita',
+        //message: err.message,
       };
     }
   },
 
   async actualizarCitaRetrasadas() {
     await CitaModel.marcarCitasRestrasadas();
+  },
+    
+  async obtenerCitas() {
+    try {
+      const filas = await CitaModel.obtenerCitas();
+      const agrupadas = agruparCitas(filas);
+      return { success: true, data: agrupadas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
   },
 };
