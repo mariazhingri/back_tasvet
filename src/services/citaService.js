@@ -11,16 +11,16 @@ const agruparCitas = (filas) => {
     id_cita: row.id_cita,
     estado_cita: row.estado_cita,
 
-      id_mascota: row.id_mascota,
-      nombre_mascota: row.nombre_mascota,
-      especie: row.especie,
-      nombre_raza: row.nombre_raza,
-      fecha_nacimiento: row.fecha_nacimiento,
-  
-      nombre: row.nombre,
-      apellido: row.apellido,
-      telefono: row.telefono_1,
-      direccion: row.direccion,
+    id_mascota: row.id_mascota,
+    nombre_mascota: row.nombre_mascota,
+    especie: row.especie,
+    nombre_raza: row.nombre_raza,
+    fecha_nacimiento: row.fecha_nacimiento,
+
+    nombre: row.nombre,
+    apellido: row.apellido,
+    telefono: row.telefono_1,
+    direccion: row.direccion,
     
     servicios: JSON.parse(`[${row.servicios}]`) // <- parseamos el string JSON en array
   }));

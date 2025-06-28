@@ -21,6 +21,7 @@ Citas.obtenerCitas = async () => {
               GROUP_CONCAT(
                 CONCAT(
                   '{',
+                  '"id_empleado":', ds.empleado_id, ',',
                   '"id_servicio":', s.id_servicio, ',',
                   '"descripcion":"', s.descripcion, '",',
                   '"formulario":"', s.formulario, '",',
