@@ -81,7 +81,7 @@ async function enviarRecordatoriosCitas() {
     try {
       const cliente = await ClienteModel.obtenerClientePorId(cita.cliente_id);
 
-      const fechaCita = new Date(cita.fecha_hora_cita).toLocaleString();
+      const fechaCita = new Date(cita.fecha_hora_inicio).toLocaleString();
       const asunto =
         cita.tipo === "24h"
           ? "📅 Recordatorio: Tu cita es mañana"

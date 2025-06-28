@@ -5,7 +5,7 @@ const Citas = {};
 
 Citas.obtenerCitas = async () => {
   try {
-    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_cita,
+    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_inicio,
             s.id_servicio, ds.id_detalle_servicio, s.formulario, s.descripcion
             from citas c
             inner join clientes cl on c.cliente_id = cl.id_cliente
@@ -30,7 +30,7 @@ Citas.obtenerCitas = async () => {
 
 Citas.getCitasRetrasadas = async () => {
   try {
-    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_cita,
+    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_inicio,
             s.id_servicio, ds.id_detalle_servicio, s.formulario, s.descripcion
             from citas c
             inner join clientes cl on c.cliente_id = cl.id_cliente
