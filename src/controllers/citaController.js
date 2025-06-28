@@ -12,9 +12,9 @@ const { listarFormularios } = require('../services/servicioService');
 module.exports = {
   async obtenerCitas(req, res) {
     try {
-      id_usuario = req.user?.id_usuario;
+      //id_usuario = req.user?.id_usuario;
 
-      const citas = await obtenerCitas(id_usuario);
+      const citas = await CitaService.obtenerCitas();
 
       res.status(200).json({
         success: true,

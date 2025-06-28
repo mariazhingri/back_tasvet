@@ -2,25 +2,53 @@ const db = require('../config/conexion');
 const moment = require('moment-timezone');
 
 const Citas = {};
-
+/* Obtener citas en estado pendiente [porque se esta usando order by y no group by?]*/
 Citas.obtenerCitas = async () => {
   try {
-    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_cita,
-            s.id_servicio, ds.id_detalle_servicio, s.formulario, s.descripcion
-            from citas c
-            inner join clientes cl on c.cliente_id = cl.id_cliente
-            inner join personas p on cl.persona_id = p.id_persona
-            inner join mascotas m on c.mascota_id  = m.id_mascota
-            inner join razas r on m.raza_id = r.id_raza
-            inner join detalle_servicios ds on c.id_cita = ds.cita_id
-            inner join servicios s on ds.servicio_id = s.id_servicio
-            where c.estado_cita = 'Pendiente'
-            and cl.estado = 'A'
-            and p.estado = 'A'
-            and m.estado  = 'A'
-            and r.estado = 'A'
-            ORDER BY c.id_cita
+    sql = ` SELECT 
+              c.id_cita, 
+              c.estado_cita,
+              m.id_mascota,
+              m.nombre_mascota,
+              m.especie,
+              m.fecha_nacimiento,
+              r.nombre_raza,
+              p.nombre,
+              p.apellido,
+              p.telefono_1,
+              cl.direccion,
+
+              GROUP_CONCAT(
+                CONCAT(
+                  '{',
+                  '"id_servicio":', s.id_servicio, ',',
+                  '"descripcion":"', s.descripcion, '",',
+                  '"formulario":"', s.formulario, '",',
+                  '"fecha_hora_inicio":"', ds.fecha_hora_inicio, '",',
+                  '"id_detalle_servicio":', ds.id_detalle_servicio,
+                  '}'
+                )
+                SEPARATOR ','
+              ) AS servicios
+
+            FROM citas c
+            INNER JOIN clientes cl ON c.cliente_id = cl.id_cliente
+            INNER JOIN personas p ON cl.persona_id = p.id_persona
+            INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
+            INNER JOIN razas r ON m.raza_id = r.id_raza
+            INNER JOIN detalle_servicios ds ON c.id_cita = ds.cita_id
+            INNER JOIN servicios s ON ds.servicio_id = s.id_servicio
+
+            WHERE 
+              c.estado_cita = 'Pendiente' AND
+              cl.estado = 'A' AND
+              p.estado = 'A' AND
+              m.estado = 'A' AND
+              r.estado = 'A'
+
+            GROUP BY c.id_cita;
             `;
+            //ORDER BY c.id_cita
     const [rows] = await db.query(sql);
     return rows;
   } catch (error) {
@@ -30,7 +58,7 @@ Citas.obtenerCitas = async () => {
 
 Citas.getCitasRetrasadas = async () => {
   try {
-    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_cita,
+    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, ds.fecha_hora_inicio,
             s.id_servicio, ds.id_detalle_servicio, s.formulario, s.descripcion
             from citas c
             inner join clientes cl on c.cliente_id = cl.id_cliente
@@ -55,7 +83,7 @@ Citas.getCitasRetrasadas = async () => {
 
 Citas.getCitasCanceladas = async () => {
   try {
-    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, c.fecha_hora_cita,
+    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, ds.fecha_hora_inicio,
             s.id_servicio, ds.id_detalle_servicio, s.formulario, s.descripcion
             from citas c
             inner join clientes cl on c.cliente_id = cl.id_cliente
@@ -87,8 +115,9 @@ Citas.getCitasByDate = async (fecha) => {
              r.nombre_raza,
              p.nombre, p.apellido, p.telefono_1,
              cl.direccion,
-             c.fecha_hora_cita
+             ds.fecha_hora_inicio
       FROM citas c
+      inner join detalle_servicios ds on c.id_cita = ds.cita_id
       INNER JOIN clientes cl ON c.cliente_id = cl.id_cliente
       INNER JOIN personas p ON cl.persona_id = p.id_persona
       INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
@@ -98,7 +127,8 @@ Citas.getCitasByDate = async (fecha) => {
         AND p.estado = 'A'
         AND m.estado = 'A'
         AND r.estado = 'A'
-        AND DATE(c.fecha_hora_cita) = ?
+        AND DATE(ds.fecha_hora_inicio) = ?
+      GROUP BY c.id_cita
     `;
 
     const [rows] = await db.query(sql, [fecha]);
@@ -123,8 +153,9 @@ Citas.getCitasByIdCita = async (id_cita) => {
              r.nombre_raza,
              p.nombre, p.apellido, p.telefono_1,
              cl.direccion,
-             c.fecha_hora_cita
+             ds.fecha_hora_inicio
       FROM citas c
+      inner join detalle_servicios ds on c.id_cita = ds.cita_id
       INNER JOIN clientes cl ON c.cliente_id = cl.id_cliente
       INNER JOIN personas p ON cl.persona_id = p.id_persona
       INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
@@ -166,8 +197,9 @@ Citas.getCitasByRangoMes = async (inicioMes, finMes) => {
              r.nombre_raza,
              p.nombre, p.apellido, p.telefono_1,
              cl.direccion,
-             c.fecha_hora_cita
+             ds.fecha_hora_inicio
       FROM citas c
+      inner join detalle_servicios ds on c.id_cita = ds.cita_id
       INNER JOIN clientes cl ON c.cliente_id = cl.id_cliente
       INNER JOIN personas p ON cl.persona_id = p.id_persona
       INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
@@ -177,8 +209,8 @@ Citas.getCitasByRangoMes = async (inicioMes, finMes) => {
         AND p.estado = 'A'
         AND m.estado = 'A'
         AND r.estado = 'A'
-        AND c.fecha_hora_cita BETWEEN ? AND ?
-      ORDER BY c.fecha_hora_cita ASC
+        AND ds.fecha_hora_inicio BETWEEN ? AND ?
+      ORDER BY ds.fecha_hora_inicio ASC
     `;
 
     const [rows] = await db.query(sql, [inicioMes, finMes]);
@@ -215,14 +247,16 @@ Citas.crearCita = async (params) => {
     throw err;
   }
 };
-
+/* esta funcion de marcar citas retrasadas se ejecuta cada 5 minutos
+y actualiza el estado de las citas que ya han pasado su hora de finalización */
 Citas.marcarCitasRestrasadas = async () => {
   const sql = `
-      UPDATE citas
+      UPDATE citas c
+      JOIN detalle_servicios ds ON c.id_cita = ds.cita_id
       SET estado_cita = 'Retrasada'
       WHERE 
-        DATE_ADD(fecha_hora_cita, INTERVAL 60 MINUTE) < NOW()
-        AND estado_cita = 'Pendiente';
+        ds.fecha_hora_fin < NOW()
+        AND c.estado_cita = 'Pendiente';
     `;
   await db.query(sql);
 };
