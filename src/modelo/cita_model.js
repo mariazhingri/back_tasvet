@@ -165,23 +165,76 @@ Citas.getCitasRetrasadas = async () => {
 
 Citas.getCitasCanceladas = async () => {
   try {
-    sql = ` select c.id_cita, c.estado_cita,m.id_mascota,m.nombre_mascota, m.especie, m.fecha_nacimiento,r.nombre_raza, p.nombre, p.apellido, p.telefono_1 ,cl.direccion, ds.fecha_hora_inicio,
-            s.id_servicio, ds.id_detalle_servicio, s.formulario, s.descripcion
-            from citas c
-            inner join clientes cl on c.cliente_id = cl.id_cliente
-            inner join personas p on cl.persona_id = p.id_persona
-            inner join mascotas m on c.mascota_id  = m.id_mascota
-            inner join razas r on m.raza_id = r.id_raza
-            inner join detalle_servicios ds on c.id_cita = ds.cita_id
-            inner join servicios s on ds.servicio_id = s.id_servicio
-            where c.estado_cita = 'Cancelada'
-            and cl.estado = 'A'
-            and p.estado = 'A'
-            and m.estado  = 'A'
-            and r.estado = 'A'
-            ORDER BY c.id_cita
+    sql = `
+
+        SELECT 
+          c.id_cita, 
+          c.estado_cita,
+          m.id_mascota,
+          m.nombre_mascota,
+          m.especie,
+          m.fecha_nacimiento,
+          r.nombre_raza,
+          p.nombre,
+          p.apellido,
+          p.telefono_1,
+          cl.direccion,
+          GROUP_CONCAT(
+            CONCAT(
+              '{',
+              '"id_servicio":', servicio_info.id_servicio, ',',
+              '"descripcion":"', servicio_info.descripcion, '",',
+              '"formulario":"', servicio_info.formulario, '",',
+              '"fecha_hora_inicio":"', servicio_info.fecha_hora_inicio, '",',
+              '"empleados":[', servicio_info.empleados_json, ']',
+              '}'
+            )
+            SEPARATOR ','
+          ) AS servicios
+        FROM citas c
+        INNER JOIN clientes cl ON c.cliente_id = cl.id_cliente
+        INNER JOIN personas p ON cl.persona_id = p.id_persona
+        INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
+        INNER JOIN razas r ON m.raza_id = r.id_raza
+        INNER JOIN (
+          -- Subconsulta para agrupar empleados por servicio y cita
+          SELECT 
+            ds.cita_id,
+            s.id_servicio,
+            s.descripcion,
+            s.formulario,
+            ds.fecha_hora_inicio,
+            GROUP_CONCAT(
+              CONCAT(
+                '{',
+                '"id_empleado":', ds.empleado_id, ',',
+                '"id_detalle_servicio":', ds.id_detalle_servicio, ',',
+                '"nombre_empleado":"', pe.nombre, ' ', pe.apellido, '",',
+                '"telefono_empleado":"', pe.telefono_1, '",',
+                '"cargo":"', e.cargo, '"',
+                '}'
+              )
+              SEPARATOR ','
+            ) AS empleados_json
+          FROM detalle_servicios ds
+          INNER JOIN servicios s ON ds.servicio_id = s.id_servicio
+          INNER JOIN empleados e ON ds.empleado_id = e.id_empleado
+          INNER JOIN personas pe ON e.persona_id = pe.id_persona
+          WHERE 
+            e.estado = 'A' AND
+            pe.estado = 'A'
+          GROUP BY ds.cita_id, s.id_servicio, s.descripcion, s.formulario, ds.fecha_hora_inicio
+        ) AS servicio_info ON c.id_cita = servicio_info.cita_id
+        WHERE 
+          c.estado_cita = 'Cancelada' AND
+          cl.estado = 'A' AND
+          p.estado = 'A' AND
+          m.estado = 'A' AND
+          r.estado = 'A'
+        GROUP BY c.id_cita
             `;
     const [rows] = await db.query(sql);
+    console.log('Citas canceladas obtenidas:', rows);
     return rows;
   } catch (error) {
     throw error;

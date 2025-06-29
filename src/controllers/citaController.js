@@ -57,7 +57,8 @@ module.exports = {
     try {
       id_usuario = req.user?.id_usuario;
 
-      const citas = await getCitasCanceladas(id_usuario);
+      // const citas = await getCitasCanceladas(id_usuario);
+      const citas = await CitaService.obtenerCitasCanceladas();
 
       res.status(200).json({
         success: true,

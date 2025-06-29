@@ -167,4 +167,19 @@ module.exports = {
     }
   },
 
+  async obtenerCitasCanceladas() {
+    try {
+      const filas = await CitaModel.getCitasCanceladas();
+      const agrupadas = agruparCitas(filas);
+      return { success: true, data: agrupadas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
+  },
+
+
 };
