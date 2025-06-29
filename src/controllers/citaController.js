@@ -32,9 +32,12 @@ module.exports = {
 
   async obtenerCitasRetrasadas(req, res) {
     try {
+      console.log('Obteniendo citas retrasadas');
       id_usuario = req.user?.id_usuario;
 
-      const citas = await getCitasRetrasadas(id_usuario);
+      // const citas = await getCitasRetrasadas(id_usuario);
+
+      const citas = await CitaService.obtenerCitasRetrasadas();
 
       res.status(200).json({
         success: true,

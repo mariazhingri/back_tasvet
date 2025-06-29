@@ -21,7 +21,7 @@ const agruparCitas = (filas) => {
     apellido: row.apellido,
     telefono: row.telefono_1,
     direccion: row.direccion,
-    
+
     servicios: JSON.parse(`[${row.servicios}]`) // <- parseamos el string JSON en array
   }));
 };
@@ -32,10 +32,10 @@ module.exports = {
     try {
       console.log('👤 Cliente a buscar mas arriba:', params.id_cliente);
       // 1️⃣ Validar campos obligatorios
-      const camposObligatorios = ['id_cliente', 'id_mascota', 'id_servicio', 'FechaHoraInicio', 'FechaHoraFin','IdEmpleado'];
+      const camposObligatorios = ['id_cliente', 'id_mascota', 'id_servicio', 'FechaHoraInicio', 'FechaHoraFin', 'IdEmpleado'];
       for (let campo of camposObligatorios) {
         if (!params[campo]) {
-          return {success: false, message: `El campo ${campo} es obligatorio.`};
+          return { success: false, message: `El campo ${campo} es obligatorio.` };
         }
       }
 
@@ -43,12 +43,12 @@ module.exports = {
       const fechaHoraInicio = new Date(params.FechaHoraInicio);
       const fechaHoraFin = new Date(params.FechaHoraFin);
       if (isNaN(fechaHoraInicio) || isNaN(fechaHoraFin)) {
-        return {success: false, message: 'La fechaHora no tiene un formato válido.'};
+        return { success: false, message: 'La fechaHora no tiene un formato válido.' };
       }
 
       // 3️⃣ Validar que la fecha no sea pasada
       if (fechaHoraInicio < new Date()) {
-        return {success: false, message: 'No se pueden agendar citas en el pasado.'};
+        return { success: false, message: 'No se pueden agendar citas en el pasado.' };
       }
 
       // 4️⃣ Validar duplicados (empleado, fecha y hora exacta)
@@ -60,9 +60,9 @@ module.exports = {
       }
 
       // 4️⃣.1 Validar si ya tiene una cita pendiente
-      const citaPendiente = await CitaModel.buscarCitaPendientePorMascota({mascota_id: params.id_mascota});
+      const citaPendiente = await CitaModel.buscarCitaPendientePorMascota({ mascota_id: params.id_mascota });
       if (Array.isArray(citaPendiente) && citaPendiente.length > 0) {
-        return {success: false, message: 'Ya tiene una cita que no ha sido atendida aún.'};
+        return { success: false, message: 'Ya tiene una cita que no ha sido atendida aún.' };
       }
 
       const citaId = await CitaModel.crearCita({
@@ -83,14 +83,14 @@ module.exports = {
         });
         detallesInsertados.push(detalle);
       }
-       // ✅ Buscar correo del cliente
+      // ✅ Buscar correo del cliente
       console.log('👤 Cliente a buscar:', params.id_cliente);
       const cliente = await ClienteModel.obtenerClientePorId(params.id_cliente)
       console.log('👤 Cliente encontrado:', cliente);
 
       if (cliente?.correo) {
-      const fecha = new Date(params.fechaHora).toLocaleString();
-      const mensaje = `
+        const fecha = new Date(params.fechaHora).toLocaleString();
+        const mensaje = `
         <div style="font-family: Arial, sans-serif; padding: 20px; text-align: center; color: #333;">
 
           <h2 style="font-size: 24px; margin-bottom: 10px;">Hola ${cliente.nombre} ${cliente.apellido},</h2>
@@ -109,18 +109,18 @@ module.exports = {
           <p style="font-size: 12px; color: #777;">Este es un correo automático, por favor no responder.</p>
         </div>
       `;
-      await enviarCorreoCitaAgendada(cliente.correo, "Cita agendada con éxito", mensaje);
+        await enviarCorreoCitaAgendada(cliente.correo, "Cita agendada con éxito", mensaje);
         try {
-    console.log('📨 Enviando correo a:', cliente.correo);
-    await enviarCorreoCitaAgendada(cliente.correo, "Cita agendada con éxito", mensaje);
-    console.log('✅ Correo enviado con éxito');
-  } catch (error) {
-    console.error('❌ Error al enviar correo:', error);
-  }
-} else {
-  console.warn('⚠️ No se encontró correo para la persona');
-}
-    
+          console.log('📨 Enviando correo a:', cliente.correo);
+          await enviarCorreoCitaAgendada(cliente.correo, "Cita agendada con éxito", mensaje);
+          console.log('✅ Correo enviado con éxito');
+        } catch (error) {
+          console.error('❌ Error al enviar correo:', error);
+        }
+      } else {
+        console.warn('⚠️ No se encontró correo para la persona');
+      }
+
       return {
         success: true,
         cita_id: citaId,
@@ -138,7 +138,7 @@ module.exports = {
   async actualizarCitaRetrasadas() {
     await CitaModel.marcarCitasRestrasadas();
   },
-    
+
   async obtenerCitas() {
     try {
       const filas = await CitaModel.obtenerCitas();
@@ -152,4 +152,19 @@ module.exports = {
       };
     }
   },
+
+  async obtenerCitasRetrasadas() {
+    try {
+      const filas = await CitaModel.getCitasRetrasadas();
+      const agrupadas = agruparCitas(filas);
+      return { success: true, data: agrupadas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
+  },
+
 };
