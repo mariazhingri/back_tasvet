@@ -30,9 +30,9 @@ const agruparCitas = (filas) => {
 module.exports = {
   async crearCita(params) {
     try {
-      console.log('👤 Cliente a buscar mas arriba:', params.id_cliente);
+      console.log('👤 Cliente a buscar mas arriba:', params);
       // 1️⃣ Validar campos obligatorios
-      const camposObligatorios = ['id_cliente', 'id_mascota', 'id_servicio', 'FechaHoraInicio', 'FechaHoraFin', 'IdEmpleado'];
+      const camposObligatorios = ['id_cliente', 'id_mascota', 'id_servicio', 'FechaHoraInicio', 'FechaHoraFin'];
       for (let campo of camposObligatorios) {
         if (!params[campo]) {
           return { success: false, message: `El campo ${campo} es obligatorio.` };
@@ -72,17 +72,18 @@ module.exports = {
       });
 
       const detallesInsertados = [];
-      for (let servicioId of params.id_servicio) {
+      for (let servicio of params.id_servicio) {
         const detalle = await ServicioModel.crearDetalleServicio({
           cita_id: citaId,
-          servicio_id: servicioId,
-          empleado_id: params.IdEmpleado,
-          fecha_hora_inicio: params.FechaHoraInicio,
-          fecha_hora_fin: params.FechaHoraFin,
+          servicio_id: servicio.serviceId,
+          empleado_id: servicio.empleadoId,
+          fecha_hora_inicio: servicio.fechaInicio,
+          fecha_hora_fin: servicio.fechaFin,
           reg_usuario: params.reg_usuario,
         });
         detallesInsertados.push(detalle);
       }
+
       // ✅ Buscar correo del cliente
       console.log('👤 Cliente a buscar:', params.id_cliente);
       const cliente = await ClienteModel.obtenerClientePorId(params.id_cliente)
@@ -130,7 +131,7 @@ module.exports = {
       return {
         success: false,
         message: 'Error al crear la cita',
-        //message: err.message,
+        message: err.message,
       };
     }
   },
