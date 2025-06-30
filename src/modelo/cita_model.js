@@ -351,6 +351,7 @@ Citas.getCitasByRangoMes = async (inicioMes, finMes) => {
     const [rows] = await db.query(sql, [inicioMes, finMes]);
 
     console.log(`✅ ${rows.length} citas encontradas en el rango`);
+    console.log('Citas obtenidas segun rango de fechas:', rows);
     return rows;
   } catch (error) {
     console.error('❌ Error al obtener citas por rango:', error.message);
