@@ -136,8 +136,14 @@ module.exports = {
     }
   },
 
+
   async actualizarCitaRetrasadas() {
     await CitaModel.marcarCitasRestrasadas();
+  },
+
+
+  async cancelarCitas(id_cita, motivo, id_usuario) {
+    await CitaModel.cancelarCita(id_cita, motivo);
   },
 
   async obtenerCitas() {

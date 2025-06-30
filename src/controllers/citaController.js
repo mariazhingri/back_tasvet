@@ -192,4 +192,49 @@ module.exports = {
       });
     }
   },
+
+  async cancelarCita(req, res) {
+    console.log('Cancelando cita...');
+    const { id_usuario, rol_descripcion } = req.user;
+    const { id_cita, motivo } = req.body;
+    console.log('Datos recibidos:', { id_usuario, rol_descripcion, id_cita, motivo });
+
+    if (!['Administrador', 'Auxiliar'].includes(rol_descripcion)) {
+      return res.status(403).json({
+        success: false,
+        message: 'No tienes permiso para cancelar citas',
+      })
+    }
+
+    if (!id_cita || !motivo) {
+      return res.status(400).json({
+        success: false,
+        message: 'Faltan datos para cancelar la cita',
+      });
+    }
+
+    try {
+      const result = await CitaService.cancelarCitas(id_cita, motivo, id_usuario);
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Cita no encontrada o ya cancelada',
+        });
+      }
+      res.status(200).json({
+        success: true,
+        message: 'Cita cancelada correctamente',
+      });
+
+
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      }
+      );
+    }
+  }
 };
+

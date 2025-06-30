@@ -398,6 +398,33 @@ Citas.marcarCitasRestrasadas = async () => {
     `;
   await db.query(sql);
 };
+
+
+Citas.cancelarCita = async (id_cita, motivo) => {
+  try {
+    const currentDate = new Date();
+    const sql = `
+      UPDATE citas
+      SET 
+        estado_cita = 'Cancelada',
+        motivo_cancelacion = ?,
+        fecha_cancelacion = ?
+      WHERE id_cita = ?
+    `;
+
+    const [result] = await db.query(sql, [
+      motivo,
+      currentDate,
+      id_cita
+    ]);
+
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 Citas.actualizarCita = async () => { };
 
 Citas.cambiarEstadoCita = async () => { };
