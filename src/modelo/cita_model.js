@@ -230,15 +230,17 @@ Citas.crearCita = async (params) => {
     const sql = `
             INSERT INTO citas (
                 cliente_id, 
-                mascota_id,  
+                mascota_id,
+                estado_cita,  
                 reg_fecha,
                 reg_usuario
             )
-            VALUES ( ?,?, ?, ?)
+            VALUES ( ?,?, ?, ?,?)
         `;
     const [result] = await db.query(sql, [
       params.cliente_id,
       params.mascota_id,
+      'Pendiente', // Estado inicial de la cita
       currentDate,
       params.reg_usuario,
     ]);
