@@ -359,6 +359,50 @@ Citas.getCitasByRangoMes = async (inicioMes, finMes) => {
   }
 };
 
+Citas.getCitasByRangoIdEmpleado = async (fechaInicio, fechaFin, idEmpleado) => {
+  console.log('📥 Rango de citas recibido:', fechaInicio, fechaFin, idEmpleado);
+
+  if (!fechaInicio || !fechaFin || !idEmpleado) {
+    throw new Error('Fechas de inicio y fin requeridas y tambien idempledo mi bro');
+  }
+
+  try {
+    const sql = `
+      SELECT c.id_cita, c.estado_cita,
+             m.nombre_mascota, m.especie,
+             r.nombre_raza,
+             p.nombre, p.apellido, p.telefono_1,
+             cl.direccion,
+             ds.fecha_hora_inicio
+      FROM citas c
+      inner join detalle_servicios ds on c.id_cita = ds.cita_id
+      INNER JOIN clientes cl ON c.cliente_id = cl.id_cliente
+      INNER JOIN personas p ON cl.persona_id = p.id_persona
+      INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
+      INNER JOIN razas r ON m.raza_id = r.id_raza
+      WHERE c.estado_cita = 'Pendiente'
+        AND cl.estado = 'A'
+        AND p.estado = 'A'
+        AND m.estado = 'A'
+        AND r.estado = 'A'
+        AND ds.empleado_id = ?
+        AND ds.fecha_hora_inicio BETWEEN ? AND ?
+      ORDER BY ds.fecha_hora_inicio ASC
+    `;
+
+    const [rows] = await db.query(sql, [idEmpleado, fechaInicio, fechaFin]);
+
+    console.log(`✅ ${rows.length} citas encontradas en el rango`);
+    console.log('Citas obtenidas segun rango de fechas:', rows);
+    return rows;
+  } catch (error) {
+    console.error('❌ Error al obtener citas por rango:', error.message);
+    throw new Error('Error al consultar citas por rango de fechas');
+  }
+};
+
+
+
 Citas.crearCita = async (params) => {
   try {
     const currentDate = new Date();

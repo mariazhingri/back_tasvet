@@ -25,7 +25,7 @@ empleados.obtenerCitasPorEmpleados = async (params) => {
             from detalle_servicios ds
             inner join citas c on ds.cita_id = c.id_cita
             inner join servicios s on ds.servicio_id = s.id_servicio
-            where ds.empleado_id  = 1
+            where ds.empleado_id  = ?
             AND ds.estado = 'A'
             AND s.estado = 'A'
             AND c.estado_cita = 'Pendiente'

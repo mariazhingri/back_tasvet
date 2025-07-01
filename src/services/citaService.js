@@ -189,4 +189,18 @@ module.exports = {
   },
 
 
+  async obtenerCitasPorFechaIdEmpleado(fechaInicio, fechaFin, id_empleado) {
+    try {
+      const filas = await CitaModel.getCitasByRangoIdEmpleado(fechaInicio, fechaFin, id_empleado);
+      return { success: true, data: filas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
+  },
+
+
 };

@@ -6,6 +6,7 @@ const {
   getCitasByIdCita,
   getCitasByRangoMes,
 } = require('../modelo/cita_model');
+const citaService = require('../services/citaService');
 const CitaService = require('../services/citaService');
 const { listarFormularios } = require('../services/servicioService');
 
@@ -159,6 +160,38 @@ module.exports = {
         success: true,
         data: rangoCita,
         message: 'Rango de Cita por mes obtenidas correctamente',
+      });
+
+      // console.log('Cita obtenida:', cita)
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  async obtenerCitaPorRangoIdEmpleado(req, res) {
+    try {
+      const { fechaInicio } = req.body;
+      const { fechaFin } = req.body;
+      const { idEmpleado } = req.body;
+
+      if (!fechaInicio || !fechaFin || !idEmpleado) {
+        return res.status(400).json({
+          success: false,
+          message: 'Rango de mes no esta definido',
+        });
+      }
+
+      const rangoCita = await citaService.obtenerCitasPorFechaIdEmpleado(fechaInicio, fechaFin, idEmpleado);
+
+      res.status(200).json({
+        success: true,
+        data: rangoCita,
+        message: 'Rango de Cita obtenidas correctamente por id empleado',
       });
 
       // console.log('Cita obtenida:', cita)
