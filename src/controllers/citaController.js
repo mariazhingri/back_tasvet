@@ -18,7 +18,7 @@ module.exports = {
 
       res.status(200).json({
         success: true,
-        data: citas,
+        //data: citas,
       });
     } catch (error) {
       console.error(error);
@@ -38,7 +38,7 @@ module.exports = {
 
       res.status(200).json({
         success: true,
-        data: citas,
+        //data: citas,
       });
     } catch (error) {
       console.error(error);
@@ -58,7 +58,7 @@ module.exports = {
 
       res.status(200).json({
         success: true,
-        data: citas,
+        //data: citas,
       });
     } catch (error) {
       console.error(error);

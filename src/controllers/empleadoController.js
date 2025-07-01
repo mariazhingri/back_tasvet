@@ -1,5 +1,5 @@
 const EmpleadoServices = require("../services/empleadoServices");
-
+const EmpleadoModel = require ("../modelo/empleado_model");
 module.exports = {
   async obtenerCitasPorEmpleados(req, res) {
     console.log("Iniciando obtenerCitasPorEmpleados");
@@ -87,6 +87,24 @@ module.exports = {
       console.error(error);
       res.status(500).json({ success: false, message: "Error interno del servidor" });
     }
+  },
+//-------GRAFICAS --------
+async obtenerTotalCitasAtendidasPorMes(req, res) {
+  try {
+    const id_usuario = req.user?.id_usuario;
+    const { anio } = req.params;
+    const Empleados = await EmpleadoServices.obtenerTotalCitasAtendidasPorMes(anio);
+    return res.status(200).json({
+      success: true,
+      data: Empleados,
+    });
+  } catch (error) {
+    console.error('Error al obtener los Empleados más solicitados:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message,
+    });
   }
-
+},
 }

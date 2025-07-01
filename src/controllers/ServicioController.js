@@ -1,5 +1,6 @@
 const Usuarios = require('../modelo/user_model');
 const servicioService = require('../services/servicioService');
+const servicioModel = require('../modelo/servicios_model');
 const e = require('express');
 require('dotenv').config();
 
@@ -292,7 +293,24 @@ async agregarServicioaCita(req, res) {
       error: error?.message || 'Error interno del servidor'
     });
   }
-}
-
+},
+// -------Graficas -----
+async obtenerServiciosMasSolicitados(req, res) {
+  try {
+    const { anio } = req.params;
+    const servicios = await servicioModel.obtenerServiciosMasSolicitados(anio);
+    return res.status(200).json({
+      success: true,
+      data: servicios,
+    });
+  } catch (error) {
+    console.error('Error al obtener los servicios más solicitados:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message,
+    });
+  }
+},
 
 };

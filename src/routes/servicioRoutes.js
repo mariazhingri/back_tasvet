@@ -35,4 +35,8 @@ module.exports = (app) => {
   // Rutas para la versión 2 de los servicios :)
   app.post('/servicio/crearV2', verificarToken, ServicioController.crearServicioV2);
   app.put('/servicio/eliminarV2', verificarToken, ServicioController.eliminarServicioV2);
+
+  //------GRAFICAS ------
+  app.get('/servicio/graficas/masSolicitados/:anio', verificarToken, ServicioController.obtenerServiciosMasSolicitados);
+
 };

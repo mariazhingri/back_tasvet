@@ -41,7 +41,27 @@ module.exports = {
   },
 
 
+//------Graficas ------
+  async obtenerTotalCitasAtendidasPorMes(anio) {
+    const CitasPorEmpelados = await EmpleadoModel.obtenerTotalCitasAtendidasPorMes(anio);
+    console.log("Citas por empleados:", CitasPorEmpelados); 
+    // Agrupar por empleado
+    const resultado = {};
 
+    CitasPorEmpelados.forEach(item => {
+      const nombre = item.empleado;
+      const mes = item.mes - 1; // Ajustar para que enero sea 0
+      const total = item.total_citas;
 
+      if (!resultado[nombre]) {
+        resultado[nombre] = [];
+      }
+
+      resultado[nombre].push({ mes, total });
+    });
+    console.log("Resultado agrupado por empleado:", resultado);
+
+    return resultado;
+  },
 
 }

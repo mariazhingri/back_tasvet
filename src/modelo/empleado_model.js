@@ -134,7 +134,38 @@ empleados.obtenerCitasPorRangoFecha = async (id_usuario, fechaInicio, fechaFin) 
   }
 };
 
+// -----GRAFICAS -----
+// Obtener total de citas atendidas por mes en un año específico
+empleados.obtenerTotalCitasAtendidasPorMes = async (anio) => {
+  try {
+    const sql = `
+      SELECT 
+        CONCAT(p.nombre, ' ', p.apellido) AS empleado,
+        m.id_mes AS mes,
+        m.descripcion AS mes_nombre,
+        COUNT(ds.cita_id) AS total_citas
+      FROM empleados e
+      INNER JOIN personas p ON e.persona_id = p.id_persona
+      CROSS JOIN meses m
+      LEFT JOIN detalle_servicios ds 
+        ON ds.empleado_id = e.id_empleado 
+        AND MONTH(ds.fecha_hora_inicio) = m.id_mes 
+        AND YEAR(ds.fecha_hora_inicio) = ?
+      LEFT JOIN citas c 
+        ON c.id_cita = ds.cita_id 
+        AND c.estado_cita = 'Atendida'
+      WHERE ds.estado = 'A' OR ds.estado IS NULL
+      GROUP BY e.id_empleado, m.id_mes
+      ORDER BY e.id_empleado, m.id_mes;
+    `;
 
+    const [rows] = await db.query(sql, [anio]);
+    console.log("Total de citas atendidas por mes:", rows);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // empleados.obtenerCitasPorIdUsuario = async (params) => {
 //   try {
