@@ -17,7 +17,7 @@ module.exports = {
       const result = await authService.login(req.body);
       return res.status(200).json({
         message: 'Login exitoso',
-        ...result,
+        ...result
         // user: correo,
         // token: `JWT ${token}`,
       });
