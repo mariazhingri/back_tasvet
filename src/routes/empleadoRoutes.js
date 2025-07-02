@@ -28,4 +28,11 @@ module.exports = (app) => {
     empleadoController.obtenerCitasPorRangoFechaIdUsuario,
   );
 
+  // -----GRAFICAS -----
+  app.get(
+    "/api/empleado/obtener/citas/atendidas/mes/:anio",
+    verificarToken,
+    empleadoController.obtenerTotalCitasAtendidasPorMes,
+  );
+
 }

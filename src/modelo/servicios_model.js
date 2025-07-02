@@ -239,4 +239,39 @@ Servicios.agregarServicioaCita = async (params) => {
     throw error;
   }
 };
+
+Servicios.obtenerServicioPorId = async (id_servicio) => {
+  try {
+    const sql = `
+      SELECT id_servicio, descripcion, categoria, formulario, estado
+      FROM servicios
+      WHERE id_servicio = ? AND eliminado = 0;
+    `;
+    const [rows] = await db.query(sql, [id_servicio]);
+    return rows[0]; // Retorna el primer servicio encontrado
+  } catch (error) {
+    throw error;
+  }
+};
+
+/*-------- Graficas -------*/
+// Obtener servicios mas solicitados
+Servicios.obtenerServiciosMasSolicitados = async (anio) => {
+  try {
+    const sql = `SELECT s.descripcion, COUNT(ds.servicio_id) AS cantidad
+      FROM detalle_servicios ds
+      INNER JOIN servicios s ON ds.servicio_id = s.id_servicio
+      inner join citas c on ds.cita_id  = c.id_cita
+      WHERE YEAR(ds.fecha_hora_inicio) = ?
+        AND c.estado_cita = 'Atendida'
+      GROUP BY ds.servicio_id
+      ORDER BY cantidad DESC
+    `;
+    const [rows] = await db.query(sql, [anio]);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = Servicios;

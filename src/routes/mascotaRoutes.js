@@ -13,6 +13,16 @@ module.exports = (app) => {
     verificarToken,
     mascotaController.obtenerMascotaDeCliente,
   );
+  app.get(
+    "/mascota/grafica/obtener/mascotas_atendidas/:anio",
+    verificarToken,
+    mascotaController.obtenerMascotasAtendidasPorAño,
+  );
+  app.get(
+    "/mascota/grafica/obtener/especies_atendidas/:anio",
+    verificarToken,
+    mascotaController.obtenerEspeciesMasAtendidas,
+  );
   app.post(
     "/mascota/obtener/mascota_by_id",
     verificarToken,

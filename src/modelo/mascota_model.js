@@ -197,4 +197,55 @@ Mascota.obtenerMascotaDeCliente = async (id_cliente) => {
     throw error;
   }
 };
+
+/*-------- Graficas -------*/
+// Obtiene el total de mascotas atendidas por mes en un año específico
+Mascota.obtenerMascotasAtendidasPorAño = async (anio) => {
+  try {
+    const sql = `
+      SELECT 
+        m.id_mes AS mes,
+        m.descripcion AS mes_nombre,
+        ? AS anio,
+        COUNT(ds.cita_id) AS total
+      FROM meses m
+      LEFT JOIN detalle_servicios ds 
+        ON MONTH(ds.fecha_hora_inicio) = m.id_mes 
+        AND YEAR(ds.fecha_hora_inicio) = ?
+      LEFT JOIN citas c 
+        ON ds.cita_id = c.id_cita 
+        AND c.estado_cita = 'Atendida'
+      GROUP BY m.id_mes, m.descripcion
+      ORDER BY m.id_mes;
+    `;
+
+    const [rows] = await db.query(sql, [anio, anio]);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+// Obtiene el total de las especies de mascotas mas atendidas
+Mascota.obtenerEspeciesMasAtendidas = async (anio) => {
+  try {
+    const sql = `
+      SELECT 
+        m.especie AS especie,
+        COUNT(c.id_cita ) AS total_atenciones
+      FROM mascotas m
+      INNER JOIN citas c ON m.id_mascota = c.mascota_id
+      INNER JOIN detalle_servicios ds ON c.id_cita = ds.cita_id
+      WHERE YEAR(ds.fecha_hora_inicio) = ?
+        AND c.estado_cita = 'Atendida'
+      GROUP BY m.especie
+      ORDER BY total_atenciones DESC;
+    `;
+
+    const [rows] = await db.query(sql, [anio]);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = Mascota;

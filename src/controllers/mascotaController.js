@@ -251,7 +251,7 @@ module.exports = {
     }
 
     try {
-      const mascotas = await Mascota.obtenerPorClienteId(clienteId);
+      const mascotas = await MascotaModal.obtenerPorClienteId(clienteId);
 
       if (!mascotas || mascotas.length === 0) {
         return res.status(404).json({
@@ -267,6 +267,44 @@ module.exports = {
     } catch (error) {
       console.error("Error al obtener mascotas:", error);
       res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+        error: error.message,
+      });
+    }
+  },
+
+  async obtenerMascotasAtendidasPorAño(req, res) {
+    try {
+      const { anio } = req.params;
+      const Mascotas = await MascotaModal.obtenerMascotasAtendidasPorAño(anio);
+
+      return res.status(200).json({
+        success: true,
+        data: Mascotas,
+      });
+    } catch (error) {
+      console.error("Error al obtener las mascotas:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+        error: error.message,
+      });
+    }
+  },
+
+  async obtenerEspeciesMasAtendidas(req, res) {
+    try {
+      const { anio } = req.params;
+      const Mascotas = await MascotaModal.obtenerEspeciesMasAtendidas(anio);
+
+      return res.status(200).json({
+        success: true,
+        data: Mascotas,
+      });
+    } catch (error) {
+      console.error("Error al obtener las mascotas:", error);
+      return res.status(500).json({
         success: false,
         message: "Error interno del servidor",
         error: error.message,

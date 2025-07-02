@@ -88,24 +88,35 @@ module.exports = {
       console.log('👤 Cliente a buscar:', params.id_cliente);
       const cliente = await ClienteModel.obtenerClientePorId(params.id_cliente)
       console.log('👤 Cliente encontrado:', cliente);
+      const serviciosConNombre = [];
+
+      // ✅ Obtener información de los servicios
+      for (let servicio of params.id_servicio) {
+        const infoServicio = await ServicioModel.obtenerServicioPorId(servicio.serviceId);
+        serviciosConNombre.push({
+          descripcion: infoServicio.descripcion,
+          fechaInicio: servicio.fechaInicio,
+          fechaFin: servicio.fechaFin,
+        });
+      }
+
 
       if (cliente?.correo) {
-        const fecha = new Date(params.fechaHora).toLocaleString();
-        const mensaje = `
-        <div style="font-family: Arial, sans-serif; padding: 20px; text-align: center; color: #333;">
-
-          <h2 style="font-size: 24px; margin-bottom: 10px;">Hola ${cliente.nombre} ${cliente.apellido},</h2>
-
-          <p style="font-size: 18px; margin-bottom: 30px;">
-            Tu cita ha sido agendada exitosamente.
-          </p>
-
-          <p style="font-size: 20px; font-style: italic; font-weight: bold; color: #2a7ae2; margin-bottom: 30px;">
-            🕒 ${fecha}
-          </p>
-
-          <p style="font-size: 16px;">Gracias por confiar en nosotros 🐾</p>
-
+      //const fecha = new Date(params.fechaHora).toLocaleString();
+      const serviciosHTML = serviciosConNombre.map(s => `
+        <li>
+          <strong>${s.descripcion}</strong><br>
+          🕒 ${new Date(s.fechaInicio).toLocaleString()} - ${new Date(s.fechaFin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </li>
+      `).join('');
+      const mensaje = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+          <h2>Hola ${cliente.nombre} ${cliente.apellido},</h2>
+          <p>Tu cita ha sido agendada exitosamente. Aquí están los detalles:</p>
+          <ul style="text-align: left; font-size: 16px;">
+            ${serviciosHTML}
+          </ul>
+          <p style="margin-top: 20px;">Gracias por confiar en nosotros 🐾</p>
           <hr style="margin-top: 40px;">
           <p style="font-size: 12px; color: #777;">Este es un correo automático, por favor no responder.</p>
         </div>
