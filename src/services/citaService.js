@@ -95,6 +95,7 @@ module.exports = {
         const infoServicio = await ServicioModel.obtenerServicioPorId(servicio.serviceId);
         serviciosConNombre.push({
           descripcion: infoServicio.descripcion,
+          empleado: servicio.empleado,
           fechaInicio: servicio.fechaInicio,
           fechaFin: servicio.fechaFin,
         });
@@ -106,9 +107,11 @@ module.exports = {
       const serviciosHTML = serviciosConNombre.map(s => `
         <li>
           <strong>${s.descripcion}</strong><br>
+          🐶 ${s.empleado} <br>
           🕒 ${new Date(s.fechaInicio).toLocaleString()} - ${new Date(s.fechaFin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </li>
       `).join('');
+
       const mensaje = `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
           <h2>Hola ${cliente.nombre} ${cliente.apellido},</h2>
