@@ -25,7 +25,7 @@ empleados.obtenerCitasPorEmpleados = async (params) => {
             from detalle_servicios ds
             inner join citas c on ds.cita_id = c.id_cita
             inner join servicios s on ds.servicio_id = s.id_servicio
-            where ds.empleado_id  = 1
+            where ds.empleado_id  = ?
             AND ds.estado = 'A'
             AND s.estado = 'A'
             AND c.estado_cita = 'Pendiente'
@@ -68,7 +68,7 @@ empleados.obtenerCitasPorUsuarioIdV2 = async (id_usuario) => {
         m.nombre_mascota,
         m.especie,
         r.nombre_raza,
-        c.fecha_hora_cita,
+        c.fecha_hora_inicio,
         cli_persona.nombre,
         cli_persona.apellido,
         cli_persona.telefono_1,
@@ -103,7 +103,7 @@ empleados.obtenerCitasPorRangoFecha = async (id_usuario, fechaInicio, fechaFin) 
         m.nombre_mascota AS mascotaNombre,
         m.especie AS mascotaEspecie,
         r.nombre_raza AS mascotaRaza,
-        c.fecha_hora_cita AS citaFecha,
+        c.fecha_hora_inicio AS citaFecha,
         CONCAT(cli_persona.nombre, ' ', cli_persona.apellido) AS clienteNombre,
         cli_persona.telefono_1 AS clienteContacto,
         NULL AS clienteDireccion, -- no existe campo direccion en personas
