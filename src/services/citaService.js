@@ -29,6 +29,8 @@ const agruparCitas = (filas) => {
 
 module.exports = {
   async crearCita(params) {
+    const moment = require('moment-timezone');
+    const zona = 'America/Guayaquil';
     try {
       console.log('👤 Cliente a buscar mas arriba:', params);
       // 1️⃣ Validar campos obligatorios
@@ -39,20 +41,20 @@ module.exports = {
         }
       }
 
-      // 2️⃣ Validar que la fecha sea válida
-      const fechaHoraInicio = new Date(params.FechaHoraInicio);
-      const fechaHoraFin = new Date(params.FechaHoraFin);
-      if (isNaN(fechaHoraInicio) || isNaN(fechaHoraFin)) {
+      // 2️⃣ Validar que la fecha sea válida y convertir a zona horaria local
+      const fechaHoraInicio = moment.tz(params.FechaHoraInicio, 'YYYY-MM-DD HH:mm:ss', zona);
+      const fechaHoraFin = moment.tz(params.FechaHoraFin, 'YYYY-MM-DD HH:mm:ss', zona);
+      if (!fechaHoraInicio.isValid() || !fechaHoraFin.isValid()) {
         return { success: false, message: 'La fechaHora no tiene un formato válido.' };
       }
 
       // 3️⃣ Validar que la fecha no sea pasada
-      if (fechaHoraInicio < new Date()) {
+      if (fechaHoraInicio.isBefore(moment.tz(zona))) {
         return { success: false, message: 'No se pueden agendar citas en el pasado.' };
       }
 
       // 4️⃣ Validar duplicados (empleado, fecha y hora exacta)
-      const fechaHoraMysql = fechaHoraInicio.toISOString().slice(0, 16).replace('T', ' '); // solo hasta minutos
+      const fechaHoraMysql = fechaHoraInicio.format('YYYY-MM-DD HH:mm'); // solo hasta minutos
 
       const citaExistente = await CitaModel.buscarCitaPorFechaHoraEmpleado(fechaHoraMysql, params.IdEmpleado);
       if (Array.isArray(citaExistente) && citaExistente.length > 0) {
@@ -73,12 +75,15 @@ module.exports = {
 
       const detallesInsertados = [];
       for (let servicio of params.id_servicio) {
+        // Normalizar fechas de detalle a zona horaria local
+        const fechaInicioDetalle = moment.tz(servicio.fechaInicio, 'YYYY-MM-DD HH:mm:ss', zona);
+        const fechaFinDetalle = moment.tz(servicio.fechaFin, 'YYYY-MM-DD HH:mm:ss', zona);
         const detalle = await ServicioModel.crearDetalleServicio({
           cita_id: citaId,
           servicio_id: servicio.serviceId,
           empleado_id: servicio.empleadoId,
-          fecha_hora_inicio: servicio.fechaInicio,
-          fecha_hora_fin: servicio.fechaFin,
+          fecha_hora_inicio: fechaInicioDetalle.isValid() ? fechaInicioDetalle.format('YYYY-MM-DD HH:mm:ss') : servicio.fechaInicio,
+          fecha_hora_fin: fechaFinDetalle.isValid() ? fechaFinDetalle.format('YYYY-MM-DD HH:mm:ss') : servicio.fechaFin,
           reg_usuario: params.reg_usuario,
         });
         detallesInsertados.push(detalle);

@@ -120,7 +120,9 @@ module.exports = {
         });
       }
 
-      const cita = await getCitasByIdCita(idCita);
+      // const cita = await getCitasByIdCita(idCita);
+      const cita = await CitaService.obtenerCitasPorIdCita(idCita);
+
 
       res.status(200).json({
         success: true,
