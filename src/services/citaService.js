@@ -108,8 +108,8 @@ module.exports = {
 
 
       if (cliente?.correo) {
-      //const fecha = new Date(params.fechaHora).toLocaleString();
-      const serviciosHTML = serviciosConNombre.map(s => `
+        //const fecha = new Date(params.fechaHora).toLocaleString();
+        const serviciosHTML = serviciosConNombre.map(s => `
         <li>
           <strong>${s.descripcion}</strong><br>
           🐶 ${s.empleado} <br>
@@ -117,7 +117,7 @@ module.exports = {
         </li>
       `).join('');
 
-      const mensaje = `
+        const mensaje = `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
           <h2>Hola ${cliente.nombre} ${cliente.apellido},</h2>
           <p>Tu cita ha sido agendada exitosamente. Aquí están los detalles:</p>
@@ -197,6 +197,22 @@ module.exports = {
     try {
       const filas = await CitaModel.getCitasCanceladas();
       const agrupadas = agruparCitas(filas);
+      return { success: true, data: agrupadas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
+  },
+
+
+  async obtenerCitasPorIdCita(id_cita) {
+    try {
+      console.log('👤 Obteniendo citas por ID:', id_cita);
+      const filas = await CitaModel.getCitasByIdCita(id_cita);
+      const agrupadas = objetoCita(filas);
       return { success: true, data: agrupadas };
     } catch (error) {
       return {

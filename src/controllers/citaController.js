@@ -122,6 +122,7 @@ module.exports = {
 
       // const cita = await getCitasByIdCita(idCita);
       const cita = await CitaService.obtenerCitasPorIdCita(idCita);
+      console.log('Cita obtenida por id_cita:', cita);
 
 
       res.status(200).json({
