@@ -450,8 +450,6 @@ Citas.getCitasByRangoIdEmpleado = async (fechaInicio, fechaFin, idEmpleado) => {
   }
 };
 
-
-
 Citas.crearCita = async (params) => {
   try {
     const currentDate = new Date();
@@ -516,14 +514,6 @@ Citas.cancelarCita = async (id_cita, motivo) => {
     throw err;
   }
 };
-
-
-Citas.actualizarCita = async () => { };
-
-Citas.cambiarEstadoCita = async () => { };
-
-Citas.eliminarCita = async () => { };
-
 
 Citas.buscarCitaPorFechaHoraEmpleado = async (fecha_hora_inicio, empleado_id) => {
   // Convertimos la fecha a la zona horaria de Ecuador

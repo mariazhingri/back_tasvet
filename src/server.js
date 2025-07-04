@@ -12,7 +12,7 @@ const formulario = require('./routes/formulariosRoutes');
 const historialClinicoRoutes = require('./routes/historialClinicoRoutes');
 const empleados = require('./routes/empleadoRoutes')
 const auxiliar = require('./routes/auxiliarRoutes')
-
+const veterinario = require('./routes/veterinarioRoutes');
 
 require('./services/task/actualizarCitasRetrasadas');
 
@@ -44,6 +44,7 @@ formulario(app);
 historialClinicoRoutes(app);
 empleados(app);
 auxiliar(app);
+veterinario(app);
 
 // Agregar logging para debugging
 app.use((req, res, next) => {

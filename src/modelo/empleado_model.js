@@ -133,6 +133,25 @@ empleados.obtenerCitasPorRangoFecha = async (id_usuario, fechaInicio, fechaFin) 
     throw error;
   }
 };
+// Obtener empleado por id_usuario
+// Esta funcion es para que se muestre el empleado logeado - extrae el id_usuario del token
+empleados.obtenerempleadoPorUsuario = async (id_usuario) => {
+  console.log("ID de usuario recibido:", id_usuario);
+  try {
+    const sql = `
+       select e.id_empleado
+        from usuarios u
+        inner join personas p on u.persona_id = p.id_persona
+        inner join empleados e on p.id_persona = e.persona_id
+        where u.id_usuario = ?
+    `;
+    const [rows] = await db.query(sql, [id_usuario]);
+    console.log("Empleado encontrado:", rows);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // -----GRAFICAS -----
 // Obtener total de citas atendidas por mes en un año específico
