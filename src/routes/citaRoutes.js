@@ -10,6 +10,8 @@ module.exports = (app) => {
 
   app.post('/api/cita/crear', verificarToken, CitaController.crearCita);
   app.post('/api/cita/cancelar', verificarToken, CitaController.cancelarCita);
+  app.post('/api/cita/reprogramar', verificarToken, CitaController.reprogramarCita);
+
 
   app.post('/api/cita/obtener/fecha', verificarToken, CitaController.obtenerCitasPorFecha);
   app.post('/api/cita/obtener/porId', verificarToken, CitaController.obtenerCitasPorId);

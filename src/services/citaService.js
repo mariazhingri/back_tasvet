@@ -179,6 +179,12 @@ module.exports = {
     await CitaModel.cancelarCita(id_cita, motivo);
   },
 
+
+  async reprogramarCitas(id_detalle_servicio, fecha_hora_inicio, fecha_hora_fin) {
+    return await CitaModel.reprogramarCita(id_detalle_servicio, fecha_hora_inicio, fecha_hora_fin);
+  },
+
+
   async obtenerCitas() {
     try {
       const filas = await CitaModel.obtenerCitas();
