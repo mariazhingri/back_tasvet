@@ -26,6 +26,20 @@ const agruparCitas = (filas) => {
   }));
 };
 
+const objetoCita = (row) => ({
+  id_cita: row.id_cita,
+  estado_cita: row.estado_cita,
+  id_mascota: row.id_mascota,
+  nombre_mascota: row.nombre_mascota,
+  especie: row.especie,
+  nombre_raza: row.nombre_raza,
+  fecha_nacimiento: row.fecha_nacimiento,
+  nombre: row.nombre,
+  apellido: row.apellido,
+  telefono: row.telefono_1,
+  direccion: row.direccion,
+  servicios: JSON.parse(`[${row.servicios}]`),
+});
 
 module.exports = {
   async crearCita(params) {
@@ -108,8 +122,8 @@ module.exports = {
 
 
       if (cliente?.correo) {
-      //const fecha = new Date(params.fechaHora).toLocaleString();
-      const serviciosHTML = serviciosConNombre.map(s => `
+        //const fecha = new Date(params.fechaHora).toLocaleString();
+        const serviciosHTML = serviciosConNombre.map(s => `
         <li>
           <strong>${s.descripcion}</strong><br>
           🐶 ${s.empleado} <br>
@@ -117,7 +131,7 @@ module.exports = {
         </li>
       `).join('');
 
-      const mensaje = `
+        const mensaje = `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
           <h2>Hola ${cliente.nombre} ${cliente.apellido},</h2>
           <p>Tu cita ha sido agendada exitosamente. Aquí están los detalles:</p>
@@ -162,8 +176,14 @@ module.exports = {
 
 
   async cancelarCitas(id_cita, motivo, id_usuario) {
-    await CitaModel.cancelarCita(id_cita, motivo);
+    return await CitaModel.cancelarCita(id_cita, motivo);
   },
+
+
+  async reprogramarCitas(id_detalle_servicio, fecha_hora_inicio, fecha_hora_fin) {
+    return await CitaModel.reprogramarCita(id_detalle_servicio, fecha_hora_inicio, fecha_hora_fin);
+  },
+
 
   async obtenerCitas() {
     try {
@@ -197,6 +217,22 @@ module.exports = {
     try {
       const filas = await CitaModel.getCitasCanceladas();
       const agrupadas = agruparCitas(filas);
+      return { success: true, data: agrupadas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
+  },
+
+
+  async obtenerCitasPorIdCita(id_cita) {
+    try {
+      console.log('👤 Obteniendo citas por ID:', id_cita);
+      const filas = await CitaModel.getCitasByIdCita(id_cita);
+      const agrupadas = objetoCita(filas);
       return { success: true, data: agrupadas };
     } catch (error) {
       return {

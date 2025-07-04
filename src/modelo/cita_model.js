@@ -515,6 +515,51 @@ Citas.cancelarCita = async (id_cita, motivo) => {
   }
 };
 
+
+
+Citas.reprogramarCita = async (id_detalle_servicio, fecha_hora_inicio, fecha_hora_fin) => {
+  const inicio = toMySQLDateTime(fecha_hora_inicio);
+  const fin = toMySQLDateTime(fecha_hora_fin);
+
+  console.log('fechas convertidas a MySQL:', inicio, fin);
+  console.log('id_detalle_servicio:', id_detalle_servicio);
+  try {
+    const sql = `
+      UPDATE detalle_servicios
+      SET 
+        fecha_hora_inicio = ?,
+        fecha_hora_fin = ?
+      WHERE id_detalle_servicio = ?
+    `;
+
+    const [result] = await db.query(sql, [
+      inicio,
+      fin,
+      id_detalle_servicio
+    ]);
+
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
+Citas.actualizarCita = async () => { };
+
+Citas.cambiarEstadoCita = async () => { };
+
+Citas.eliminarCita = async () => { };
+
+
+//convertidor de fecha a formato MySQL 'YYYY-MM-DD HH:mm:ss'
+function toMySQLDateTime(dateInput) {
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) throw new Error('Fecha inválida');
+  const pad = (n) => n.toString().padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
 Citas.buscarCitaPorFechaHoraEmpleado = async (fecha_hora_inicio, empleado_id) => {
   // Convertimos la fecha a la zona horaria de Ecuador
   const inicio = moment(fecha_hora_inicio).tz('America/Guayaquil');

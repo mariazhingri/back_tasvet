@@ -36,7 +36,7 @@ module.exports = {
 
     if (IdFormulario === 1) {
       AtencionVeterinaria = await FormularioModel.crearAtencionVeterinaria({
-        empleado_id: empleado,
+        empleado_id: empleado[0].id_empleado,
         temperatura: formulario.temperatura,
         peso: formulario.pesoKg,
         edad_meses: formulario.edadMeses,
@@ -71,7 +71,7 @@ module.exports = {
       });
     } else if (IdFormulario === 4) {
       carnetSpa = await FormularioModel.crearCarnetsSpa({
-        empleado_id: empleado.IdEmpleado,
+        empleado_id: empleado[0].id_empleado,
         peso_kg: formulario.pesoKg,
         edad_meses: formulario.edadMeses,
         corte_pelo: formulario.cortePelo,

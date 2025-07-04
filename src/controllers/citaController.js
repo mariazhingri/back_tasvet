@@ -122,6 +122,7 @@ module.exports = {
 
       // const cita = await getCitasByIdCita(idCita);
       const cita = await CitaService.obtenerCitasPorIdCita(idCita);
+      console.log('Cita obtenida por id_cita:', cita);
 
 
       res.status(200).json({
@@ -270,6 +271,68 @@ module.exports = {
       }
       );
     }
+  },
+
+  async reprogramarCita(req, res) {
+    console.log('Reprogramando múltiples citas...');
+    const { id_usuario, rol_descripcion } = req.user;
+    const citas = req.body;
+
+    if (!['Administrador', 'Auxiliar'].includes(rol_descripcion)) {
+      return res.status(403).json({
+        success: false,
+        message: 'No tienes permiso para reprogramar citas',
+      });
+    }
+
+    if (!Array.isArray(citas) || citas.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Se requiere una lista de citas para reprogramar',
+      });
+    }
+
+    try {
+      for (const cita of citas) {
+        const { idDetalleServicio, fechaHoraInicio, fechaHoraFin } = cita;
+
+        if (!idDetalleServicio || !fechaHoraInicio || !fechaHoraFin) {
+          return res.status(400).json({
+            success: false,
+            message: 'Datos incompletos para una de las citas',
+          });
+        }
+
+        const result = await CitaService.reprogramarCitas(
+          idDetalleServicio,
+          fechaHoraInicio,
+          fechaHoraFin,
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({
+            success: false,
+            message: `Cita con ID ${idDetalleServicio} no encontrada o no modificada`,
+          });
+        }
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Citas reprogramadas correctamente',
+      });
+
+    } catch (error) {
+      console.error('❌ Error al reprogramar citas:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
   }
+
+
+
 };
 

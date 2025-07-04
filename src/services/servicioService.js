@@ -1,6 +1,6 @@
 const Usuarios = require('../modelo/user_model');
 const Servicio = require('../modelo/servicios_model');
-
+const empleadoModel = require('../modelo/empleado_model');
 module.exports = {
   async obtenerServicios(id_usuario) {
     if (!id_usuario) {
@@ -195,14 +195,16 @@ module.exports = {
   },
 
   async agregarServicioaCita(params){
+    const user = params.reg_usuario;
 
-    // const userRol = await Usuarios.findUsuario({ id_usuario: user });
-    // if (userRol.rol_id !== 1 && userRol.rol_id !== 2) {
-    //   throw { status: 403, message: "Acción no permitida" };
-    // }
-    const eliminar = await Servicio.agregarServicioaCita({
+    const empleado = await empleadoModel.obtenerempleadoPorUsuario(user);
+
+    const eliminar = await Servicio.crearDetalleServicio({
       cita_id: params.IdCita,
       servicio_id: params.IdServicio,
+      empleado_id: empleado[0].id_empleado,
+      //fecha_hora_inicio: params.fechaHoraInicio,
+      fecha_hora_fin: params.fechaHoraFin,
       reg_usuario: params.reg_usuario
     })
 

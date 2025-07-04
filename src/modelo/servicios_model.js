@@ -139,7 +139,7 @@ Servicios.crearDetalleServicio = async (params) => {
       params.cita_id,
       params.servicio_id,
       params.empleado_id,
-      params.fecha_hora_inicio,
+      currentDate,
       params.fecha_hora_fin,
       'A',
       currentDate,
