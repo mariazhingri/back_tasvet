@@ -176,7 +176,7 @@ module.exports = {
 
 
   async cancelarCitas(id_cita, motivo, id_usuario) {
-    await CitaModel.cancelarCita(id_cita, motivo);
+    return await CitaModel.cancelarCita(id_cita, motivo);
   },
 
 
