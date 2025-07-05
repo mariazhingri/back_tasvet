@@ -2,7 +2,7 @@ const Usuarios = require("../modelo/user_model");
 const FormularioModel = require("../modelo/formularios_model");
 const ServiciosModel = require("../modelo/servicios_model");
 const empleados = require("../modelo/empleado_model");
-
+const CitaModel = require("../modelo/cita_model")
 module.exports = {
 
     async crearCarnets(params) {
@@ -112,6 +112,9 @@ module.exports = {
     fecha: new Date()
   });
 
+  await CitaModel.actualizarEstadoCita(formularios[0].IdCita);
+
+  
   
 
   return {
