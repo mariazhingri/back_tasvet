@@ -43,4 +43,10 @@ module.exports = (app) => {
     clienteController.obtenerDatosUsuario,
   );
 
+  app.get('/api/cliente/obtener/citas', verificarToken, clienteController.obtenerCitasCliente);
+  app.get('/api/cliente/obtener/citas/retrasadas', verificarToken, clienteController.obtenerCitasClienteRetradas);
+  app.get('/api/cliente/obtener/citas/canceladas', verificarToken, clienteController.obtenerCitasClienteCanceladas);
+
+
+
 };

@@ -200,4 +200,111 @@ module.exports = {
       });
     }
   },
+
+  async obtenerCitasCliente(req, res) {
+    try {
+      const id_usuario = req.user?.id_usuario;
+
+      if (!id_usuario) {
+        return res.status(401).json({
+          success: false,
+          message: "Usuario no autenticado",
+        });
+      }
+      console.log("ID del usuario para consultar citas de cliente:", id_usuario);
+
+      const citas = await clienteService.obtenerCitasDeCliente(id_usuario);
+
+      if (!citas || citas.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No se encontraron citas para el cliente",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: citas,
+      });
+    } catch (error) {
+      console.error("❌ Error en obtenerCitasCliente:", error.message);
+      return res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  },
+
+  async obtenerCitasClienteRetradas(req, res) {
+    try {
+      const id_usuario = req.user?.id_usuario;
+
+      if (!id_usuario) {
+        return res.status(401).json({
+          success: false,
+          message: "Usuario no autenticado",
+        });
+      }
+      console.log("ID del usuario para consultar citas de cliente:", id_usuario);
+
+      const citas = await clienteService.obtenerCitasDeClienteRetrasadas(id_usuario);
+
+      if (!citas || citas.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No se encontraron citas para el cliente",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: citas,
+      });
+    } catch (error) {
+      console.error("❌ Error en obtenerCitasCliente:", error.message);
+      return res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  },
+
+
+  async obtenerCitasClienteCanceladas(req, res) {
+    try {
+      const id_usuario = req.user?.id_usuario;
+
+      if (!id_usuario) {
+        return res.status(401).json({
+          success: false,
+          message: "Usuario no autenticado",
+        });
+      }
+      console.log("ID del usuario para consultar citas de cliente:", id_usuario);
+
+      const citas = await clienteService.obtenerCitasDeClienteCanceladas(id_usuario);
+
+      if (!citas || citas.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No se encontraron citas para el cliente",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: citas,
+      });
+    } catch (error) {
+      console.error("❌ Error en obtenerCitasCliente:", error.message);
+      return res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  }
+
+
+
 };
+

@@ -111,4 +111,70 @@ module.exports = {
       cliente_id: clienteActualizado,
     };
   },
+
+  async obtenerCitasDeCliente(id_usuario) {
+    try {
+      const rows = await ClienteModel.obtenerCitasCliente(id_usuario)
+      const parse = agruparCitas(rows);
+      return { success: true, data: parse };
+    } catch {
+      return {
+        success: false,
+        message: 'Error al convertir la citas',
+        error: error.message,
+      }
+    }
+  },
+
+  async obtenerCitasDeClienteRetrasadas(id_usuario) {
+    try {
+      const rows = await ClienteModel.obtenerCitasClienteRetradas(id_usuario)
+      const parse = agruparCitas(rows);
+      return { success: true, data: parse };
+    } catch {
+      return {
+        success: false,
+        message: 'Error al convertir la citas',
+        error: error.message,
+      }
+    }
+  },
+
+  async obtenerCitasDeClienteCanceladas(id_usuario) {
+    try {
+      const rows = await ClienteModel.obtenerCitasClienteCancelada(id_usuario)
+      const parse = agruparCitas(rows);
+      return { success: true, data: parse };
+    } catch {
+      return {
+        success: false,
+        message: 'Error al convertir la citas',
+        error: error.message,
+      }
+    }
+  }
+
+
 };
+
+const agruparCitas = (filas) => {
+  return filas.map(row => ({
+    id_cita: row.id_cita,
+    estado_cita: row.estado_cita,
+
+    id_mascota: row.id_mascota,
+    nombre_mascota: row.nombre_mascota,
+    especie: row.especie,
+    nombre_raza: row.nombre_raza,
+    fecha_nacimiento: row.fecha_nacimiento,
+
+    nombre: row.nombre,
+    apellido: row.apellido,
+    telefono: row.telefono_1,
+    direccion: row.direccion,
+
+    servicios: JSON.parse(`[${row.servicios}]`) // <- parseamos el string JSON en array
+  }));
+};
+
+
