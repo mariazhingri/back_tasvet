@@ -623,4 +623,19 @@ Citas.buscarCitaPendientePorMascota = async (params) => {
   }
 }
 
+Citas.actualizarEstadoCita = async(id_cita) => {
+  console.log("id cita llegando: ", id_cita)
+  try{
+    const sql = `
+      update citas
+        set estado_cita = ?
+      where id_cita = ?
+    `
+    const result = await db.query(sql,['Atendida',id_cita])
+    return result
+  }catch(err){
+    throw err
+  }
+}
+
 module.exports = Citas;
