@@ -106,6 +106,46 @@ module.exports = {
     }
   },
 
+  async crearMascotaPorCliente(req, res) {
+    console.log("Crear mascota por cliente");
+    try {
+      const usuario_creador = req.user?.id_usuario;
+      const body = req.body;
+
+      const params = {
+        ...body,
+        reg_usuario: usuario_creador,
+        act_usuario: usuario_creador,
+      };
+      //console.log("desde front: ",params)
+
+      console.log("params en crearMascotaPorCliente:", params);
+      const resultado =
+        await MascotaService.crearNuevaMascotaPorCliente(params, usuario_creador);
+
+      if (resultado.success) {
+        return res.status(200).json({
+          success: true,
+          message: "Mascota asignada correctamente al cliente.",
+          mascota_id: resultado.mascota_id,
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          message:
+            resultado.message || "No se pudo asignar la mascota al cliente.",
+        });
+      }
+    } catch (error) {
+      console.error("Error en MascotaController.asignarNuevaMascota:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error interno del servidor.",
+        error: error.message,
+      });
+    }
+  },
+
   async obtenerRazas(req, res) {
     try {
       const id_usuario = req.user?.id_usuario;

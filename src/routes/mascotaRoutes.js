@@ -41,6 +41,12 @@ module.exports = (app) => {
     mascotaController.asignarNuevaMascota,
   );
 
+  app.post(
+    "/mascota/crearPorCliente",
+    verificarToken,
+    mascotaController.crearMascotaPorCliente,
+  );
+
   app.put(
     "/mascota/actualizar",
     verificarToken,

@@ -99,8 +99,8 @@ Mascota.obtenerMascotaPorIdUsuario = async (id_usuario) => {
       return null;
     }
 
-    console.log("✅ Mascota obtenida:", rows[0]);
-    return rows[0];
+    console.log("✅ Mascota obtenida:", rows);
+    return rows;
   } catch (error) {
     console.error("❌ Error al obtener mascota:", error.message);
     throw new Error("Error al obtener la mascota por ID");
@@ -149,6 +149,64 @@ Mascota.crearMascota = async (params) => {
     throw err;
   }
 };
+
+Mascota.crearMascotaPorUsuario = async (params) => {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    // 1. Obtener el cliente_id a partir del id_usuario
+    const [clienteRows] = await connection.query(
+      `
+      SELECT cl.id_cliente
+      FROM usuarios u
+      JOIN personas p ON u.persona_id = p.id_persona
+      JOIN clientes cl ON cl.persona_id = p.id_persona
+      WHERE u.id_usuario = ?
+      `,
+      [params.id_usuario]
+    );
+
+    console.log("Cliente Rows:", clienteRows);
+
+    if (clienteRows.length === 0) throw new Error('Cliente no encontrado');
+
+    const cliente_id = clienteRows[0].id_cliente;
+    const currentDate = new Date();
+
+    // 2. Insertar la mascota
+    const [mascotaResult] = await connection.query(
+      `
+      INSERT INTO mascotas (
+        cliente_id, nombre_mascota, especie, raza_id,
+        fecha_nacimiento, sexo, peso_kg,
+        estado, reg_fecha, reg_usuario
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'A', ?, ?)
+      `,
+      [
+        cliente_id,
+        params.nombre_mascota,
+        params.especie,
+        params.raza_id,
+        params.fecha_nacimiento,
+        params.sexo,
+        params.peso_kg,
+        currentDate,
+        params.reg_usuario,
+      ]
+    );
+
+    await connection.commit();
+    console.log("Mascota creada con ID:", mascotaResult.insertId);
+    return mascotaResult.insertId;
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
+  }
+};
+
 
 Mascota.actualizarMascota = async (params) => {
   try {

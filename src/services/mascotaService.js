@@ -75,6 +75,47 @@ module.exports = {
     }
   },
 
+  async crearNuevaMascotaPorCliente(params, id_usuario) {
+    try {
+      // 1 Verificar existencia de mascota
+      const existentes = await MascotaModel.verificarExistenciaMascota(
+        params.nombre_mascota,
+        params.especie,
+        params.raza,
+      );
+
+      if (existentes.length > 0) {
+        throw new Error(
+          "Ya existe una mascota registrada con el mismo nombre, especie y raza.",
+        );
+      }
+
+      console.log("ID del usuario que crea la mascota:", id_usuario);
+      // 3. Crear nueva mascota
+      const mascotaId = await MascotaModel.crearMascotaPorUsuario({
+        id_usuario: id_usuario,
+        nombre_mascota: params.nombre_mascota,
+        especie: params.especie,
+        raza_id: params.raza,
+        fecha_nacimiento: params.fecha_nacimiento,
+        sexo: params.sexo,
+        peso_kg: params.peso_kg,
+        reg_usuario: params.reg_usuario,
+      });
+
+      return {
+        success: true,
+        mascota_id: mascotaId,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  },
+
+
   async actualizarMascota(params) {
     // Validar permisos
     if (params.act_usuario !== 1 && params.act_usuario !== 2) {
