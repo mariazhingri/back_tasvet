@@ -12,7 +12,11 @@ module.exports = (app) => {
     verificarToken,
     formularioController.obtenerVacunas,
   );
-
+  app.get(
+    "/api/obtener/antiparasitario",
+    verificarToken,
+    formularioController.obtenerAntiparasitarios,
+  );
   app.post(
     "/api/carnets/crear",
     verificarToken,

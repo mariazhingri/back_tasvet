@@ -450,8 +450,6 @@ Citas.getCitasByRangoIdEmpleado = async (fechaInicio, fechaFin, idEmpleado) => {
   }
 };
 
-
-
 Citas.crearCita = async (params) => {
   try {
     const currentDate = new Date();

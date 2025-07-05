@@ -9,6 +9,7 @@ Auxiliar.obtenerCitaAuxiliar = async () => {
       SELECT 
         c.id_cita AS idCita,
         c.estado_cita AS estadoCita,
+        m.id_mascota as idMascota,
         m.nombre_mascota AS nombreMascota,
         m.especie,
         r.nombre_raza AS raza,

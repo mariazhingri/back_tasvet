@@ -257,5 +257,18 @@ module.exports = {
     }
   },
 
+  async obtenerCitasPorIdCita(id_cita) {
+    try {
+      const filas = await CitaModel.getCitasByIdCita(id_cita);
+      const agrupadas = objetoCita(filas);
+      return { success: true, data: agrupadas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
+  },
 
 };

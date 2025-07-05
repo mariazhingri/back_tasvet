@@ -1,6 +1,7 @@
 const Usuarios = require("../modelo/user_model");
 const FormularioModel = require("../modelo/formularios_model");
 const ServiciosModel = require("../modelo/servicios_model");
+const empleados = require("../modelo/empleado_model");
 
 module.exports = {
 
@@ -13,10 +14,11 @@ module.exports = {
   }
 
   const userRol = await Usuarios.findUsuario({ id_usuario: user });
-  if (userRol.rol_id !== 1 && userRol.rol_id !== 2) {
+  if (userRol.rol_id !== 1 && userRol.rol_id !== 2 && userRol.rol_id !== 4) {
     throw { status: 403, message: "Acción no permitida" };
   }
-
+  const empleado = await empleados.obtenerempleadoPorUsuario( user );
+  console.log("empleado: ", empleado);
   const formulariosHabilitados = await ServiciosModel.obtenerFomularios();
   const disponibles = formulariosHabilitados.map(f => f.formulario);
 
@@ -34,7 +36,7 @@ module.exports = {
 
     if (IdFormulario === 1) {
       AtencionVeterinaria = await FormularioModel.crearAtencionVeterinaria({
-        empleado_id: formulario.IdEmpleado,
+        empleado_id: empleado[0].id_empleado,
         temperatura: formulario.temperatura,
         peso: formulario.pesoKg,
         edad_meses: formulario.edadMeses,
@@ -47,7 +49,7 @@ module.exports = {
       });
     } else if (IdFormulario === 2) {
       formularioVacuna = await FormularioModel.crearCarnetVacuna({
-        empleado_id: formulario.IdEmpleado,
+        empleado_id: empleado[0].id_empleado,
         vacuna_id: formulario.IdVacuna,
         fecha_aplicacion: formulario.fechaAplicacion,
         peso_kg: formulario.pesoKg,
@@ -58,7 +60,7 @@ module.exports = {
       });
     } else if (IdFormulario === 3) {
       carnetDesparasitacion = await FormularioModel.crearCarnetDesparacitacion({
-        empleado_id: formulario.IdEmpleado,
+        empleado_id: empleado[0].id_empleado,
         antiparasitario_id: formulario.IdAntiparasitario,
         fecha_aplicacion: formulario.fechaAplicacion,
         peso_kg: formulario.pesoKg,
@@ -69,7 +71,7 @@ module.exports = {
       });
     } else if (IdFormulario === 4) {
       carnetSpa = await FormularioModel.crearCarnetsSpa({
-        empleado_id: formulario.IdEmpleado,
+        empleado_id: empleado[0].id_empleado,
         peso_kg: formulario.pesoKg,
         edad_meses: formulario.edadMeses,
         corte_pelo: formulario.cortePelo,
@@ -107,7 +109,7 @@ module.exports = {
     evento_clinico_id: eventoClinico,
     numero_historia_clinica: siguienteNumero,
     antecedentes_veterinarios_id: formularios[0].AntecedentesVeterinarios || null,
-    fecha: formularios[0].fecha,
+    fecha: new Date()
   });
 
   
