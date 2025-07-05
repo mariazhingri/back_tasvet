@@ -155,6 +155,44 @@ module.exports = {
     }
   },
 
+  async obtenerMascotaPorIdUsuario(req, res) {
+    console.log("Obtener mascota por id de usuario");
+    try {
+
+      const id_usuario = req.user?.id_usuario;
+      console.log("Id de usuario recibido:", id_usuario);
+
+      if (!id_usuario) {
+        return res.status(400).json({
+          success: false,
+          message: "Id de usuario no proporcionada",
+        });
+      }
+      const mascota = await MascotaModal.obtenerMascotaPorIdUsuario(id_usuario);
+
+      if (!mascota || mascota.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Mascota no encontrada",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: mascota,
+        message: "Mascota obtenida correctamente",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+        error: error.message,
+      });
+    }
+  },
+
+
   async eliminarMascota(req, res) {
     try {
       const id_usuario = req.user?.id_usuario;

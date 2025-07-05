@@ -30,6 +30,12 @@ module.exports = (app) => {
   );
 
   app.post(
+    "/mascota/obtener/byIdUsuario",
+    verificarToken,
+    mascotaController.obtenerMascotaPorIdUsuario,
+  );
+
+  app.post(
     "/mascota/asignar_nueva_mascota",
     verificarToken,
     mascotaController.asignarNuevaMascota,

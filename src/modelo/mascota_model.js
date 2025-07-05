@@ -61,6 +61,53 @@ Mascota.obtenerMascotaPorId = async (idMascota) => {
   }
 };
 
+
+Mascota.obtenerMascotaPorIdUsuario = async (id_usuario) => {
+  if (!id_usuario || isNaN(Number(id_usuario))) {
+    throw new Error("ID de usuario inválido");
+  }
+
+  try {
+    const sql = `
+        SELECT 
+          m.id_mascota,
+          m.nombre_mascota,
+          m.especie,
+          m.fecha_nacimiento,
+          r.nombre_raza,
+          cl.direccion,
+          p.nombre,
+          p.apellido,
+          p.telefono_1
+        FROM usuarios u
+        JOIN personas p ON u.persona_id = p.id_persona
+        JOIN clientes cl ON cl.persona_id = p.id_persona
+        JOIN mascotas m ON m.cliente_id = cl.id_cliente
+        JOIN razas r ON m.raza_id = r.id_raza
+        WHERE 
+          u.id_usuario = ? AND
+          p.estado = 'A' AND
+          cl.estado = 'A' AND
+          m.estado = 'A' AND
+          r.estado = 'A';
+            `;
+
+    const [rows] = await db.query(sql, [id_usuario]);
+
+    if (rows.length === 0) {
+      console.warn(`⚠️ No se encontró mascota con ID usuario ${id_usuario}`);
+      return null;
+    }
+
+    console.log("✅ Mascota obtenida:", rows[0]);
+    return rows[0];
+  } catch (error) {
+    console.error("❌ Error al obtener mascota:", error.message);
+    throw new Error("Error al obtener la mascota por ID");
+  }
+};
+
+
 Mascota.obtenerRazas = async () => {
   try {
     const sql = `
