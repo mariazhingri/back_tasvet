@@ -83,6 +83,21 @@ Usuarios.createUser = async (datosUsuario) => {
       personaId = personaResult.insertId;
     }
 
+    // 2. Insertar cliente
+    if (personaId) {
+      await connection.query(
+        `INSERT INTO clientes (persona_id, direccion, estado, reg_fecha, reg_usuario)
+         VALUES (?, ?, ?, ?, ?)`,
+        [
+          personaId,
+          datosUsuario.direccion,
+          "A",
+          currentDate,
+          datosUsuario.reg_usuario,
+        ],
+      );
+    }
+
     // Insertar en la tabla usuarios
     const [usuarioResult] = await connection.query(
       `INSERT INTO usuarios (persona_id, clave, rol_id, estado, reg_fecha, reg_usuario) 
