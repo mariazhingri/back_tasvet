@@ -41,10 +41,10 @@ module.exports = {
   },
 
 
-//------Graficas ------
+  //------Graficas ------
   async obtenerTotalCitasAtendidasPorMes(anio) {
     const CitasPorEmpelados = await EmpleadoModel.obtenerTotalCitasAtendidasPorMes(anio);
-    console.log("Citas por empleados:", CitasPorEmpelados); 
+    console.log("Citas por empleados:", CitasPorEmpelados);
     // Agrupar por empleado
     const resultado = {};
 
@@ -64,4 +64,100 @@ module.exports = {
     return resultado;
   },
 
+
+  //--------SOLO PARA VETERINARIOS-------------
+
+  async obtenerCitas(id_usuario) {
+    try {
+      const filas = await EmpleadoModel.obtenerCitas(id_usuario);
+      const agrupadas = agruparCitas(filas);
+      return { success: true, data: agrupadas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
+  },
+
+  async obtenerCitasRetrasadasVet(id_usuario) {
+    try {
+      const filas = await EmpleadoModel.obtenerCitasRetrasadas(id_usuario);
+      const agrupadas = agruparCitas(filas);
+      return { success: true, data: agrupadas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
+  },
+
+  async obtenerCitasCanceladasVet(id_usuario) {
+    try {
+      const filas = await EmpleadoModel.obtenerCitasCanceladas(id_usuario);
+      const agrupadas = agruparCitas(filas);
+      return { success: true, data: agrupadas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
+  },
+
+  async obtenerCitasAtendidaVet(id_usuario) {
+    try {
+      const filas = await EmpleadoModel.obtenerCitasAtendidas(id_usuario);
+      const agrupadas = agruparCitas(filas);
+      return { success: true, data: agrupadas };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al obtener citas por fecha',
+        error: error.message,
+      };
+    }
+  },
+
 }
+
+const agruparCitas = (filas) => {
+  return filas.map(row => ({
+    id_cita: row.id_cita,
+    estado_cita: row.estado_cita,
+
+    id_mascota: row.id_mascota,
+    nombre_mascota: row.nombre_mascota,
+    especie: row.especie,
+    nombre_raza: row.nombre_raza,
+    fecha_nacimiento: row.fecha_nacimiento,
+
+    nombre: row.nombre,
+    apellido: row.apellido,
+    telefono: row.telefono_1,
+    direccion: row.direccion,
+
+    servicios: JSON.parse(`[${row.servicios}]`) // <- parseamos el string JSON en array
+  }));
+};
+
+const objetoCita = (row) => ({
+  id_cita: row.id_cita,
+  estado_cita: row.estado_cita,
+  id_mascota: row.id_mascota,
+  nombre_mascota: row.nombre_mascota,
+  especie: row.especie,
+  nombre_raza: row.nombre_raza,
+  fecha_nacimiento: row.fecha_nacimiento,
+  nombre: row.nombre,
+  apellido: row.apellido,
+  telefono: row.telefono_1,
+  direccion: row.direccion,
+  servicios: JSON.parse(`[${row.servicios}]`),
+});
+
+
