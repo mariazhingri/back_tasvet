@@ -214,6 +214,358 @@ empleados.obtenerTotalCitasAtendidasPorMes = async (anio) => {
 //   }
 // };
 
+//-----------CONSULTAS CITAS DEL VETERINARIO----------------
+empleados.obtenerCitas = async (id_usuario) => {
+  try {
+    const sql = `
+      SELECT 
+        c.id_cita, 
+        c.estado_cita,
+        m.id_mascota,
+        m.nombre_mascota,
+        m.especie,
+        m.fecha_nacimiento,
+        r.nombre_raza,
+        p.nombre,
+        p.apellido,
+        p.telefono_1,
+        cl.direccion,
+        GROUP_CONCAT(
+          DISTINCT CONCAT(
+            '{',
+            '"id_servicio":', servicio_info.id_servicio, ',',
+            '"descripcion":"', servicio_info.descripcion, '",',
+            '"formulario":"', servicio_info.formulario, '",',
+            '"fecha_hora_inicio":"', servicio_info.fecha_hora_inicio, '",',
+            '"empleados":[', servicio_info.empleados_json, ']',
+            '}'
+          ) SEPARATOR ','
+        ) AS servicios
+      
+      FROM usuarios u
+      JOIN personas pers ON u.persona_id = pers.id_persona
+      JOIN empleados emp ON emp.persona_id = pers.id_persona
+      JOIN detalle_servicios ds ON ds.empleado_id = emp.id_empleado
+      JOIN citas c ON ds.cita_id = c.id_cita
+      JOIN clientes cl ON c.cliente_id = cl.id_cliente
+      JOIN personas p ON cl.persona_id = p.id_persona
+      JOIN mascotas m ON c.mascota_id = m.id_mascota
+      JOIN razas r ON m.raza_id = r.id_raza
+      
+      -- Subconsulta para agrupar empleados por servicio y cita
+      INNER JOIN (
+        SELECT 
+          ds.cita_id,
+          s.id_servicio,
+          s.descripcion,
+          s.formulario,
+          ds.fecha_hora_inicio,
+          GROUP_CONCAT(
+            DISTINCT CONCAT(
+              '{',
+              '"id_empleado":', ds.empleado_id, ',',
+              '"id_detalle_servicio":', ds.id_detalle_servicio, ',',
+              '"nombre_empleado":"', pe.nombre, ' ', pe.apellido, '",',
+              '"telefono_empleado":"', pe.telefono_1, '",',
+              '"cargo":"', e.cargo, '"',
+              '}'
+            ) SEPARATOR ','
+          ) AS empleados_json
+        FROM detalle_servicios ds
+        JOIN servicios s ON ds.servicio_id = s.id_servicio
+        JOIN empleados e ON ds.empleado_id = e.id_empleado
+        JOIN personas pe ON e.persona_id = pe.id_persona
+        WHERE 
+          e.estado = 'A' AND
+          pe.estado = 'A' AND
+          ds.estado = 'A'
+        GROUP BY ds.cita_id, s.id_servicio, s.descripcion, s.formulario, ds.fecha_hora_inicio
+      ) AS servicio_info ON c.id_cita = servicio_info.cita_id
+      
+      WHERE 
+        u.id_usuario = ? AND
+        c.estado_cita = 'Pendiente' AND
+        cl.estado = 'A' AND
+        p.estado = 'A' AND
+        m.estado = 'A' AND
+        r.estado = 'A'
+      
+      GROUP BY c.id_cita;
+    `;
+
+    const [rows] = await db.query(sql, [id_usuario]);
+    console.log('Citas obtenidas pendientes:', rows);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+empleados.obtenerCitasRetrasadas = async (id_usuario) => {
+  try {
+    const sql = `
+      SELECT 
+        c.id_cita, 
+        c.estado_cita,
+        m.id_mascota,
+        m.nombre_mascota,
+        m.especie,
+        m.fecha_nacimiento,
+        r.nombre_raza,
+        p.nombre,
+        p.apellido,
+        p.telefono_1,
+        cl.direccion,
+        GROUP_CONCAT(
+          DISTINCT CONCAT(
+            '{',
+            '"id_servicio":', servicio_info.id_servicio, ',',
+            '"descripcion":"', servicio_info.descripcion, '",',
+            '"formulario":"', servicio_info.formulario, '",',
+            '"fecha_hora_inicio":"', servicio_info.fecha_hora_inicio, '",',
+            '"empleados":[', servicio_info.empleados_json, ']',
+            '}'
+          ) SEPARATOR ','
+        ) AS servicios
+      
+      FROM usuarios u
+      JOIN personas pers ON u.persona_id = pers.id_persona
+      JOIN empleados emp ON emp.persona_id = pers.id_persona
+      JOIN detalle_servicios ds ON ds.empleado_id = emp.id_empleado
+      JOIN citas c ON ds.cita_id = c.id_cita
+      JOIN clientes cl ON c.cliente_id = cl.id_cliente
+      JOIN personas p ON cl.persona_id = p.id_persona
+      JOIN mascotas m ON c.mascota_id = m.id_mascota
+      JOIN razas r ON m.raza_id = r.id_raza
+      
+      -- Subconsulta para agrupar empleados por servicio y cita
+      INNER JOIN (
+        SELECT 
+          ds.cita_id,
+          s.id_servicio,
+          s.descripcion,
+          s.formulario,
+          ds.fecha_hora_inicio,
+          GROUP_CONCAT(
+            DISTINCT CONCAT(
+              '{',
+              '"id_empleado":', ds.empleado_id, ',',
+              '"id_detalle_servicio":', ds.id_detalle_servicio, ',',
+              '"nombre_empleado":"', pe.nombre, ' ', pe.apellido, '",',
+              '"telefono_empleado":"', pe.telefono_1, '",',
+              '"cargo":"', e.cargo, '"',
+              '}'
+            ) SEPARATOR ','
+          ) AS empleados_json
+        FROM detalle_servicios ds
+        JOIN servicios s ON ds.servicio_id = s.id_servicio
+        JOIN empleados e ON ds.empleado_id = e.id_empleado
+        JOIN personas pe ON e.persona_id = pe.id_persona
+        WHERE 
+          e.estado = 'A' AND
+          pe.estado = 'A' AND
+          ds.estado = 'A'
+        GROUP BY ds.cita_id, s.id_servicio, s.descripcion, s.formulario, ds.fecha_hora_inicio
+      ) AS servicio_info ON c.id_cita = servicio_info.cita_id
+      
+      WHERE 
+        u.id_usuario = ? AND
+        c.estado_cita = 'Retrasada' AND
+        cl.estado = 'A' AND
+        p.estado = 'A' AND
+        m.estado = 'A' AND
+        r.estado = 'A'
+      
+      GROUP BY c.id_cita;
+    `;
+
+    const [rows] = await db.query(sql, [id_usuario]);
+    console.log('Citas obtenidas retrasada:', rows);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+
+};
+
+
+empleados.obtenerCitasCanceladas = async (id_usuario) => {
+  try {
+    const sql = `
+      SELECT 
+        c.id_cita, 
+        c.estado_cita,
+        m.id_mascota,
+        m.nombre_mascota,
+        m.especie,
+        m.fecha_nacimiento,
+        r.nombre_raza,
+        p.nombre,
+        p.apellido,
+        p.telefono_1,
+        cl.direccion,
+        GROUP_CONCAT(
+          DISTINCT CONCAT(
+            '{',
+            '"id_servicio":', servicio_info.id_servicio, ',',
+            '"descripcion":"', servicio_info.descripcion, '",',
+            '"formulario":"', servicio_info.formulario, '",',
+            '"fecha_hora_inicio":"', servicio_info.fecha_hora_inicio, '",',
+            '"empleados":[', servicio_info.empleados_json, ']',
+            '}'
+          ) SEPARATOR ','
+        ) AS servicios
+      
+      FROM usuarios u
+      JOIN personas pers ON u.persona_id = pers.id_persona
+      JOIN empleados emp ON emp.persona_id = pers.id_persona
+      JOIN detalle_servicios ds ON ds.empleado_id = emp.id_empleado
+      JOIN citas c ON ds.cita_id = c.id_cita
+      JOIN clientes cl ON c.cliente_id = cl.id_cliente
+      JOIN personas p ON cl.persona_id = p.id_persona
+      JOIN mascotas m ON c.mascota_id = m.id_mascota
+      JOIN razas r ON m.raza_id = r.id_raza
+      
+      -- Subconsulta para agrupar empleados por servicio y cita
+      INNER JOIN (
+        SELECT 
+          ds.cita_id,
+          s.id_servicio,
+          s.descripcion,
+          s.formulario,
+          ds.fecha_hora_inicio,
+          GROUP_CONCAT(
+            DISTINCT CONCAT(
+              '{',
+              '"id_empleado":', ds.empleado_id, ',',
+              '"id_detalle_servicio":', ds.id_detalle_servicio, ',',
+              '"nombre_empleado":"', pe.nombre, ' ', pe.apellido, '",',
+              '"telefono_empleado":"', pe.telefono_1, '",',
+              '"cargo":"', e.cargo, '"',
+              '}'
+            ) SEPARATOR ','
+          ) AS empleados_json
+        FROM detalle_servicios ds
+        JOIN servicios s ON ds.servicio_id = s.id_servicio
+        JOIN empleados e ON ds.empleado_id = e.id_empleado
+        JOIN personas pe ON e.persona_id = pe.id_persona
+        WHERE 
+          e.estado = 'A' AND
+          pe.estado = 'A' AND
+          ds.estado = 'A'
+        GROUP BY ds.cita_id, s.id_servicio, s.descripcion, s.formulario, ds.fecha_hora_inicio
+      ) AS servicio_info ON c.id_cita = servicio_info.cita_id
+      
+      WHERE 
+        u.id_usuario = ? AND
+        c.estado_cita = 'Cancelada' AND
+        cl.estado = 'A' AND
+        p.estado = 'A' AND
+        m.estado = 'A' AND
+        r.estado = 'A'
+      
+      GROUP BY c.id_cita;
+    `;
+
+    const [rows] = await db.query(sql, [id_usuario]);
+    console.log('Citas obtenidas retrasada:', rows);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+
+};
+
+
+empleados.obtenerCitasAtendidas = async (id_usuario) => {
+  try {
+    const sql = `
+      SELECT 
+        c.id_cita, 
+        c.estado_cita,
+        m.id_mascota,
+        m.nombre_mascota,
+        m.especie,
+        m.fecha_nacimiento,
+        r.nombre_raza,
+        p.nombre,
+        p.apellido,
+        p.telefono_1,
+        cl.direccion,
+        GROUP_CONCAT(
+          DISTINCT CONCAT(
+            '{',
+            '"id_servicio":', servicio_info.id_servicio, ',',
+            '"descripcion":"', servicio_info.descripcion, '",',
+            '"formulario":"', servicio_info.formulario, '",',
+            '"fecha_hora_inicio":"', servicio_info.fecha_hora_inicio, '",',
+            '"empleados":[', servicio_info.empleados_json, ']',
+            '}'
+          ) SEPARATOR ','
+        ) AS servicios
+      
+      FROM usuarios u
+      JOIN personas pers ON u.persona_id = pers.id_persona
+      JOIN empleados emp ON emp.persona_id = pers.id_persona
+      JOIN detalle_servicios ds ON ds.empleado_id = emp.id_empleado
+      JOIN citas c ON ds.cita_id = c.id_cita
+      JOIN clientes cl ON c.cliente_id = cl.id_cliente
+      JOIN personas p ON cl.persona_id = p.id_persona
+      JOIN mascotas m ON c.mascota_id = m.id_mascota
+      JOIN razas r ON m.raza_id = r.id_raza
+      
+      -- Subconsulta para agrupar empleados por servicio y cita
+      INNER JOIN (
+        SELECT 
+          ds.cita_id,
+          s.id_servicio,
+          s.descripcion,
+          s.formulario,
+          ds.fecha_hora_inicio,
+          GROUP_CONCAT(
+            DISTINCT CONCAT(
+              '{',
+              '"id_empleado":', ds.empleado_id, ',',
+              '"id_detalle_servicio":', ds.id_detalle_servicio, ',',
+              '"nombre_empleado":"', pe.nombre, ' ', pe.apellido, '",',
+              '"telefono_empleado":"', pe.telefono_1, '",',
+              '"cargo":"', e.cargo, '"',
+              '}'
+            ) SEPARATOR ','
+          ) AS empleados_json
+        FROM detalle_servicios ds
+        JOIN servicios s ON ds.servicio_id = s.id_servicio
+        JOIN empleados e ON ds.empleado_id = e.id_empleado
+        JOIN personas pe ON e.persona_id = pe.id_persona
+        WHERE 
+          e.estado = 'A' AND
+          pe.estado = 'A' AND
+          ds.estado = 'A'
+        GROUP BY ds.cita_id, s.id_servicio, s.descripcion, s.formulario, ds.fecha_hora_inicio
+      ) AS servicio_info ON c.id_cita = servicio_info.cita_id
+      
+      WHERE 
+        u.id_usuario = ? AND
+        c.estado_cita = 'Atendida' AND
+        cl.estado = 'A' AND
+        p.estado = 'A' AND
+        m.estado = 'A' AND
+        r.estado = 'A'
+      
+      GROUP BY c.id_cita;
+    `;
+
+    const [rows] = await db.query(sql, [id_usuario]);
+    console.log('Citas obtenidas retrasada:', rows);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+
+
+};
+
 
 
 module.exports = empleados;

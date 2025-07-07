@@ -1,5 +1,5 @@
 const EmpleadoServices = require("../services/empleadoServices");
-const EmpleadoModel = require ("../modelo/empleado_model");
+const EmpleadoModel = require("../modelo/empleado_model");
 module.exports = {
   async obtenerCitasPorEmpleados(req, res) {
     console.log("Iniciando obtenerCitasPorEmpleados");
@@ -88,23 +88,111 @@ module.exports = {
       res.status(500).json({ success: false, message: "Error interno del servidor" });
     }
   },
-//-------GRAFICAS --------
-async obtenerTotalCitasAtendidasPorMes(req, res) {
-  try {
-    const id_usuario = req.user?.id_usuario;
-    const { anio } = req.params;
-    const Empleados = await EmpleadoServices.obtenerTotalCitasAtendidasPorMes(anio);
-    return res.status(200).json({
-      success: true,
-      data: Empleados,
-    });
-  } catch (error) {
-    console.error('Error al obtener los Empleados más solicitados:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message,
-    });
-  }
-},
+  //-------GRAFICAS --------
+  async obtenerTotalCitasAtendidasPorMes(req, res) {
+    try {
+      const id_usuario = req.user?.id_usuario;
+      const { anio } = req.params;
+      const Empleados = await EmpleadoServices.obtenerTotalCitasAtendidasPorMes(anio);
+      return res.status(200).json({
+        success: true,
+        data: Empleados,
+      });
+    } catch (error) {
+      console.error('Error al obtener los Empleados más solicitados:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  //----------SOLO PARA VETERINARIOS----------------
+
+  async obtenerCitas(req, res) {
+    try {
+      id_usuario = req.user?.id_usuario;
+
+      console.log('Obteniendo citas para el veterinario', id_usuario);
+      const citas = await EmpleadoServices.obtenerCitas(id_usuario);
+
+      res.status(200).json({
+        success: true,
+        data: citas,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  async obtenerCitasRetrasadas(req, res) {
+    try {
+      console.log('Obteniendo citas retrasadas');
+      id_usuario = req.user?.id_usuario;
+
+      const citas = await EmpleadoServices.obtenerCitasRetrasadasVet(id_usuario);
+
+      res.status(200).json({
+        success: true,
+        data: citas,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  async obtenerCitasCanceladas(req, res) {
+    try {
+      let id_usuario = req.user?.id_usuario;
+
+      // const citas = await getCitasCanceladas(id_usuario);
+      const citas = await EmpleadoServices.obtenerCitasCanceladasVet(id_usuario);
+
+      res.status(200).json({
+        success: true,
+        data: citas,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  async obtenerCitasAtendidas(req, res) {
+    try {
+      let id_usuario = req.user?.id_usuario;
+
+      // const citas = await getCitasCanceladas(id_usuario);
+      const citas = await EmpleadoServices.obtenerCitasAtendidaVet(id_usuario);
+
+      res.status(200).json({
+        success: true,
+        data: citas,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+
 }

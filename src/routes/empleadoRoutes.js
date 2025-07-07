@@ -35,4 +35,10 @@ module.exports = (app) => {
     empleadoController.obtenerTotalCitasAtendidasPorMes,
   );
 
+  // -----------CONSULTA de citas solo para el veterinario-------------------
+  app.get('/api/veterinario/obtener/pendientes', verificarToken, empleadoController.obtenerCitas);
+  app.get('/api/veterinario/obtener/retrasadas', verificarToken, empleadoController.obtenerCitasRetrasadas);
+  app.get('/api/veterinario/obtener/canceladas', verificarToken, empleadoController.obtenerCitasCanceladas);
+  app.get('/api/veterinario/obtener/atendidas', verificarToken, empleadoController.obtenerCitasAtendidas);
+
 }
