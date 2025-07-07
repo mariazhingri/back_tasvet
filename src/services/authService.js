@@ -209,6 +209,6 @@ async verificarCorreoYSolicitarCodigo(correo) {
     success: true,
     codigo,
   };
-}
+},
 
 };

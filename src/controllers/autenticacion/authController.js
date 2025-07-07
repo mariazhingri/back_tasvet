@@ -348,7 +348,7 @@ module.exports = {
           message: result.message,
         });
       }
-      res.status(201).json({
+      res.status(200).json({
         success: true,
         message: "Clave cambia da con exito",
         // Si quieres, puedes enviar también el código aquí:
