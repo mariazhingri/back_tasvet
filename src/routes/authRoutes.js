@@ -10,11 +10,13 @@ module.exports = (app) => {
   app.post("/api/users/registrar/auxiliar", usersController.registerAuxiliar);
   app.post("/api/users/registrar/veterinario", usersController.registerVeterinario);
 
-
+  app.post("/api/users/cambia_Clave", usersController.cambiarClave)
 
   app.put("/api/users/actualizar", usersController.updateUserController);
 
   app.get("/api/users/obtener_cedula/:cedula", usersController.VerificarCedula);
 
   app.delete("/api/users/eliminar", verificarToken, usersController.DeleteUser);
+
+  app.post("/api/users/verificarCorreo_SolicitarCodigo", usersController.verificarCorreoYSolicitarCodigo)
 };

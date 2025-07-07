@@ -4,17 +4,18 @@ const key = require("../config/key");
 const User = require("../modelo/user_model");
 const { enviarCodigoVerificacion } = require("./mailSend");
 const { guardarCodigo } = require("../modelo/CodigoVerificacionModel");
-const { verificarCodigoDB } = require("../modelo/CodigoVerificacionModel");
 const { updateClientPet } = require("./clienteService");
+const { CodigoVerificacion } = require("../modelo/CodigoVerificacionModel")
+
 require("dotenv").config();
 
 module.exports = {
   async login({ correo, clave }) {
     const user = await User.findUsuario({ correo });
 
-    if (!user) {
-      throw { status: 404, message: "Usuario no encontrado" };
-    }
+  if (!user) {
+    return { success: false, message: "Correo y/o contraseña incorrectos" };
+  }
 
     let isvalid;
     if (user.clave.startsWith("$2b$") || user.clave.startsWith("$2a$")) {
@@ -24,7 +25,7 @@ module.exports = {
     }
 
     if (!isvalid) {
-      throw { status: 401, message: "Acceso no autorizado" };
+      return { success: false, message: "Correo y/o contraseña incorrectos" };
     }
 
     const token = jwt.sign(
@@ -37,6 +38,7 @@ module.exports = {
     );
 
     return {
+      success: true,
       user: correo,
       token: `JWT ${token}`,
     };
@@ -164,5 +166,49 @@ module.exports = {
 
     return nuevaPersonawithusuario;
   },
+
+async cambiarClave(params) {
+  console.log("cambiar clave service: ", params);
+
+   if (!params.clave || !params.correo) {
+     return {
+       success: false,
+       message: "Faltan datos obligatorios",
+     };
+   }
+
+  const salt = bcrypt.genSaltSync(10);
+  const claveEncriptada = bcrypt.hashSync(params.clave, salt);
+
+  const nuevaClave = await User.cambiarClave({
+    correo: params.correo,
+    clave: claveEncriptada,
+  });
+
+  return {
+    success: true,
+    message: 'Cambio de clave exitoso',
+    data: nuevaClave,
+  };
+},
+
+async verificarCorreoYSolicitarCodigo(correo) {
+  const user = await User.findUsuario({ correo });
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Correo no encontrado",
+    };
+  }
+
+  const codigo = await enviarCodigoVerificacion(correo);
+  // Guardar en la base de datos
+  await guardarCodigo(correo, codigo);
+  return {
+    success: true,
+    codigo,
+  };
+}
 
 };

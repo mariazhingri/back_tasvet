@@ -374,4 +374,22 @@ Usuarios.createUserVeterinario = async (datosUsuario) => {
   }
 };
 
+// -------RECUPERAR CLAVE--------------
+
+Usuarios.cambiarClave = async (params) => {
+  console.log("cambiar clave modelo: ", params);
+  try {
+    const sql = `
+        UPDATE usuarios u
+        JOIN personas p ON u.persona_id = p.id_persona
+        SET u.clave = ?
+        WHERE p.correo = ?;
+    `;
+    const [result] = await db.query(sql, [params.clave, params.correo]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = Usuarios;

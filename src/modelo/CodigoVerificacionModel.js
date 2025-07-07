@@ -12,6 +12,12 @@ CodigoVerificacion.guardarCodigo = async (correo, codigo) => {
   db.execute(sql, [correo, codigo, expiracion]);
 };
 
+// esta funcion verifica si el codigo ya expiro
+//lo que hace es ver:
+// Que el correo coincida,
+// Que el código sea el correcto,
+// Que aún esté dentro del tiempo de expiración, y
+// Que no se haya usado antes.
 CodigoVerificacion.verificarCodigoDB = async (correo, codigo) => {
   console.log("Verificando código para:", correo, "con código:", codigo);
 
@@ -21,6 +27,7 @@ CodigoVerificacion.verificarCodigoDB = async (correo, codigo) => {
         ORDER BY id DESC LIMIT 1
     `;
   const [result] = await db.execute(sql, [correo, codigo]);
+  console.log("codigo validado: ", result)
 
   if (result.length > 0) {
     // Marcar el código como usado

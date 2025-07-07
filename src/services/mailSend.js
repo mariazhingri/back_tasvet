@@ -18,6 +18,7 @@ function generarCodigo() {
 }
 
 async function enviarCodigoVerificacion(correo) {
+  console.log("correo al que se le va a generar codigo: ", correo)
   const codigo = generarCodigo();
 
   const mailOptions = {
