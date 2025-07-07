@@ -96,7 +96,7 @@ module.exports = {
         id_usuario: id_usuario,
         nombre_mascota: params.nombre_mascota,
         especie: params.especie,
-        raza_id: params.raza,
+        raza_id: params.raza_id,
         fecha_nacimiento: params.fecha_nacimiento,
         sexo: params.sexo,
         peso_kg: params.peso_kg,

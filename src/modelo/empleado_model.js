@@ -103,7 +103,6 @@ empleados.obtenerCitasPorRangoFecha = async (id_usuario, fechaInicio, fechaFin) 
         m.nombre_mascota AS mascotaNombre,
         m.especie AS mascotaEspecie,
         r.nombre_raza AS mascotaRaza,
-        c.fecha_hora_inicio AS citaFecha,
         CONCAT(cli_persona.nombre, ' ', cli_persona.apellido) AS clienteNombre,
         cli_persona.telefono_1 AS clienteContacto,
         NULL AS clienteDireccion, -- no existe campo direccion en personas
