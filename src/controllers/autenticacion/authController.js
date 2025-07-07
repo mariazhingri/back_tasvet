@@ -15,6 +15,11 @@ module.exports = {
     console.log('🔍 Datos de login recibidos:', req.body);
     try {
       const result = await authService.login(req.body);
+       // Verifica si el login fue exitoso
+        if (!result.success) {
+            return res.status(401).json(result); // Devuelve un estado 401 para errores de autenticación
+        }
+
       return res.status(200).json({
         message: 'Login exitoso',
         ...result
@@ -201,6 +206,7 @@ module.exports = {
 
   async verificarCodigo(req, res) {
     const { correo, codigo } = req.body;
+    console
 
     try {
       const valido = await verificarCodigoDB(correo, codigo);
@@ -208,12 +214,12 @@ module.exports = {
       if (valido) {
         res.status(200).json({
           success: true,
-          mensaje: 'Código válido',
+          message: 'Código válido',
         });
       } else {
-        res.status(400).json({
+        res.status(200).json({
           success: false,
-          error: 'Código inválido o expirado',
+          message: 'Código inválido o expirado',
         });
       }
     } catch (error) {
@@ -324,5 +330,68 @@ module.exports = {
       });
     }
   },
+  
+  async cambiarClave(req, res) {
+    console.log("datos para cambiar clave: ", req.body);
+    try {
+      const usuarioActualizador = req.user?.id_usuario || 1;
+      const body = req.body;
+      const params = {
+        ...body,
+        act_usuario: usuarioActualizador
+      };
+
+      const result = await authService.cambiarClave(params);
+      if (!result.success) {
+        return res.status(200).json({
+          success: false,
+          message: result.message,
+        });
+      }
+      res.status(201).json({
+        success: true,
+        message: "Clave cambia da con exito",
+        // Si quieres, puedes enviar también el código aquí:
+        // codigo: resultado.codigo
+      });
+
+
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error al cambiar clave',
+        error: err.message,
+      });
+    }
+  },
+
+  async verificarCorreoYSolicitarCodigo(req, res) {
+    try {
+      const { correo } = req.body;
+
+      const resultado = await authService.verificarCorreoYSolicitarCodigo(correo);
+
+      if (!resultado.success) {
+        return res.status(200).json({
+          success: false,
+          message: resultado.message,
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Código enviado al correo",
+        // Si quieres, puedes enviar también el código aquí:
+        // codigo: resultado.codigo
+      });
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  }
 
 };
