@@ -35,7 +35,7 @@ Veterinario.MascotasAgendadas = async (id_usuario) => {
         JOIN personas pc ON cl.persona_id = pc.id_persona
         JOIN mascotas m ON c.mascota_id = m.id_mascota
         JOIN razas r ON m.raza_id = r.id_raza
-        WHERE u.id_usuario = 5
+        WHERE u.id_usuario = ?
           AND c.estado_cita = 'Pendiente'
           AND m.estado = 'A'
           AND r.estado = 'A'

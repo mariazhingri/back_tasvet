@@ -238,6 +238,7 @@ formularios.obtenerEmpleados = async (params) => {
             INNER JOIN personas p on e.persona_id = p.id_persona
             where e.estado = 'A'
             AND p.estado = 'A'
+            AND e.cargo NOT IN ('Auxiliar');
             `;
     const [rows] = await db.query(sql);
     return rows;

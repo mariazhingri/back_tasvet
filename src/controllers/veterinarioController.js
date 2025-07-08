@@ -5,7 +5,9 @@ module.exports = {
     // Esta función utiliza el id_usuario del token para filtrar las mascotas
     async MascotasAgendadas (req, res) {
         try {
+           
             const id_usuario = req.user?.id_usuario;
+             console.log("id veterinario: ", id_usuario)
             const mascotas = await VeterinarioModel.MascotasAgendadas(id_usuario);
             return res.status(201).json({
                 success: true,
