@@ -181,7 +181,7 @@ module.exports = {
     return servicios;
   },
 
-  async eliminarServicioDeCita({IdCita, IdServicio}){
+  async eliminarServicioDeCita({ IdCita, IdServicio }) {
 
     // const userRol = await Usuarios.findUsuario({ id_usuario: user });
     // if (userRol.rol_id !== 1 && userRol.rol_id !== 2) {
@@ -194,7 +194,7 @@ module.exports = {
     return eliminar
   },
 
-  async agregarServicioaCita(params){
+  async agregarServicioaCita(params) {
     const user = params.reg_usuario;
 
     const empleado = await empleadoModel.obtenerempleadoPorUsuario(user);
@@ -211,6 +211,27 @@ module.exports = {
     return eliminar
 
   },
+
+  //para insumos
+  async agregarVacunas(params) {
+    const response = await Servicio.crearVacunas(params);
+    return response;
+
+  },
+
+  async actualizarVacunas(params) {
+    const response = await Servicio.actualizarVacuna(params);
+    return response;
+
+  },
+
+
+  async eliminarVacunas(id_vacuna, act_usuario) {
+    const response = await Servicio.eliminarVacuna(id_vacuna, act_usuario);
+    return response;
+
+  },
+
 
 
 };

@@ -250,67 +250,163 @@ module.exports = {
     }
   },
 
-  
-async eliminarServicioDeCita(req, res) {
-  try {
-    const { IdCita, IdServicio } = req.params;
-    console.log('data: ', req.params)
 
-    console.log("cita_id:", IdCita, "servicio_id:", IdServicio);
+  async eliminarServicioDeCita(req, res) {
+    try {
+      const { IdCita, IdServicio } = req.params;
+      console.log('data: ', req.params)
 
-    const eliminar = await servicioService.eliminarServicioDeCita({ IdCita, IdServicio });
+      console.log("cita_id:", IdCita, "servicio_id:", IdServicio);
 
-    res.status(200).json({
-      success: true,
-      data: eliminar
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error?.message || 'Error interno del servidor'
-    });
-  }
-},
-async agregarServicioaCita(req, res) {
-  try {
-    const usuario_creador = req.user?.id_usuario;
-    const body = req.body;
+      const eliminar = await servicioService.eliminarServicioDeCita({ IdCita, IdServicio });
 
-    const params = {
-      ...body,
-      reg_usuario: usuario_creador
+      res.status(200).json({
+        success: true,
+        data: eliminar
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error?.message || 'Error interno del servidor'
+      });
     }
-    console.log('data: ', params)
-    const agregarServicio = await servicioService.agregarServicioaCita(params);
+  },
+  async agregarServicioaCita(req, res) {
+    try {
+      const usuario_creador = req.user?.id_usuario;
+      const body = req.body;
 
-    res.status(200).json({
-      success: true,
-      data: agregarServicio
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error?.message || 'Error interno del servidor'
-    });
-  }
-},
-// -------Graficas -----
-async obtenerServiciosMasSolicitados(req, res) {
-  try {
-    const { anio } = req.params;
-    const servicios = await servicioModel.obtenerServiciosMasSolicitados(anio);
-    return res.status(200).json({
-      success: true,
-      data: servicios,
-    });
-  } catch (error) {
-    console.error('Error al obtener los servicios más solicitados:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message,
-    });
-  }
-},
+      const params = {
+        ...body,
+        reg_usuario: usuario_creador
+      }
+      console.log('data: ', params)
+      const agregarServicio = await servicioService.agregarServicioaCita(params);
+
+      res.status(200).json({
+        success: true,
+        data: agregarServicio
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error?.message || 'Error interno del servidor'
+      });
+    }
+  },
+  // -------Graficas -----
+  async obtenerServiciosMasSolicitados(req, res) {
+    try {
+      const { anio } = req.params;
+      const servicios = await servicioModel.obtenerServiciosMasSolicitados(anio);
+      return res.status(200).json({
+        success: true,
+        data: servicios,
+      });
+    } catch (error) {
+      console.error('Error al obtener los servicios más solicitados:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  //PARA INSURMOS 
+  async agregarVacuna(req, res) {
+    try {
+      const usuario_creador = req.user?.id_usuario;
+      const body = req.body;
+
+      console.log('Body recibido:', req.body);
+
+      const params = {
+        ...body,
+        reg_usuario: usuario_creador
+      }
+      console.log('data: ', params)
+      const agregarServicio = await servicioService.agregarVacunas(params);
+
+      res.status(200).json({
+        success: true,
+        data: agregarServicio
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error?.message || 'Error interno del servidor'
+      });
+    }
+  },
+
+  async obtenerVacunas(req, res) {
+    try {
+      const servicios = await servicioModel.obtenerVacunas();
+      return res.status(200).json({
+        success: true,
+        data: servicios,
+      });
+    } catch (error) {
+      console.error('Error al obtener los vacunas regristradas:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  async actualizarVacuna(req, res) {
+    try {
+      const usuario_creador = req.user?.id_usuario;
+      const body = req.body;
+
+      console.log('Body recibido:', req.body);
+
+      const params = {
+        ...body,
+        act_usuario: usuario_creador
+      }
+      console.log('data: ', params)
+      const agregarServicio = await servicioService.actualizarVacunas(params);
+
+      res.status(200).json({
+        success: true,
+        data: agregarServicio
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error?.message || 'Error interno del servidor'
+      });
+    }
+  },
+
+  async eliminarVacuna(req, res) {
+    try {
+      const usuario_eliminador = req.user?.id_usuario;
+      const { id_vacuna } = req.body;
+      const response = await servicioService.eliminarVacunas(
+        id_vacuna,
+        usuario_eliminador,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Vacuna eliminado exitosamente",
+        data: response
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+        error: error.message,
+      });
+    }
+  },
+
+
 
 };

@@ -129,7 +129,7 @@ Servicios.eliminarServicioV2 = async (id_servicio, eli_usuario) => {
 };
 
 Servicios.crearDetalleServicio = async (params) => {
-  console.log('Crear detalle_servicio con:', params);
+  console.log('Crear vacuna con:', params);
   try {
     const currentDate = new Date();
     const sql = `
@@ -273,5 +273,114 @@ Servicios.obtenerServiciosMasSolicitados = async (anio) => {
     throw error;
   }
 };
+
+Servicios.crearVacunas = async (params) => {
+  console.log('Crear detalle_servicio con:', params);
+  try {
+    const currentDate = new Date();
+    const sql = `
+            INSERT INTO vacunas (nombre_vacuna, descripcion, lote, fecha_vencimiento, estado, reg_fecha, reg_usuario)
+            VALUES (?,?,?,?, ?, ?, ?)`;
+    const [result] = await db.query(sql, [
+      params.nombre_vacuna,
+      params.descripcion,
+      params.lote,
+      params.fecha_vencimiento,
+      'A',
+      currentDate,
+      params.reg_usuario,
+    ]);
+
+    return result.insertId;
+  } catch (error) {
+    throw error;
+  }
+};
+
+Servicios.obtenerVacunas = async () => {
+  try {
+    const sql = `
+        SELECT 
+          v.id_vacuna, 
+          v.nombre_vacuna, 
+          v.descripcion, 
+          v.lote, 
+          v.fecha_vencimiento, 
+          v.estado
+        FROM vacunas v
+        WHERE v.estado = 'A'
+        ORDER BY v.id_vacuna DESC
+      `;
+    const [rows] = await db.query(sql);
+    console.log('-------->>>  serviciosObteniendo vacunas', rows);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+Servicios.actualizarVacuna = async (params) => {
+  console.log('Actualizar vacuna con:', params);
+  try {
+    const currentDate = new Date();
+    const sql = `
+      UPDATE vacunas
+      SET 
+        nombre_vacuna = ?,
+        descripcion = ?,
+        lote = ?,
+        fecha_vencimiento = ?,
+        estado = ?,
+        reg_fecha = ?,
+        reg_usuario = ?
+      WHERE id_vacuna = ?
+    `;
+
+    const [result] = await db.query(sql, [
+      params.nombre_vacuna,
+      params.descripcion,
+      params.lote,
+      params.fecha_vencimiento,
+      'A',
+      currentDate,
+      params.reg_usuario,
+      params.id_vacuna,
+    ]);
+
+    return result.affectedRows; // filas afectadas en UPDATE
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+Servicios.eliminarVacuna = async (id_vacuna, act_usuario) => {
+  console.log('Eliminando vacuna (lógico) con ID:', id_vacuna);
+  try {
+    const currentDate = new Date();
+    const sql = `
+      UPDATE vacunas
+      SET 
+        estado = 'I',
+        eli_fecha = ?,
+        eli_usuario = ?
+      WHERE id_vacuna = ?
+    `;
+
+    const [result] = await db.query(sql, [
+      currentDate,
+      act_usuario,
+      id_vacuna,
+    ]);
+
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
 
 module.exports = Servicios;

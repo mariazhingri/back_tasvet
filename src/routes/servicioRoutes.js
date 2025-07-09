@@ -24,13 +24,13 @@ module.exports = (app) => {
     "/api/servicio/eliminar/:IdCita/:IdServicio",
     verificarToken,
     ServicioController.eliminarServicioDeCita,
-  ); 
+  );
 
   app.post(
     "/api/servicio/agregar",
     verificarToken,
     ServicioController.agregarServicioaCita,
-  ); 
+  );
 
   // Rutas para la versión 2 de los servicios :)
   app.post('/servicio/crearV2', verificarToken, ServicioController.crearServicioV2);
@@ -38,5 +38,26 @@ module.exports = (app) => {
 
   //------GRAFICAS ------
   app.get('/servicio/graficas/masSolicitados/:anio', verificarToken, ServicioController.obtenerServiciosMasSolicitados);
+
+  //para INSUMOS 
+  app.post(
+    "/api/insumos/vacuna/agregar",
+    verificarToken,
+    ServicioController.agregarVacuna,
+  );
+  app.get('/insumos/vacunas/obtener', verificarToken, ServicioController.obtenerVacunas);
+
+  app.post(
+    "/api/insumos/vacuna/actualizar",
+    verificarToken,
+    ServicioController.actualizarVacuna,
+  );
+
+
+  app.put(
+    "/api/insumos/delete/vacuna",
+    verificarToken,
+    ServicioController.eliminarVacuna,
+  );
 
 };
