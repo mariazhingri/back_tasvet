@@ -41,4 +41,8 @@ module.exports = (app) => {
   app.get('/api/veterinario/obtener/canceladas', verificarToken, empleadoController.obtenerCitasCanceladas);
   app.get('/api/veterinario/obtener/atendidas', verificarToken, empleadoController.obtenerCitasAtendidas);
 
+    // -----------CONSULTA solo para el admin-------------------
+  app.get('/api/veterinario/obtener/empleados', verificarToken, empleadoController.obtenerEmpleados);
+  app.get('/api/veterinario/obtener/cargo_empleados', verificarToken, empleadoController.obtenerCargoDeEmpleados);
+
 }

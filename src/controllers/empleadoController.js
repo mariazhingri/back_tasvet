@@ -193,6 +193,40 @@ module.exports = {
       });
     }
   },
-
-
+/* -Esto solo lo puede ver el admin, es el lstado ed empleados con sus datos */
+ async obtenerEmpleados(req, res){
+  try{
+    let id_usuario = req.user?.id_usuario;
+    const empleados = await EmpleadoModel.obtenerEmpleados();
+    res.status(200).json({
+        success: true,
+        data: empleados,
+      });
+  }catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+ },
+  async obtenerCargoDeEmpleados(req, res){
+  try{
+    let id_usuario = req.user?.id_usuario;
+    const CardoDeEmpleados = await EmpleadoModel.obtenerCargoDeEmpleados();
+    console.log("roles de empleados: ", CardoDeEmpleados)
+    res.status(200).json({
+        success: true,
+        data: CardoDeEmpleados,
+      });
+  }catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+ },
 }

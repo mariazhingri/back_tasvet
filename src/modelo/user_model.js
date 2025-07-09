@@ -391,5 +391,33 @@ Usuarios.cambiarClave = async (params) => {
     throw err;
   }
 };
+// HACER UNA INSERCION A LA TABLA USUARIOS
+Usuarios.crearUsuario = async (params) => {
+  console.log("crear Usuario: ", params);
+  try {
+    const currentDate = new Date()
+    const sql = `
+        INSERT INTO usuarios (
+                  rol_id,
+                  persona_id,
+                  clave,
+                  estado,
+                  reg_fecha,
+                  reg_usuario
+                ) VALUES (?,?,?,?,?,?)
+    `;
+    const [result] = await db.query(sql, [
+      params.rol_id, 
+      params.persona_id,
+      params.clave,
+      'A',
+      currentDate,
+      params.reg_usuario
+    ]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
 
 module.exports = Usuarios;

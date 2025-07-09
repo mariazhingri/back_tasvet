@@ -2,6 +2,7 @@ const db = require("../config/conexion");
 const Persona = {};
 
 Persona.crearPersona = async (params) => {
+  console.log("data persona: ", params)
   const currentDate = new Date();
   const sql = `
     INSERT INTO personas (

@@ -33,5 +33,27 @@ module.exports = {
         } catch (error) {
             res.status(500).json({ error: "Error al obtener las citas de atención veterinaria" });
         }
+    },
+
+        async CrearVeterinario (req, res) {
+        try {
+            const id_usuario = req.user?.id_usuario;
+            const body = req.body
+            const params = {
+                ...body,
+                reg_usuario: id_usuario
+            }
+            const veterinario = await VeterinarioService.CrearVeterinario(params);
+            return res.status(200).json({
+                success: true,
+                message: 'Vetereinario creado',
+                data: veterinario,
+            });
+        } catch (error) {
+            res.status(500).json({ 
+                error: "Error al crear Empleado",
+                message: error.message
+            });
+        }
     }
 };

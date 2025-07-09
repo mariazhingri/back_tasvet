@@ -6,13 +6,14 @@ const empleados = {};
 empleados.obtenerEmpleados = async () => {
   try {
     const sql = `
-            select id_empleado, p.nombre,p.apellido,e.cargo, e.descripcion
+            select id_empleado, p.nombre,p.apellido,p.cedula,p.telefono_1,e.cargo, e.descripcion
             from empleados e
             INNER JOIN personas p on e.persona_id = p.id_persona
             where e.estado = 'A'
             AND p.estado = 'A'
             `;
     const [rows] = await db.query(sql);
+    console.log("Lista Empleados: ", rows)
     return rows;
   } catch (error) {
     throw error;
@@ -563,9 +564,44 @@ empleados.obtenerCitasAtendidas = async (id_usuario) => {
     throw error;
   }
 
-
 };
+empleados.obtenerCargoDeEmpleados = async () => {
+  try{
+    const sql = `select  id_rol, descripcion 
+        from roles r`
+    const [rows] = await db.query(sql);
+    console.log('Roles obtenidos:', rows);
+    return rows
+  }catch (error) {
+    throw error;
+  }
+}
 
-
+/*---------funcion para crear un empleado-------- */
+empleados.CrearEmpleado = async (params) => {
+  console.log("data empleado: ", params)
+  try{
+    const currentDate = new Date();
+    const sql = `INSERT INTO empleados (
+                  persona_id,
+                  cargo,
+                  descripcion,
+                  estado,
+                  reg_fecha,
+                  reg_usuario
+                ) VALUES (?,?,?,?,?,?)`
+    const [rows] = await db.query(sql,[
+      params.persona_id,
+      params.cargo,
+      params.descripcion,
+      'A',
+      currentDate,
+      params.reg_usuario
+    ]);
+    return rows
+  }catch (error) {
+    throw error;
+  }
+}
 
 module.exports = empleados;
