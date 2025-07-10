@@ -1,4 +1,7 @@
 const EmpleadoModel = require("../modelo/empleado_model");
+const PersonaModel = require("../modelo/persona_model");
+const UsuarioModel = require("../modelo/user_model");
+const bcrypt = require("bcryptjs");
 
 module.exports = {
   async obtenerCitasPorEmpleados(params) {
@@ -123,6 +126,82 @@ module.exports = {
     }
   },
 
+  async CrearEmpleado (params) {
+    console.log('Crear empleado: ', params);
+    const Persona = await PersonaModel.crearPersona({
+      cedula: params.cedula,
+      correo: params.correo,
+      nombre: params.nombre,
+      apellido: params.apellido,
+      telefono_1:params.telefono_1,
+      telefono_2: params.telefono_2 
+    });
+
+    const empleado = await EmpleadoModel.CrearEmpleado({
+      persona_id: Persona,
+      cargo: params.cargo,
+      descripcion: params.descripcion,
+      reg_usuario: params.reg_usuario
+    });
+    console.log("clave: ", params.clave)
+
+
+    const salt = bcrypt.genSaltSync(10);
+    const claveEncriptada = bcrypt.hashSync(params.clave, salt);
+
+    const Usuario = await UsuarioModel.crearUsuario({
+      rol_id: params.id_rol,
+      persona_id: Persona,
+      clave: claveEncriptada,
+      reg_usuario: params.reg_usuario
+    })
+
+    return {
+      success: true,
+      message: 'Veterinario creado exitosamente',
+      //data: agrupadas
+    };
+  },
+
+  async EditarEmpleado (params) {
+    console.log('Crear empleado: ', params);
+    const Persona = await PersonaModel.crearPersona({
+      cedula: params.cedula,
+      correo: params.correo,
+      nombre: params.nombre,
+      apellido: params.apellido,
+      telefono_1:params.telefono_1,
+      telefono_2: params.telefono_2 
+    });
+
+    return {
+      success: true,
+      message: 'Veterinario creado exitosamente',
+      data: Persona
+    };
+  },
+
+    async darDeBajaEmpleado (params) {
+    console.log('Dar de bajaServices: ', params);
+    const Persona = await PersonaModel.darDeBajaPersona({
+      eli_usuario: params.eli_usuario,
+      id_persona: params.id_persona
+    });
+
+    const empleado = await EmpleadoModel.darDeBajaEmpleado({
+       eli_usuario: params.eli_usuario,
+      id_empleado: params.id_empleado
+    })
+    const usuario = await UsuarioModel.darDeBajaUsuario({
+       eli_usuario: params.eli_usuario,
+      id_usuario: params.id_usuario
+    })
+    return {
+      success: true,
+      message: 'eliminado exitosamente',
+      data: Persona, empleado, usuario
+    };
+  },
 }
 
 const agruparCitas = (filas) => {

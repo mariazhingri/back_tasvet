@@ -420,4 +420,25 @@ Usuarios.crearUsuario = async (params) => {
   }
 };
 
+Usuarios.darDeBajaUsuario = async (params) => {
+  console.log("crear Usuario: ", params);
+  try {
+    const currentDate = new Date()
+    const sql = `UPDATE usuarios 
+                  SET estado = ?, 
+                      eli_fecha = ?, 
+                      eli_usuario = ?
+                  WHERE id_usuario = ?`;
+    const [result] = await db.query(sql, [
+      'I',
+      currentDate,
+      params.eli_usuario,
+      params.id_usuario
+    ]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = Usuarios;

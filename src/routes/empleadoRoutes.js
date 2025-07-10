@@ -28,6 +28,10 @@ module.exports = (app) => {
     empleadoController.obtenerCitasPorRangoFechaIdUsuario,
   );
 
+  app.post('/api/empleado/crear', verificarToken, empleadoController.CrearEmpleado);
+  app.put('/api/empleado/editar', verificarToken, empleadoController.EditarEmpleado);
+  app.put('/api/empleado/darDeBaja', verificarToken, empleadoController.darDeBajaEmpleado);
+
   // -----GRAFICAS -----
   app.get(
     "/api/empleado/obtener/citas/atendidas/mes/:anio",
@@ -44,5 +48,7 @@ module.exports = (app) => {
     // -----------CONSULTA solo para el admin-------------------
   app.get('/api/veterinario/obtener/empleados', verificarToken, empleadoController.obtenerEmpleados);
   app.get('/api/veterinario/obtener/cargo_empleados', verificarToken, empleadoController.obtenerCargoDeEmpleados);
+
+
 
 }

@@ -1,5 +1,9 @@
 const EmpleadoServices = require("../services/empleadoServices");
 const EmpleadoModel = require("../modelo/empleado_model");
+const VeterinarioService = require("../services/veterinarioService");
+const empleadoServices = require("../services/empleadoServices");
+const personaModel = require("../modelo/persona_model")
+
 module.exports = {
   async obtenerCitasPorEmpleados(req, res) {
     console.log("Iniciando obtenerCitasPorEmpleados");
@@ -193,8 +197,8 @@ module.exports = {
       });
     }
   },
-/* -Esto solo lo puede ver el admin, es el lstado ed empleados con sus datos */
- async obtenerEmpleados(req, res){
+/* -Esto solo lo puede ver el admin, es el listado de empleados con sus datos */
+async obtenerEmpleados(req, res){
   try{
     let id_usuario = req.user?.id_usuario;
     const empleados = await EmpleadoModel.obtenerEmpleados();
@@ -229,4 +233,71 @@ module.exports = {
       });
     }
  },
+
+  async CrearEmpleado (req, res) {
+    try {
+        const id_usuario = req.user?.id_usuario;
+        const body = req.body
+        const params = {
+            ...body,
+            reg_usuario: id_usuario
+        }
+        const veterinario = await empleadoServices.CrearEmpleado(params);
+        return res.status(200).json({
+            success: true,
+            message: 'Vetereinario creado',
+            data: veterinario,
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            error: "Error al crear Empleado",
+            message: error.message
+        });
+    }
+},
+  async EditarEmpleado (req, res) {
+    try {
+        const id_usuario = req.user?.id_usuario;
+        const body = req.body
+        console.log("empleado a editar: ", body)
+        const params = {
+            ...body,
+            reg_usuario: id_usuario
+        }
+        const veterinario = await personaModel.actualizarPersona(params);
+        return res.status(200).json({
+            success: true,
+            message: 'Empleado editado exitosamente',
+            data: veterinario,
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            error: "Error al editar Empleado",
+            message: error.message
+        });
+    }
+},
+
+async darDeBajaEmpleado (req, res) {
+    try {
+        const id_usuario = req.user?.id_usuario;
+        const body = req.body
+        console.log("empleado a dar de baja: ", body)
+        const params = {
+            ...body,
+            eli_eliminar: id_usuario
+        } 
+        const empleado = await empleadoServices.darDeBajaEmpleado(params);
+        return res.status(200).json({
+            success: true,
+            message: 'Empleado eliminado exitosamente',
+            data: empleado,
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            error: "Error al eliminar Empleado",
+            message: error.message
+        });
+    }
+  }
 }

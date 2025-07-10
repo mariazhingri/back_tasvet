@@ -30,6 +30,7 @@ Persona.crearPersona = async (params) => {
 };
 
 Persona.actualizarPersona = async (params) => {
+  console.log("Empleado a editar MOdel: ", params);
   try {
     console.log("👉 Recibido en actualizarPersona:", params);
     const currentDate = new Date();
@@ -53,6 +54,31 @@ Persona.actualizarPersona = async (params) => {
       params.telefono_2,
       currentDate,
       params.act_usuario,
+      params.id_persona,
+    ]);
+
+    // Devuelve true si se actualizó al menos una fila
+    return result.affectedRows > 0;
+  } catch (error) {
+    console.error("Error en Persona.updatePersona:", error);
+    throw error;
+  }
+};
+
+Persona.darDeBajaPersona = async (params) => {
+  console.log("Empleado a editar MOdel: ", params);
+  try {
+    console.log("👉 Recibido en DarDeBajaPersona:", params);
+    const currentDate = new Date();
+    const sql = ` UPDATE personas 
+                  SET estado = ?, 
+                      eli_fecha = ?, 
+                      eli_usuario = ?
+                  WHERE id_persona = ?`;
+    const [result] = await db.query(sql, [
+      'I',
+      currentDate,
+      params.eli_usuario,
       params.id_persona,
     ]);
 

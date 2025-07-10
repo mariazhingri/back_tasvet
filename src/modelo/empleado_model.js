@@ -6,9 +6,10 @@ const empleados = {};
 empleados.obtenerEmpleados = async () => {
   try {
     const sql = `
-            select id_empleado, p.nombre,p.apellido,p.cedula,p.telefono_1,e.cargo, e.descripcion
+            select e.id_empleado, p.id_persona, u.id_usuario ,p.nombre,p.apellido,p.cedula,p.telefono_1,e.cargo, e.descripcion
             from empleados e
             INNER JOIN personas p on e.persona_id = p.id_persona
+            inner join usuarios u on p.id_persona = u.persona_id
             where e.estado = 'A'
             AND p.estado = 'A'
             `;
@@ -597,6 +598,27 @@ empleados.CrearEmpleado = async (params) => {
       'A',
       currentDate,
       params.reg_usuario
+    ]);
+    return rows
+  }catch (error) {
+    throw error;
+  }
+}
+
+empleados.darDeBajaEmpleado = async (params) => {
+  console.log("data eliminar empleado: ", params)
+  try{
+    const currentDate = new Date();
+    const sql = `UPDATE empleados 
+                  SET estado = ?, 
+                      eli_fecha = ?, 
+                      eli_usuario = ?
+                  WHERE id_empleado = ?`
+    const [rows] = await db.query(sql,[
+      'I',
+      currentDate,
+      params.eli_usuario,
+      params.id_empleado
     ]);
     return rows
   }catch (error) {
