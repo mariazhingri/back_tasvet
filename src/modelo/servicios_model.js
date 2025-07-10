@@ -275,7 +275,7 @@ Servicios.obtenerServiciosMasSolicitados = async (anio) => {
 };
 
 Servicios.crearVacunas = async (params) => {
-  console.log('Crear detalle_servicio con:', params);
+  // console.log('Crear detalle_servicio con:', params);
   try {
     const currentDate = new Date();
     const sql = `
@@ -312,7 +312,7 @@ Servicios.obtenerVacunas = async () => {
         ORDER BY v.id_vacuna DESC
       `;
     const [rows] = await db.query(sql);
-    console.log('-------->>>  serviciosObteniendo vacunas', rows);
+    // console.log('-------->>>  serviciosObteniendo vacunas', rows);
     return rows;
   } catch (error) {
     throw error;
@@ -321,7 +321,7 @@ Servicios.obtenerVacunas = async () => {
 
 
 Servicios.actualizarVacuna = async (params) => {
-  console.log('Actualizar vacuna con:', params);
+  // console.log('Actualizar vacuna con:', params);
   try {
     const currentDate = new Date();
     const sql = `
@@ -348,7 +348,7 @@ Servicios.actualizarVacuna = async (params) => {
       params.id_vacuna,
     ]);
 
-    return result.affectedRows; // filas afectadas en UPDATE
+    return result.affectedRows;
   } catch (error) {
     throw error;
   }
@@ -356,7 +356,7 @@ Servicios.actualizarVacuna = async (params) => {
 
 
 Servicios.eliminarVacuna = async (id_vacuna, act_usuario) => {
-  console.log('Eliminando vacuna (lógico) con ID:', id_vacuna);
+  // console.log('Eliminando vacuna (lógico) con ID:', id_vacuna);
   try {
     const currentDate = new Date();
     const sql = `
@@ -379,6 +379,126 @@ Servicios.eliminarVacuna = async (id_vacuna, act_usuario) => {
     throw error;
   }
 };
+
+
+//antiparasitarios --------------------------------------
+Servicios.crearAntiparasitario = async (params) => {
+  // console.log('Crear antiparasitario con:', params);
+  try {
+    const currentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const fecha_vencimiento = params.fecha_vencimiento.split('T')[0];
+
+    console.log('Fecha actual:', currentDate);
+    console.log('Fecha vencimiento:', fecha_vencimiento);
+
+    const sql = `
+      INSERT INTO antiparasitarios 
+      (nombre_antiparasitario, descripcion, lote, fecha_vencimiento, estado, reg_fecha, reg_usuario)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await db.query(sql, [
+      params.nombre_antiparasitario,
+      params.descripcion,
+      parseInt(params.lote),
+      fecha_vencimiento,
+      'A',
+      currentDate,
+      params.reg_usuario
+    ]);
+
+    console.log('Antiparasitario creado con ID:', result.insertId);
+    return result.insertId;
+  } catch (error) {
+    console.error('Error al crear antiparasitario:', error.message, error.stack);
+    throw error;
+  }
+};
+
+Servicios.obtenerAntiparasitarios = async () => {
+  try {
+    const sql = `
+        SELECT 
+          a.id_antiparasitario, 
+          a.nombre_antiparasitario, 
+          a.descripcion, 
+          a.lote, 
+          a.fecha_vencimiento, 
+          a.estado
+        FROM antiparasitarios a
+        WHERE a.estado = 'A'
+        ORDER BY a.id_antiparasitario DESC
+      `;
+    const [rows] = await db.query(sql);
+    console.log('-------->>>  serviciosObteniendo antiparasitarios', rows);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+Servicios.actualizarAntiparasitario = async (params) => {
+  // console.log('Actualizar antiparasitarios con:', params);
+  try {
+    const currentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const fecha_vencimiento = params.fecha_vencimiento.split('T')[0];
+
+    const sql = `
+      UPDATE antiparasitarios
+      SET 
+        nombre_antiparasitario = ?,
+        descripcion = ?,
+        lote = ?,
+        fecha_vencimiento = ?,
+        estado = ?,
+        reg_fecha = ?,
+        reg_usuario = ?
+      WHERE id_antiparasitario = ?
+    `;
+
+    const [result] = await db.query(sql, [
+      params.nombre_antiparasitario,
+      params.descripcion,
+      params.lote,
+      fecha_vencimiento,
+      'A',
+      currentDate,
+      params.reg_usuario,
+      params.id_antiparasitario,
+    ]);
+
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+Servicios.eliminarAntiparasitario = async (id_antiparasitario, act_usuario) => {
+  // console.log('Eliminando antiparasitario (lógico) con ID:', id_antiparasitario);
+  try {
+    const currentDate = new Date();
+    const sql = `
+      UPDATE antiparasitarios
+      SET estado = 'I',
+        eli_fecha = ?,
+        eli_usuario = ?
+      WHERE id_antiparasitario = ?
+    `;
+
+    const [result] = await db.query(sql, [
+      currentDate,
+      act_usuario,
+      id_antiparasitario,
+    ]);
+
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 
 
 

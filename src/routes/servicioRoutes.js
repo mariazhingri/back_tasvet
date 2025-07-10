@@ -60,4 +60,25 @@ module.exports = (app) => {
     ServicioController.eliminarVacuna,
   );
 
+  //antiparasitarios
+  app.post(
+    "/api/insumos/antiparasitario/agregar",
+    verificarToken,
+    ServicioController.agregarAntiparasitario,
+  );
+  app.get('/insumos/antiparasitario/obtener', verificarToken, ServicioController.obtenerAntiparasitarios);
+
+  app.post(
+    "/api/insumos/antiparasitario/actualizar",
+    verificarToken,
+    ServicioController.actualizarAntiparasitario,
+  );
+
+  app.put(
+    "/api/insumos/delete/antiparasitario",
+    verificarToken,
+    ServicioController.eliminarAntiparasitario,
+  );
+
+
 };
