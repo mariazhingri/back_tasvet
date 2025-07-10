@@ -1,6 +1,7 @@
 const Usuarios = require('../modelo/user_model');
 const Servicio = require('../modelo/servicios_model');
 const empleadoModel = require('../modelo/empleado_model');
+const { eliminarAntiparasitario } = require('../controllers/ServicioController');
 module.exports = {
   async obtenerServicios(id_usuario) {
     if (!id_usuario) {
@@ -231,6 +232,27 @@ module.exports = {
     return response;
 
   },
+
+  //antiparasitarios
+  async agregarAntiparasitario(params) {
+    const response = await Servicio.crearAntiparasitario(params);
+    return response;
+
+  },
+
+  async actualizarAntiparasitario(params) {
+    const response = await Servicio.actualizarAntiparasitario(params);
+    return response;
+
+  },
+
+
+  async eliminarAntiparasitarios(id_antiparasitario, act_usuario) {
+    const response = await Servicio.eliminarAntiparasitario(id_antiparasitario, act_usuario);
+    return response;
+
+  },
+
 
 
 

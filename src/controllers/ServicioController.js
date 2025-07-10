@@ -407,6 +407,102 @@ module.exports = {
     }
   },
 
+  //antiparasitarios
+  async agregarAntiparasitario(req, res) {
+    try {
+      const usuario_creador = req.user?.id_usuario;
+      const body = req.body;
+
+      console.log('Body recibido:', req.body);
+
+      const params = {
+        ...body,
+        reg_usuario: usuario_creador
+      }
+      console.log('data: ', params)
+      const agregarServicio = await servicioService.agregarAntiparasitario(params);
+
+      res.status(200).json({
+        success: true,
+        data: agregarServicio
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error?.message || 'Error interno del servidor'
+      });
+    }
+  },
+
+  async obtenerAntiparasitarios(req, res) {
+    try {
+      const servicios = await servicioModel.obtenerAntiparasitarios();
+      return res.status(200).json({
+        success: true,
+        data: servicios,
+      });
+    } catch (error) {
+      console.error('Error al obtener los vacunas regristradas:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      });
+    }
+  },
+
+  async actualizarAntiparasitario(req, res) {
+    try {
+      const usuario_creador = req.user?.id_usuario;
+      const body = req.body;
+
+      console.log('Body recibido:', req.body);
+
+      const params = {
+        ...body,
+        act_usuario: usuario_creador
+      }
+      console.log('data: ', params)
+      const agregarServicio = await servicioService.actualizarAntiparasitario(params);
+
+      res.status(200).json({
+        success: true,
+        data: agregarServicio
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error?.message || 'Error interno del servidor'
+      });
+    }
+  },
+
+  async eliminarAntiparasitario(req, res) {
+    try {
+      const usuario_eliminador = req.user?.id_usuario;
+      const { id_antiparasitario } = req.body;
+      console.log('ID Antiparasitario recibido:', id_antiparasitario);
+      const response = await servicioService.eliminarAntiparasitarios(
+        id_antiparasitario,
+        usuario_eliminador,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Antiparasitario eliminado exitosamente",
+        data: response
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+        error: error.message,
+      });
+    }
+  },
+
+
 
 
 };
