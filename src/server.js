@@ -13,11 +13,17 @@ const historialClinicoRoutes = require('./routes/historialClinicoRoutes');
 const empleados = require('./routes/empleadoRoutes')
 const auxiliar = require('./routes/auxiliarRoutes')
 const veterinario = require('./routes/veterinarioRoutes');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 require('./services/task/actualizarCitasRetrasadas');
 
 const app = express();
 const port = 5000;
+//const port = process.env.PORT || 5000;
+
+
 
 // Middleware
 app.use(
