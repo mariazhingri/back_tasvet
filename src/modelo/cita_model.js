@@ -262,7 +262,7 @@ Citas.getCitasByDate = async (fecha) => {
         AND p.estado = 'A'
         AND m.estado = 'A'
         AND r.estado = 'A'
-        AND DATE(ds.fecha_hora_inicio) = '2025-07-11'
+        AND DATE(ds.fecha_hora_inicio) = ?
       GROUP BY c.id_cita, c.estado_cita,
               m.nombre_mascota, m.especie,
               r.nombre_raza,
