@@ -246,13 +246,13 @@ Citas.getCitasByDate = async (fecha) => {
   try {
     const sql = `
       SELECT c.id_cita, c.estado_cita,
-             m.nombre_mascota, m.especie,
-             r.nombre_raza,
-             p.nombre, p.apellido, p.telefono_1,
-             cl.direccion,
-             ds.fecha_hora_inicio
+       m.nombre_mascota, m.especie,
+       r.nombre_raza,
+       p.nombre, p.apellido, p.telefono_1,
+       cl.direccion,
+       MIN(ds.fecha_hora_inicio) AS fecha_inicio
       FROM citas c
-      inner join detalle_servicios ds on c.id_cita = ds.cita_id
+      INNER JOIN detalle_servicios ds ON c.id_cita = ds.cita_id
       INNER JOIN clientes cl ON c.cliente_id = cl.id_cliente
       INNER JOIN personas p ON cl.persona_id = p.id_persona
       INNER JOIN mascotas m ON c.mascota_id = m.id_mascota
@@ -262,9 +262,12 @@ Citas.getCitasByDate = async (fecha) => {
         AND p.estado = 'A'
         AND m.estado = 'A'
         AND r.estado = 'A'
-        AND DATE(ds.fecha_hora_inicio) = ?
-      GROUP BY c.id_cita
-    `;
+        AND DATE(ds.fecha_hora_inicio) = '2025-07-11'
+      GROUP BY c.id_cita, c.estado_cita,
+              m.nombre_mascota, m.especie,
+              r.nombre_raza,
+              p.nombre, p.apellido, p.telefono_1,
+              cl.direccion`;
 
     const [rows] = await db.query(sql, [fecha]);
     console.log('Rows obtenidos:', rows);
