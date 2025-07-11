@@ -250,7 +250,7 @@ Citas.getCitasByDate = async (fecha) => {
        r.nombre_raza,
        p.nombre, p.apellido, p.telefono_1,
        cl.direccion,
-       MIN(ds.fecha_hora_inicio) AS fecha_inicio
+       MIN(ds.fecha_hora_inicio) AS fecha_hora_inicio
       FROM citas c
       INNER JOIN detalle_servicios ds ON c.id_cita = ds.cita_id
       INNER JOIN clientes cl ON c.cliente_id = cl.id_cliente
